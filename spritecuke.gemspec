@@ -6,12 +6,12 @@ require 'spritecuke/version'
 Gem::Specification.new do |spec|
   spec.name          = "spritecuke"
   spec.version       = Spritecuke::VERSION
-  spec.authors       = ["Jens Finkhaeuser"]
-  spec.email         = ["jens@finkhaeuser.de"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
-  spec.homepage      = ""
-  spec.license       = "MIT"
+  spec.authors       = ["Mark Barzilay", "Jens Finkhaeuser"]
+  spec.email         = ["mark@spritecloud.com", "jens@spritecloud.com"]
+  spec.description   = %q{Cucumber helper functions and scaffolding for spriteCloud TA engineers.}
+  spec.summary       = %q{Cucumber helper functions and scaffolding for spriteCloud TA engineers.}
+  spec.homepage      = "https://github.com/spriteCloud/spritecuke"
+  spec.license       = "Proprietary"
 
   spec.files         = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
