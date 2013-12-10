@@ -2,11 +2,13 @@ PATH
   remote: .
   specs:
     spritecuke (0.0.1)
+      thor
 
 GEM
   remote: https://rubygems.org/
   specs:
     rake (10.1.0)
+    thor (0.18.1)
 
 PLATFORMS
   ruby
