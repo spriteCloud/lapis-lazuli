@@ -39,6 +39,9 @@ module Spritecuke
           :spritecuke => {
             :version => Spritecuke::VERSION
           },
+          :project => {
+            :name => File.basename(path),
+          },
         }
 
         require 'facets/string/lchomp'
