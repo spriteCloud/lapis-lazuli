@@ -2,6 +2,8 @@
 # Copyright 2013,2014 spriteCloud B.V. All rights reserved.
 # Author: "Jens Finkhaeuser" <jens@spritecloud.com>
 
+require 'spritecuke/version'
+
 require 'thor/group'
 
 module Spritecuke
