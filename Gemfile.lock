@@ -2,11 +2,13 @@ PATH
   remote: .
   specs:
     spritecuke (0.0.1)
+      facets
       thor
 
 GEM
   remote: https://rubygems.org/
   specs:
+    facets (2.9.3)
     rake (10.1.0)
     thor (0.18.1)
 
