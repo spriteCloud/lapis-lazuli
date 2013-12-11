@@ -9,13 +9,13 @@ require "spritecuke/version"
 module Spritecuke
 
   # Creating a link for easy reporting afterwards
-  def self.create_link(name, url)
+  def create_link(name, url)
       #Lets just send the url without the parameters to prevent html display problems
       "<a href='#{url}' target='_blank'>#{name}</a>"
   end
   
   # Taking a screenshot of the current page. Using the name as defined at the start of every scenario
-  def self.take_screenshot()
+  def take_screenshot()
     begin
       $BROWSER.driver.save_screenshot($SCREENSHOTS_DIR + '/' + $scenario_name + '.jpg')
      $log.debug "Screenshot saved: #{$SCREENSHOTS_DIR + '/' + $scenario_name + '.jpg'}"
@@ -26,7 +26,7 @@ module Spritecuke
   end
   
   # Waits until the string is found with a maximum waiting time variable
-  def self.wait_until_text_found(text, wait_time = 10)
+  def wait_until_text_found(text, wait_time = 10)
     starttime = Time.now
   
     while Time.now-starttime<wait_time
@@ -40,7 +40,7 @@ module Spritecuke
   end
   
   # General function that can retrieve an element with a given attibute (e.g. class or id) and value
-  def self.get_element(attribute, value, wait_time = 5)
+  def get_element(attribute, value, wait_time = 5)
     wait_until_text_found(value, wait_time)
   
     starttime = Time.now
@@ -59,7 +59,7 @@ module Spritecuke
   
   # General function that tries to find a button, using the most common button layouts.
   # Waits until the button is found with a maximum waiting time variable.
-  def self.find_button(text, wait_time = 5)
+  def find_button(text, wait_time = 5)
     wait_until_text_found(text, wait_time)
   
     # First try to find it quick and return the element
@@ -103,7 +103,7 @@ module Spritecuke
   end
   
   # Button as span also occurs often.
-  def self.find_span_button_by_title(title)
+  def find_span_button_by_title(title)
     all_save_buttons = $BROWSER.spans(:title => title)
     all_save_buttons.each do |button|
       if button.visible?
@@ -114,7 +114,7 @@ module Spritecuke
   end
   
   # Gently process (make a screenshot, report the error) if an element is not found
-  def self.handle_element_not_found(element, name)
+  def handle_element_not_found(element, name)
     take_screenshot()
     feedback = "#{element}: '#{name}' not found on #{create_link('page', $BROWSER.url)}"
   
@@ -127,7 +127,7 @@ module Spritecuke
   end
   
   # Gently process (make a screenshot, report the error) if an element is found unexpectedly
-  def self.handle_element_found(element, name)
+  def handle_element_found(element, name)
     take_screenshot()
     feedback = "#{element}: '#{name}' found on #{create_link('page', $BROWSER.url)}"
     
@@ -142,7 +142,7 @@ module Spritecuke
   
   
   # Using strings TIMESTAMP or EPOCH_TIMESTAMP in your tests, converts that string to a time value.
-  def self.update_variable(variable)
+  def update_variable(variable)
     
     if variable.include?("EPOCH_TIMESTAMP")
       variable = variable.gsub!("EPOCH_TIMESTAMP", $CURRENT_EPOCH_TIMESTAMP.to_i.to_s)
@@ -157,7 +157,7 @@ module Spritecuke
   
   # Closes the browser and creates a new BROWSER instance.
   # This is useful when a scenario experiences a popup that it cannot close or process, and the testrun is stuck
-  def self.restart_browser()
+  def restart_browser()
     $log.debug "Restarting browser in scenario: #{$scenario_name}"
     $BROWSER.close
     # Needs to be a global value, else we get a dynamic constant assignment error
@@ -196,7 +196,7 @@ module Spritecuke
   end
   
   # Method is the one making the actual HTTP request
-  def self.get_xml_data(url)
+  def get_xml_data(url)
     require 'net/http'
     require 'xmlsimple'
     
@@ -206,13 +206,13 @@ module Spritecuke
   end
   
   # Template. This function is custom development and differs per web application
-  def self.get_software_version_info()
+  def get_software_version_info()
     version_info = {}
   end
   
   # General function that finds a text field uses the most common input field structures
   # First tries to find exact matches, but also looks at case insensitive near matches
-  def self.find_input_field(field_label)
+  def find_input_field(field_label)
   
     return $BROWSER.text_field(:name => field_label) if $BROWSER.text_field(:name => field_label).present?
   
@@ -243,7 +243,7 @@ module Spritecuke
   end
   
   # General function that finds a link by using the most common structures
-  def self.find_link(text)
+  def find_link(text)
     wait_until_text_found(text, 5)
     
     return $BROWSER.a(:text => text) if $BROWSER.a(:text => text) and $BROWSER.a(:text => text).visible? rescue ""
@@ -268,14 +268,14 @@ module Spritecuke
   end
   
   # General basic function that reloads the url and returns the loadtime
-  def self.get_loadtime(url)
+  def get_loadtime(url)
     starttime = Time.now
     $BROWSER.goto url
     endtime = Time.now-starttime
   end
   
   # Finds a select list by using the label
-  def self.find_select_list(label)
+  def find_select_list(label)
     return $BROWSER.select_list(:id => label) if $BROWSER.select_list(:id => label).exist?
     raise handle_element_not_found("select_list", label)
   end
