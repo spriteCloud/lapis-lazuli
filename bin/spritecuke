@@ -1,3 +1,0 @@
-#!/usr/bin/env ruby
-require 'spritecuke/cli'
-Spritecuke::CLI.start

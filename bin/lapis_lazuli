@@ -1,0 +1,3 @@
+#!/usr/bin/env ruby
+require 'lapis_lazuli/cli'
+LapisLazuli::CLI.start
