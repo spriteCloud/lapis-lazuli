@@ -23,5 +23,5 @@ Author: "<%= config[:user] %>" <<%= config[:email] %>>
 
 ## Contributing
 
-If you create new utility functions and want to contribute them to the spritecuke
-project, see https://github.com/spriteCloud/spritecuke
+If you create new utility functions and want to contribute them to the Lapis
+Lazuli project, see https://github.com/spriteCloud/lapis-lazuli

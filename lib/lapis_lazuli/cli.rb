@@ -3,9 +3,9 @@
 # Author: "Jens Finkhaeuser" <jens@spritecloud.com>
 require 'thor'
 
-require 'spritecuke/generators/cucumber'
+require 'lapis_lazuli/generators/cucumber'
 
-module Spritecuke
+module LapisLazuli
   class CLI < Thor
     class_option :verbose, :aliases => "-v", :type => :boolean, :default => false, :desc => "Be verbose."
 
@@ -15,6 +15,6 @@ module Spritecuke
       and whistles of a proper spriteCloud test setup.
     LONGDESC
     option :force, :aliases => "-f", :type => :boolean, :default => false, :desc => "Always overwrite existing files."
-    register(Spritecuke::Generators::Cucumber, "create", "create PROJECT", "Creates a cucumber project with some common step definitions.")
+    register(LapisLazuli::Generators::Cucumber, "create", "create PROJECT", "Creates a cucumber project with some common step definitions.")
   end
 end

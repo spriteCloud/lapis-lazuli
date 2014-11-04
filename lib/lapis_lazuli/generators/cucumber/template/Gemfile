@@ -16,7 +16,7 @@ gem 'watir-webdriver-performance'
 gem 'cucumber'
 
 # spriteCloud specific
-gem 'spritecuke', :git => 'git@github.com:spriteCloud/spritecuke.git', :branch => :master
+gem 'lapis_lazuli', :git => 'git@github.com:spriteCloud/lapis-lazuli.git', :branch => :master
 
 # Windows specific
 platforms :mswin, :mingw do

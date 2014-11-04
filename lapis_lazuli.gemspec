@@ -1,16 +1,16 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'spritecuke/version'
+require 'lapis_lazuli/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "spritecuke"
-  spec.version       = Spritecuke::VERSION
-  spec.authors       = ["Mark Barzilay", "Jens Finkhaeuser"]
-  spec.email         = ["mark@spritecloud.com", "jens@spritecloud.com"]
-  spec.description   = %q{Cucumber helper functions and scaffolding for spriteCloud TA engineers.}
-  spec.summary       = %q{Cucumber helper functions and scaffolding for spriteCloud TA engineers.}
-  spec.homepage      = "https://github.com/spriteCloud/spritecuke"
+  spec.name          = "lapis_lazuli"
+  spec.version       = LapisLazuli::VERSION
+  spec.authors       = ["Onno Steenbergen", "Gijs Paulides", "Mark Barzilay", "Jens Finkhaeuser"]
+  spec.email         = ["info@spritecloud.com"]
+  spec.description   = %q{Cucumber helper functions and scaffolding for easier test automation suite development.}
+  spec.summary       = %q{Cucumber helper functions and scaffolding for easier test automation suite development.}
+  spec.homepage      = "https://github.com/spriteCloud/lapis-lazuli"
   spec.license       = "Proprietary"
 
   spec.files         = `git ls-files`.split($/)

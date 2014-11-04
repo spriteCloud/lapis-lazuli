@@ -2,11 +2,11 @@
 # Copyright 2013,2014 spriteCloud B.V. All rights reserved.
 # Author: "Mark Barzilay" <mark@spritecloud.com>
 
-require "spritecuke/version"
+require "lapis_lazuli/version"
 
 # FIXME None of these functions are tested.
 
-module Spritecuke
+module LapisLazuli
 
   # Creating a link for easy reporting afterwards
   def create_link(name, url)

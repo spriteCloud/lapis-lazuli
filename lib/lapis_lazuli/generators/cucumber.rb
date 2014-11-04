@@ -2,11 +2,11 @@
 # Copyright 2013,2014 spriteCloud B.V. All rights reserved.
 # Author: "Jens Finkhaeuser" <jens@spritecloud.com>
 
-require 'spritecuke/version'
+require 'lapis_lazuli/version'
 
 require 'thor/group'
 
-module Spritecuke
+module LapisLazuli
   module Generators
 
     PROJECT_PATHS = [
@@ -38,8 +38,8 @@ module Spritecuke
           :year => Time.now.year,
           :user => Cucumber.get_username(self),
           :email => Cucumber.get_email(self),
-          :spritecuke => {
-            :version => Spritecuke::VERSION
+          :lapis_lazuli => {
+            :version => LapisLazuli::VERSION
           },
           :project => {
             :name => File.basename(path),
