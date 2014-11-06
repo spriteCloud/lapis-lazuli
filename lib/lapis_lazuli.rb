@@ -9,23 +9,6 @@ require "lapis_lazuli/lapis_lazuli"
 
 module LapisLazuli
 
-  # Creating a link for easy reporting afterwards
-  def create_link(name, url)
-      #Lets just send the url without the parameters to prevent html display problems
-      "<a href='#{url}' target='_blank'>#{name}</a>"
-  end
-
-  # Taking a screenshot of the current page. Using the name as defined at the start of every scenario
-  def take_screenshot()
-    begin
-      $BROWSER.driver.save_screenshot($SCREENSHOTS_DIR + '/' + $scenario_name + '.jpg')
-     $log.debug "Screenshot saved: #{$SCREENSHOTS_DIR + '/' + $scenario_name + '.jpg'}"
-    rescue Exception => e
-      puts "Failed to save screenshot. Error message #{e.message}"
-      $log.debug "Failed to save screenshot. Error message #{e.message}"
-    end
-  end
-
   # Waits until the string is found with a maximum waiting time variable
   def wait_until_text_found(text, wait_time = 10)
     starttime = Time.now
@@ -156,46 +139,6 @@ module LapisLazuli
     variable
   end
 
-  # Closes the browser and creates a new BROWSER instance.
-  # This is useful when a scenario experiences a popup that it cannot close or process, and the testrun is stuck
-  def restart_browser()
-    $log.debug "Restarting browser in scenario: #{$scenario_name}"
-    $BROWSER.close
-    # Needs to be a global value, else we get a dynamic constant assignment error
-    # Most ideal situation is if the BROWSER instance is already a global variable, but this works
-    case $WEB_DRIVER
-      when 'firefox'
-        $NEW_BROWSER = Watir::Browser.new :firefox
-      when 'chrome'
-        # Check Platform running script
-        if RUBY_PLATFORM.downcase.include?("linux")
-          Watir::Browser::Chrome.path = "/usr/lib/chromium-browser/chromium-browser"
-        end
-        $NEW_BROWSER = Watir::Browser.new :chrome
-      when 'safari'
-        $NEW_BROWSER = Watir::Browser.new :safari
-      when 'ie'
-        require 'rbconfig'
-        if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
-          $NEW_BROWSER = Watir::Browser.new :ie
-        else
-          raise "You can't run IE tests on non-Windows machine"
-        end
-      when 'ios'
-        if RUBY_PLATFORM.downcase.include?("darwin")
-          $NEW_BROWSER = Watir::Browser.new :iphone
-        else
-          raise "You can't run IOS tests on non-mac machine"
-        end
-      else
-        # Defaults to firefox
-        $log.info("Couldn't determine the browser to use. Using firefox")
-        $NEW_BROWSER = Watir::Browser.new :firefox
-    end
-    $NEW_BROWSER.goto $SITE
-    return $NEW_BROWSER
-  end
-
   # Method is the one making the actual HTTP request
   def get_xml_data(url)
     require 'net/http'
@@ -214,8 +157,9 @@ module LapisLazuli
   # General function that finds a text field uses the most common input field structures
   # First tries to find exact matches, but also looks at case insensitive near matches
   def find_input_field(field_label)
-
-    return $BROWSER.text_field(:name => field_label) if $BROWSER.text_field(:name => field_label).present?
+    if $BROWSER.text_field(:name => field_label).present?
+      return $BROWSER.text_field(:name => field_label)
+    end
 
     text_fields = $BROWSER.text_fields(:name => field_label)
     text_fields.each do |text_field|

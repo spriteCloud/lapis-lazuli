@@ -5,6 +5,7 @@ Feature: Example Feature
   I want to run and adjust the tests below
 
   @example01
-  Scenario: example01 - Navigation mainmenu
-    Given I navigate to page "home"
-    And I use value "test" for field "search"
+  Scenario: example01 - Google Search
+    Given I navigate to Google in english
+    And I search for "spriteCloud"
+    Then I see "www.spriteCloud.com" on the page

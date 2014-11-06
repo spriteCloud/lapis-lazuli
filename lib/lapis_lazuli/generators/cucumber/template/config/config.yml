@@ -18,8 +18,8 @@ make_screenshot_on_failed_scenario: true  # make a screenshot after a scenario f
 # List of error strings. Step will fail if one of these strings is detected.
 error_strings:
   [
-    'Server Error',
-    'Error: Page Not Found'
+    "Server Error",
+    "Error: Page Not Found"
   ]
 
 
@@ -30,4 +30,5 @@ test:
 uat:
 
 production:
-  home: http://www.google.com/
+  google:
+      english: http://www.google.com/ncr

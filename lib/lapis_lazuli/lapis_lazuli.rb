@@ -10,14 +10,18 @@ module LapisLazuli
     @browser
     @config
     @env
-    attr_reader :log, :scenario
-    attr_accessor :scenario
+    attr_reader :log, :scenario, :time
+    attr_accessor :scenario, :time
 
     def initialize
       if ENV["TEST_ENV"]
-
         @env = ENV["TEST_ENV"]
       end
+
+      @time = {
+        :timestamp => Time.now.strftime('%y%m%d_%H%M%S'),
+        :epoch => Time.now.to_i.to_s
+      }
     end
 
     def init(config_name)
@@ -36,9 +40,9 @@ module LapisLazuli
         p "Has env logfile #{self.env("logfile")}"
       end
       p "Logfile #{log_file}"
-      @log = LapisLazuli::TeeLogger.new(log_file)
+      @log = TeeLogger.new(log_file)
 
-      @scenario = LapisLazuli::Scenario.new
+      @scenario = Scenario.new
     end
 
     ##
@@ -170,10 +174,34 @@ module LapisLazuli
 
     def browser
       if @browser.nil?
-        @browser = LapisLazuli::Browser.new(self)
+        @browser = Browser.new(self)
       end
       return @browser
     end
 
+    def error(settings=nil)
+      message = "An unknown error occurred"
+      if not settings.nil?
+        if settings.is_a? String
+          message = settings
+        elsif settings.has_key? :message
+          message = settings[:message]
+        elsif settings.has_key? :env
+          exists = ""
+          if not (settings.has_key?(:exists) or settings[:exists])
+            exists = ' not'
+          end
+          message = "Environment setting '#{settings[:env]}'" +
+                    exists + " found"
+        elsif settings.has_key? :text
+        end
+      end
+      raise message
+    end
+
+    def variable(string)
+      string.gsub!("EPOCH_TIMESTAMP", @time[:epoch])
+      string.gsub!("TIMESTAMP",@time[:timestamp])
+    end
   end
 end

@@ -26,7 +26,7 @@ After do |scenario|
 end
 
 # Can be used for debug purposes
-AfterStep('@pause') do
+AfterStep('@pause') do |scenario|
   print "Press Return to continue"
   STDIN.getc
 end

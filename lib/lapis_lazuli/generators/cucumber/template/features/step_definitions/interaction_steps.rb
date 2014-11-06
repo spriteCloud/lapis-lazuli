@@ -4,116 +4,20 @@
 # Author: "<%= config[:user] %>" <<%= config[:email] %>>
 
 require 'lapis_lazuli'
+ll = LapisLazuli::LapisLazuli.instance
 
-
-################################################################################
-# Navigating to a page functions
-
-Given /^I navigate to page "([^"]*)"$/ do |arg1|
-  if !CONFIGS[arg1] or CONFIGS[arg1].empty?
-    LapisLazuli::handle_element_not_found('page', arg1)
-  end
-  $BROWSER.goto CONFIGS[arg1]
-end
-
-Given /^I navigate to url "([^"]*)"$/ do |arg1|
-  if !arg1.match(/^(http|https|ftp):\/\//)
-    arg1 = "http://" + arg1
-  end
-  $BROWSER.goto arg1
-end
-
-Given /^I click on the back button of the browser$/ do
-  $BROWSER.back
-end
-
-When /^I wait for (\d+) seconds$/ do |arg1|
-  sleep(arg1.to_i)
-end
-
-################################################################################
-# Link and button interaction steps
-
-When /^I click on link "([^"]*)"$/ do |arg1|
-  link = find_link(arg1)
-  
-  if link
-    link.click
+Given(/^I navigate to (.*) in (.*)$/) do |site,language|
+  config = "#{site.downcase}.#{language.downcase}"
+  if ll.has_env?(config)
+    url = ll.env(config)
+    ll.browser.goto url
   else
-    handle_element_not_found("link", arg1)
+    ll.error(:env => config)
   end
 end
 
-Given /^I click on link with "([^"]*)" value "([^"]*)"$/ do |arg1, arg2|
-  $BROWSER.element(:xpath =>  "//a[contains(@#{arg1}, '#{arg2}')]").click
-end
-
-When /^I click on link "([^"]*)" \(regexp\)$/ do |arg1|
-  wait_until_text_found(arg1, 10)
-  if !$BROWSER.a(:text => /#{arg1}/i).exist?
-    handle_element_not_found("link", arg1)
-  else
-    $BROWSER.a(:text => /#{arg1}/i).click
-  end
-end
-
-Then /^I click on button "([^\"]*)"$/ do |arg1|
-  button = find_button(arg1, 10)
-  if !button
-    handle_element_not_found('button', arg1)
-  else
-    button.click
-  end
-end
-
-################################################################################
-# Input field interaction steps
-
-Then /^I use value "([^"]*)" for field "([^"]*)"$/ do |arg1, arg2|
-  wait_until_text_found(arg2, 10)
-
-  arg1 = update_variable(arg1)
-  unless arg1.empty?
-    
-    input_field = find_input_field(arg2)
-    
-    handle_element_not_found("Field", arg2) unless input_field
-    
-    input_field.clear rescue $log.debug "Warning. failed to clear input field #{arg2}"
-    input_field.send_keys(arg1)
-  end
-end
-
-
-################################################################################
-# Checkbox interaction steps
-
-Given /^I click checkbox "(.*?)"$/ do |arg1|
-  checkbox = find_checkbox(arg1)
-
-  if checkbox
-    checkbox.click
-  else
-    handle_element_not_found('checkbox', arg1)
-  end
-end
-
-Given /^I set checkbox "(.*?)"$/ do |arg1|
-  checkbox = find_checkbox(arg1)
-
-  if checkbox
-    checkbox.set
-  else
-    handle_element_not_found('checkbox', arg1)
-  end
-end
-
-Given /^I clear checkbox "(.*?)"$/ do |arg1|
-  checkbox = find_checkbox(arg1)
-
-  if checkbox
-    checkbox.clear
-  else
-    handle_element_not_found('checkbox', arg1)
-  end
+Given(/^I search for "(.*?)"$/) do |query|
+  searchbox = ll.browser.find(:text_field => {:name => "q"})
+  searchbox.clear rescue ll.log.debug "Could not clear searchbox"
+  searchbox.send_keys(query)
 end
