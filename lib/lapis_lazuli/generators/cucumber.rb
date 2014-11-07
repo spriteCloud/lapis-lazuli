@@ -63,7 +63,7 @@ module LapisLazuli
         # If a branch was specified on the CLI, we have to update the dependency
         # string.
         if options.has_key?("branch")
-          opts[:lapis_lazuli][:dependency] = ":git => 'git@github.com:spriteCloud/lapis-lazuli.git', :branch => #{options["branch"]}"
+          opts[:lapis_lazuli][:dependency] = ":git => 'git@github.com:spriteCloud/lapis-lazuli.git', :branch => '#{options["branch"]}'"
         end
 
         require 'facets/string/lchomp'
