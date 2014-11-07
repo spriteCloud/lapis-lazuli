@@ -2,12 +2,12 @@
 
 Author: "<%= config[:user] %>" <<%= config[:email] %>>
 
-## Setup
+# Setup
 
-### Linux
+## General
 
-- Make sure you have ruby 1.8 or later installed.
-- Make sure you have firefox and chrome installed
+- Make sure you have ruby 1.9 or later installed.
+- Make sure you have firefox and/or chrome installed
 - Install the bundler gem:
 
     $ gem install bundler
@@ -16,12 +16,12 @@ Author: "<%= config[:user] %>" <<%= config[:email] %>>
 
     $ bundle install
 
-- Run cucumber through bundler:
+- Run cucumber or regressinator through bundler:
 
     $ bundle exec cucumber
+    $ bundle exec regressinator legacy cucumber
 
-
-## Contributing
+# Contributing
 
 If you create new utility functions and want to contribute them to the Lapis
 Lazuli project, see https://github.com/spriteCloud/lapis-lazuli
