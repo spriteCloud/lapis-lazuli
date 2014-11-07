@@ -33,6 +33,15 @@ module LapisLazuli
 
 
 
+      def create_directory_structure
+        empty_directory(path)
+        PROJECT_PATHS.each do |p|
+          empty_directory(File.join(path, p))
+        end
+      end
+
+
+
       def copy_template
         opts = {
           :year => Time.now.year,
@@ -69,15 +78,6 @@ module LapisLazuli
           else
             template(relative, File.join(path, relative), opts)
           end
-        end
-      end
-
-
-
-      def create_directory_structure
-        empty_directory(path)
-        PROJECT_PATHS.each do |p|
-          empty_directory(File.join(path, p))
         end
       end
 

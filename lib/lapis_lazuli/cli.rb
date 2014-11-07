@@ -16,5 +16,6 @@ module LapisLazuli
     LONGDESC
     option :force, :aliases => "-f", :type => :boolean, :default => false, :desc => "Always overwrite existing files."
     register(LapisLazuli::Generators::Cucumber, "create", "create PROJECT", "Creates a cucumber project with some common step definitions.")
+    register(LapisLazuli::Generators::Cucumber, "update", "update PROJECT", "Updates a project. Alias for 'create'.")
   end
 end
