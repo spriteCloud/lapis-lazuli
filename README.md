@@ -52,13 +52,21 @@ for further instructions.
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
-When you are contributing, it makes sense to not use the github version of
-Lapis Lazuli, but your local changes instead. This is fine when running
-`lapis_lazuli`, as you just need to type a different path in the shell.
+When you are contributing, it will make sense not to use a released version of
+Lapis Lazuli, but either a github branch or your local changes instead.
 
-But `bundle install` in a newly created Lapis Lazuli project may cause some
-problems. You can force bundler to use your locally checked out Lapis Lazuli
-instead of the github version by running:
+### Use Github version of Lapiz Lazuli
+
+The `create` command knows a `--branch` parameter for specifying a github branch.
+If specified, the newly created or updated project will require this github
+branch instead of a release version of Lapis Lazuli.
+
+### Use local version of Lapis Lazuli
+
+You can force bundler to use your locally checked out Lapis Lazuli instead of
+a github or release version by running:
 
     $ bundle config local.lapis_lazuli /path/to/local/lapis_lazuli
+    $ bundle install
 
+That will resolve the `lapis_lazuli` dependency to the local version.
