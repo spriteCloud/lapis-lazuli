@@ -31,6 +31,19 @@ module LapisLazuli
 
       argument :path, :type => :string
 
+      # Bug in Thor: this seems to need to be in place both here, and in the CLI
+      # class - here to actually work, and in the CLI class to be shown in the help.
+      class_option :branch, :aliases => "-b", :type => :string, :default => nil
+
+
+
+      def create_directory_structure
+        empty_directory(path)
+        PROJECT_PATHS.each do |p|
+          empty_directory(File.join(path, p))
+        end
+      end
+
 
 
       def copy_template
@@ -39,12 +52,19 @@ module LapisLazuli
           :user => Cucumber.get_username(self),
           :email => Cucumber.get_email(self),
           :lapis_lazuli => {
-            :version => LapisLazuli::VERSION
+            :version => LapisLazuli::VERSION,
+            :dependency => '"' + LapisLazuli::VERSION + '"',
           },
           :project => {
             :name => File.basename(path),
           },
         }
+
+        # If a branch was specified on the CLI, we have to update the dependency
+        # string.
+        if options.has_key?("branch")
+          opts[:lapis_lazuli][:dependency] = ":git => 'git@github.com:spriteCloud/lapis-lazuli.git', :branch => '#{options["branch"]}'"
+        end
 
         require 'facets/string/lchomp'
         require 'find'
@@ -69,15 +89,6 @@ module LapisLazuli
           else
             template(relative, File.join(path, relative), opts)
           end
-        end
-      end
-
-
-
-      def create_directory_structure
-        empty_directory(path)
-        PROJECT_PATHS.each do |p|
-          empty_directory(File.join(path, p))
         end
       end
 
