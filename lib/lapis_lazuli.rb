@@ -9,20 +9,6 @@ require "lapis_lazuli/lapis_lazuli"
 
 module LapisLazuli
 
-  # Waits until the string is found with a maximum waiting time variable
-  def wait_until_text_found(text, wait_time = 10)
-    starttime = Time.now
-
-    while Time.now-starttime<wait_time
-      if $BROWSER.html.include?(text)
-        return true
-      end
-      sleep 0.5
-    end
-
-    return false
-  end
-
   # General function that can retrieve an element with a given attibute (e.g. class or id) and value
   def get_element(attribute, value, wait_time = 5)
     wait_until_text_found(value, wait_time)
@@ -97,47 +83,6 @@ module LapisLazuli
     return nil
   end
 
-  # Gently process (make a screenshot, report the error) if an element is not found
-  def handle_element_not_found(element, name)
-    take_screenshot()
-    feedback = "#{element}: '#{name}' not found on #{create_link('page', $BROWSER.url)}"
-
-    if ENV['BREAKPOINT_ON_FAILURE']
-      p feedback
-      require 'debugger'; debugger
-    end
-
-    raise feedback
-  end
-
-  # Gently process (make a screenshot, report the error) if an element is found unexpectedly
-  def handle_element_found(element, name)
-    take_screenshot()
-    feedback = "#{element}: '#{name}' found on #{create_link('page', $BROWSER.url)}"
-
-    if ENV['BREAKPOINT_ON_FAILURE']
-      p feedback
-      require 'ruby-debug'
-      breakpoint
-    end
-
-    raise feedback
-  end
-
-
-  # Using strings TIMESTAMP or EPOCH_TIMESTAMP in your tests, converts that string to a time value.
-  def update_variable(variable)
-
-    if variable.include?("EPOCH_TIMESTAMP")
-      variable = variable.gsub!("EPOCH_TIMESTAMP", $CURRENT_EPOCH_TIMESTAMP.to_i.to_s)
-    end
-
-    if variable.include?("TIMESTAMP")
-      variable = variable.gsub!("TIMESTAMP", $CURRENT_TIMESTAMP)
-    end
-
-    variable
-  end
 
   # Method is the one making the actual HTTP request
   def get_xml_data(url)
@@ -152,39 +97,6 @@ module LapisLazuli
   # Template. This function is custom development and differs per web application
   def get_software_version_info()
     version_info = {}
-  end
-
-  # General function that finds a text field uses the most common input field structures
-  # First tries to find exact matches, but also looks at case insensitive near matches
-  def find_input_field(field_label)
-    if $BROWSER.text_field(:name => field_label).present?
-      return $BROWSER.text_field(:name => field_label)
-    end
-
-    text_fields = $BROWSER.text_fields(:name => field_label)
-    text_fields.each do |text_field|
-      return text_field unless !text_field.visible?
-    end
-
-    text_fields = $BROWSER.text_fields(:name => /#{field_label}/i)
-    text_fields.each do |text_field|
-      return text_field unless !text_field.visible?
-    end
-
-    #if it is a search query, try to find it by using an input field with value 'query'
-    if ['vind', 'search', 'zoeken'].include? field_label.downcase
-      text_fields = $BROWSER.text_fields(:name => /q/)
-      text_fields.each do |text_field|
-        return text_field unless !text_field.visible?
-      end
-
-      text_fields = $BROWSER.text_fields(:name => "keyword")
-      text_fields.each do |text_field|
-        return text_field unless !text_field.visible?
-      end
-    end
-
-    return nil
   end
 
   # General function that finds a link by using the most common structures
