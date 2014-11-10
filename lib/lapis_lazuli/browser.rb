@@ -125,60 +125,35 @@ module LapisLazuli
     # Find DOM elements
     #
     # Examples:
-    # findAll(:text_field => :first)
     # findAll(:text_field => {:name => "test"})
-    # findAll(:text_field => "test") (searches based on name or id)
-    #
-    # TODO: Add a lot more like select, options, list..
+    # findAll(:text_field => "test") (xpath search based on name, id or text)
     def findAll(settings)
-      error = true
-      if settings.has_key? :error and not settings[:error]
-        error = false
-      end
-
-      if settings.has_key? :text_field
-        text_field = settings[:text_field]
-        # TODO: should be removed as find(:text_field => "something") will return the first by default
-        if text_field == :first
-          p "First field"
-          return @browser.text_fields(:type => "text") ||
-            (error and @ll.error("First inputfield not found"))
-        elsif text_field.is_a? Hash
-          return @browser.text_fields(text_field) ||
-            (error and @ll.error("First inputfield not found"))
-        else
-          text_field = text_field.to_s
-          begin
-            # Find it based on name or id
-            xpath = @browser.text_fields(
-                :xpath,
-                "//*[@name='#{text_field}' or @id='#{text_field}']"
-              )
-            return xpath
-          rescue
-            @ll.error("Could not find a text field with name or id equal to '#{text_field}'")
-          end
-        end
-      # Buttons
-      elsif settings.has_key? :button
-        button = settings[:button]
-        if button.is_a? Hash
-          return @browser.buttons(button) ||
-            (error and @ll.error("Button not found"))
-        else
-          button = button.to_s
-          begin
-            # Find it based on name or id
-            xpath = @browser.buttons(
-                :xpath,
-                "//*[@name='#{button}' or @id='#{button}' or text()='#{button}']"
-              )
-            return xpath
-          rescue
-            @ll.error("Could not find a text field with name or id equal to '#{text_field}'")
+      # For all settings
+      settings.each do |key, value|
+        # Find the one the browser responds to
+        # Example : text_fields or buttons
+        function_name = "#{key.to_s}s"
+        if @browser.respond_to? function_name
+          # If the value is a hash use it as arguments for this function
+          if value.is_a? Hash
+            return @browser.send(function_name, value)
+          else
+            string = value.to_s
+            begin
+              # Find it based on name,id or text
+              xpath = @browser.send(
+                  function_name,
+                  :xpath,
+                  "//*[@name='#{string}' or @id='#{string}' or text()='#{string}']"
+                )
+              return xpath
+            rescue
+              @ll.error("Could not find any #{function_name} with name, id or text equal to '#{string}'")
+            end
           end
         end
       end
+      # We need one function to respond..
       @ll.error("Incorrect settings for find")
     end
 
@@ -199,6 +174,11 @@ module LapisLazuli
     # add settings[:present] = false to use findAll
     # TODO: Add :last, :random instead of first of always having the first element
     def find(settings)
+      error = true
+      if settings.has_key? :error and not settings[:error]
+        error = false
+      end
+
       # Output
       result = nil
       # Should we use findAll
@@ -209,15 +189,23 @@ module LapisLazuli
         result = self.findAllPresent(settings)
       end
 
+      element = nil
       # A Watir collection
       if result.is_a? Watir::ElementCollection
-        return result.first
+        element =  result.first
       # or an array
       elsif result.is_a? Array
-        return result[0]
+        element = result[0]
       else
         # We didn't get the result we wanted
         @ll.error("Incorrect settings for find #{result}")
+      end
+
+      # Throw an error if not found
+      if error and element.nil?
+        @ll.error("Could not find element with settings: #{settings}")
+      else
+        return element
       end
     end
 
@@ -255,7 +243,7 @@ module LapisLazuli
     def take_screenshot
       begin
         fileloc = @ll.config("screenshot_dir","screenshots") +
-          '/' + @ll.scenario.time.timestampe + "_" + @ll.scenario.name + '.jpg'
+          '/' + @ll.scenario.time.timestamp + "_" + @ll.scenario.name + '.jpg'
         # Save the screenshot
         @browser.driver.save_screenshot(fileloc)
         @ll.log.debug "Screenshot saved: #{fileloc}"
