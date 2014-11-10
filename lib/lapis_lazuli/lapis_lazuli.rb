@@ -39,6 +39,7 @@ module LapisLazuli
         :timestamp => Time.now.strftime('%y%m%d_%H%M%S'),
         :epoch => Time.now.to_i.to_s
       }
+
     end
 
     ##

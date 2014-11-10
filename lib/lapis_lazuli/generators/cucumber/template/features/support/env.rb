@@ -7,3 +7,6 @@ require 'lapis_lazuli/cucumber'
 
 ll = LapisLazuli::LapisLazuli.instance
 ll.init("config/config.yml");
+
+# Transition function from old codebase to new
+load 'features/support/transition.rb'
