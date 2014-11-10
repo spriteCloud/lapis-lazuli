@@ -242,12 +242,18 @@ module LapisLazuli
     # Using the name as defined at the start of every scenario
     def take_screenshot
       begin
+        # Filename is the
+        # - screenshot directory
+        # - scenario timestamp
+        # - scenario name
+        # - random number between 0 and 10000
         fileloc = @ll.config("screenshot_dir","screenshots") +
-          '/' + @ll.scenario.time[:timestamp] + "_" + @ll.scenario.name + '.jpg'
+          '/' + @ll.scenario.time[:timestamp] + "_" + @ll.scenario.name +
+          '-' + Random.rand(10000).to_s + '.png'
         # Save the screenshot
-        @browser.driver.save_screenshot(fileloc)
+        @browser.screenshot.save fileloc
         @ll.log.debug "Screenshot saved: #{fileloc}"
-      rescue Exception => e
+      rescue RuntimeError => e
         @ll.log.debug "Failed to save screenshot. Error message #{e.message}"
       end
     end
