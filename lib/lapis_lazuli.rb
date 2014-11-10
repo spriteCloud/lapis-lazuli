@@ -125,6 +125,7 @@ module LapisLazuli
   end
 
   # General basic function that reloads the url and returns the loadtime
+  # TODO: Replace with http://watirwebdriver.com/page-performance/
   def get_loadtime(url)
     starttime = Time.now
     $BROWSER.goto url

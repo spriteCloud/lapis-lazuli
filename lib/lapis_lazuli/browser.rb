@@ -16,7 +16,7 @@ module LapisLazuli
 
     ##
     # Create a new browser depending on settings
-    def create(browser_wanted)
+    def create(browser_wanted=nil)
       browser = nil
       # Use the supplied browser or from the ENV
       browser_name = browser_wanted || ENV['BROWSER']
@@ -43,13 +43,13 @@ module LapisLazuli
           if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
             browser = Watir::Browser.new :ie
           else
-            raise "You can't run IE tests on non-Windows machine"
+            @ll.error("You can't run IE tests on non-Windows machine")
           end
         when 'ios'
           if RUBY_PLATFORM.downcase.include?("darwin")
             browser = Watir::Browser.new :iphone
           else
-            raise "You can't run IOS tests on non-mac machine"
+            @ll.error("You can't run IOS tests on non-mac machine")
           end
         else
           # Defaults to firefox
@@ -111,7 +111,7 @@ module LapisLazuli
 
       if block.nil?
         # We need a block to execute the waiting
-        raise "Incorrect settings"
+        @ll.error("Incorrect settings")
       elsif settings.has_key? :condition and settings[:condition] == :while
         # Do a while wait if asked nicely
         Watir::Wait.while(timeout, message, &block)
@@ -138,6 +138,7 @@ module LapisLazuli
 
       if settings.has_key? :text_field
         text_field = settings[:text_field]
+        # TODO: should be removed as find(:text_field => "something") will return the first by default
         if text_field == :first
           p "First field"
           return @browser.text_fields(:type => "text") ||
@@ -158,6 +159,25 @@ module LapisLazuli
             @ll.error("Could not find a text field with name or id equal to '#{text_field}'")
           end
         end
+      # Buttons
+      elsif settings.has_key? :button
+        button = settings[:button]
+        if button.is_a? Hash
+          return @browser.buttons(button) ||
+            (error and @ll.error("Button not found"))
+        else
+          button = button.to_s
+          begin
+            # Find it based on name or id
+            xpath = @browser.buttons(
+                :xpath,
+                "//*[@name='#{button}' or @id='#{button}' or text()='#{button}']"
+              )
+            return xpath
+          rescue
+            @ll.error("Could not find a text field with name or id equal to '#{text_field}'")
+          end
+        end
       end
       @ll.error("Incorrect settings for find")
     end
@@ -165,13 +185,13 @@ module LapisLazuli
     ##
     # Same as findAll only it filters present elements
     def findAllPresent(settings)
-      self.findAll(settings).find_all do |element|
+      self.findAll(settings).find_all {|element|
         begin
           element.present?
         rescue
           false
         end
-      end
+      }
     end
 
     ##
@@ -214,12 +234,12 @@ module LapisLazuli
         # Get the HTML of the page
         page_text = @browser.html
         # Try to find all errors
-        @ll.config("error_strings").each do |error|
+        @ll.config("error_strings").each {|error|
           if page_text.scan(error)[0]
             # Stop if we found one
             return true
           end
-        end
+        }
       rescue RuntimeError => err
         # An error?
         # TODO: Check if we need to return true here
@@ -235,7 +255,7 @@ module LapisLazuli
     def take_screenshot
       begin
         fileloc = @ll.config("screenshot_dir","screenshots") +
-          '/' + @ll.scenario.time.timestampe + "_" @ll.scenario.name + '.jpg'
+          '/' + @ll.scenario.time.timestampe + "_" + @ll.scenario.name + '.jpg'
         # Save the screenshot
         @browser.driver.save_screenshot(fileloc)
         @ll.log.debug "Screenshot saved: #{fileloc}"
@@ -252,7 +272,7 @@ module LapisLazuli
       if @browser.respond_to? meth
         return @browser.send(meth.to_s, *args, &block)
       end
-      raise "Method Missing: #{meth}"
+      @ll.error("Browser Method Missing: #{meth}")
     end
   end
 end
