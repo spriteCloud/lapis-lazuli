@@ -243,7 +243,7 @@ module LapisLazuli
     def take_screenshot
       begin
         fileloc = @ll.config("screenshot_dir","screenshots") +
-          '/' + @ll.scenario.time.timestamp + "_" + @ll.scenario.name + '.jpg'
+          '/' + @ll.scenario.time[:timestamp] + "_" + @ll.scenario.name + '.jpg'
         # Save the screenshot
         @browser.driver.save_screenshot(fileloc)
         @ll.log.debug "Screenshot saved: #{fileloc}"
