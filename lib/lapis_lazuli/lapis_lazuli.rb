@@ -251,6 +251,13 @@ module LapisLazuli
                     exists + " found"
         end
       end
+      # Write the error to the log
+      self.log.error(message)
+
+      if ENV['BREAKPOINT_ON_FAILURE'] || self.config("breakpoint_on_failure")
+        require "byebug"
+        byebug
+      end
       # Raise the message
       raise message
     end

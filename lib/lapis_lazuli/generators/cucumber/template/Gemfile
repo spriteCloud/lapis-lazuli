@@ -11,11 +11,7 @@ gem 'rspec'
 gem 'gherkin'
 gem 'xml-simple'
 gem 'mechanize'
-
-# Ruby version specific gems
-platforms :ruby_19, :ruby_20 do
-  gem 'debugger'
-end
+gem 'byebug'
 
 # Windows specific
 platforms :mswin, :mingw do
