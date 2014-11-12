@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <script>
+    var addContent = function(){
+      var content = document.createElement('span')
+      content.innerHTML = "content";
+
+      // Clear the body first
+      document.body.innerHTML = ""
+      // Add our new content to the body
+      document.body.appendChild(content);
+    }
+    setTimeout(addContent, 2500);
+    </script>
+  </head>
+  <body>
+    <span>waiting</span>
+  </body>
+</html>

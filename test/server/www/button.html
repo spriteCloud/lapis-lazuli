@@ -1,0 +1,22 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <script>
+      function button_click(button){
+        var output = document.getElementById("output");
+        output.innerHTML = button.id + " clicked";
+      }
+    </script>
+  </head>
+  <body>
+    <button type="submit" id="first" onclick="button_click(this)">first</button>
+    <button type="submit" id="second" onclick="button_click(this)">second</button>
+    <button type="submit" id="third" onclick="button_click(this)">third</button>
+    <button type="submit" id="hidden_fourth" style="display:none;" onclick="button_click(this)">hidden_fourth</button>
+    <button type="submit" id="fifth" onclick="button_click(this)">fifth</button>
+    <button type="submit" id="last" onclick="button_click(this)">last</button>
+    <div id="output"></div>
+  </body>
+</html>

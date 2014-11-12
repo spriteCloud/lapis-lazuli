@@ -1,0 +1,31 @@
+source 'http://rubygems.org'
+source 'https://3RFCCaafQBDr4qAA2qzQ@gem.fury.io/spritecloud/'
+
+
+# Add following two lines to your ~/.gemrc or /etc/gemrc:
+# install: --no-rdoc --no-ri
+# update:  --no-rdoc --no-ri
+
+# Install helper libraries
+gem 'rspec'
+gem 'gherkin'
+gem 'xml-simple'
+gem 'mechanize'
+gem 'byebug'
+
+# Windows specific
+platforms :mswin, :mingw do
+  gem 'win32console'
+  gem 'term-ansicolor'
+end
+
+
+# Install all the webdriver gems and cucumber
+gem 'watir-webdriver'
+gem 'watir-webdriver-performance'
+gem 'watir-scroll'
+gem 'cucumber'
+
+# spriteCloud specific
+gem 'regressinator'
+gem 'lapis_lazuli', :git => 'git@github.com:spriteCloud/lapis-lazuli.git', :branch => 'onno'
