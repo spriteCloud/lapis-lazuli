@@ -106,15 +106,20 @@ module LapisLazuli
         }
       end
 
-      if block.nil?
-        # We need a block to execute the waiting
-        @ll.error("Incorrect settings")
-      elsif settings.has_key? :condition and settings[:condition] == :while
-        # Do a while wait if asked nicely
-        Watir::Wait.while(timeout, message, &block)
-      else
-        # By default do a wait until
-        Watir::Wait.until(timeout, message, &block)
+      begin
+        if block.nil?
+          # We need a block to execute the waiting
+          @ll.error("Incorrect settings")
+        elsif settings.has_key? :condition and settings[:condition] == :while
+          # Do a while wait if asked nicely
+          Watir::Wait.while(timeout, message, &block)
+        else
+          # By default do a wait until
+          Watir::Wait.until(timeout, message, &block)
+        end
+      rescue Watir::Wait::TimeoutError => err
+        settings[:message] = err.message
+        @ll.error(settings)
       end
     end
 
@@ -145,7 +150,8 @@ module LapisLazuli
                 )
               return xpath
             rescue
-              @ll.error("Could not find any #{function_name} with name, id or text equal to '#{string}'")
+              settings[:message] = "Could not find any #{function_name} with name, id or text equal to '#{string}'"
+              @ll.error(settings)
             end
           end
         end
@@ -208,7 +214,9 @@ module LapisLazuli
 
       # Throw an error if not found
       if error and element.nil?
-        @ll.error("Could not find element with settings: #{settings}")
+        # Send all settings to the error function, allows for groups information ext.
+        settings[:message] = "Could not find element with settings: #{settings}"
+        @ll.error(settings)
       else
         return element
       end

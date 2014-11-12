@@ -233,24 +233,44 @@ module LapisLazuli
     def error(settings=nil)
       # Default message
       message = "An unknown error occurred"
+      groups = nil
       # Do we have settings
       if not settings.nil?
         # Simple string input
         if settings.is_a? String
           message = settings
-        elsif settings.has_key? :message
-          message = settings[:message]
-        # Environment errors
-        elsif settings.has_key? :env
-          # Does the value exist or not?
-          exists = ""
-          if not (settings.has_key?(:exists) or settings[:exists])
-            exists = ' not'
+        elsif settings.is_a? Hash
+          if settings.has_key? :message
+            message = settings[:message]
           end
-          message = "Environment setting '#{settings[:env]}'" +
-                    exists + " found"
+          # Environment errors
+          if settings.has_key? :env
+            # Does the value exist or not?
+            exists = ""
+            if not (settings.has_key?(:exists) or settings[:exists])
+              exists = ' not'
+            end
+            message = "Environment setting '#{settings[:env]}'" +
+                      exists + " found"
+          end
+
+          # Grouping of errors
+          if settings.has_key? :groups
+            grouping = settings[:groups]
+            if grouping.is_a? String
+              groups = [grouping]
+            elsif grouping.is_a? Array
+              groups = grouping
+            end
+          end
         end
       end
+
+      # Add the groups to the message
+      if not groups.nil?
+        message = "[#{groups.join("][")}] #{message}"
+      end
+
       # Write the error to the log
       self.log.error(message)
 

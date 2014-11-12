@@ -95,7 +95,8 @@ Then(/^within (\d+) seconds I should see "(.*?)"( disappear)?$/) do |timeout, te
 	ll.browser.wait(
 		:timeout => timeout,
 		:text => text,
-		:condition => condition
+		:condition => condition,
+		:groups => ["wait"]
 	)
 end
 
@@ -110,10 +111,14 @@ Then(/^within (\d+) seconds I get an error waiting for "(.*?)"( disappear)?$/) d
 		ll.browser.wait(
 			:timeout => timeout,
 			:text => text,
-			:condition => condition
+			:condition => condition,
+			:groups => ["wait"]
 		)
-		ll.error("Didn't receive an error with this timeout")
-	rescue
+		ll.error(
+			:message => "Didn't receive an error with this timeout",
+			:groups => ["wait"]
+		)
+	rescue RuntimeError => err
 	end
 end
 
@@ -122,7 +127,10 @@ Then(/^a screenshot should have been created$/) do
   folder = ll.config("screenshot_dir","screenshots")
 	screenshot_prefix = ll.scenario.time[:timestamp] + "_" + ll.scenario.name
 	if not Dir["#{folder}/#{screenshot_prefix}*"]
-		ll.error("Didn't find a screenshot for this scenario")
+		ll.error(
+			:message => "Didn't find a screenshot for this scenario",
+			:groups => ["screenshot"]
+		)
 	end
 end
 
