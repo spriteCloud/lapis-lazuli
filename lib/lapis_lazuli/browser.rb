@@ -173,6 +173,24 @@ module LapisLazuli
     end
 
     ##
+    # Randomized find
+    # Returns an Enumerator
+    #
+    # Example:
+    # enum = ll.browser.findRandomized(:button => {:class => "button"})
+    # a_button = enum.next()
+    # a_different_button = enum.next()
+    #
+    # Enumerator raises StopIteration error on next() if list is exhausted 
+    def findRandomized(settings)
+      function = :findAll
+      if not settings.nil? and settings.has_key? :present and not settings[:present]
+        function = :findAllPresent
+      end
+      return self.send(function, settings).to_a.shuffle.each
+    end
+
+    ##
     # By default it selects the first element of findAllPresent
     # add settings[:present] = false to use findAll
     # TODO: Add :last, :random instead of first of always having the first element
@@ -202,6 +220,8 @@ module LapisLazuli
           if settings[:pick] == :last
             # The last
             element = result.last
+          elsif settings[:pick] == :random
+            element = result.to_a.shuffle.first
           elsif settings[:pick].is_a? Numeric
             # Or based on a number
             element = result[settings[:pick]]
