@@ -50,8 +50,11 @@ module LapisLazuli
             @ll.error("You can't run IOS tests on non-mac machine")
           end
         else
+          profile = Selenium::WebDriver::Firefox::Profile.new
+          profile.proxy = Selenium::WebDriver::Proxy.new :http => 'localhost:8008'
+          browser = Watir::Browser.new :firefox, :profile => profile
           # Defaults to firefox
-          browser = Watir::Browser.new :firefox
+          #browser = Watir::Browser.new :firefox
       end
       return browser
     end
@@ -181,7 +184,7 @@ module LapisLazuli
     # a_button = enum.next()
     # a_different_button = enum.next()
     #
-    # Enumerator raises StopIteration error on next() if list is exhausted 
+    # Enumerator raises StopIteration error on next() if list is exhausted
     def findRandomized(settings)
       function = :findAll
       if not settings.nil? and settings.has_key? :present and not settings[:present]
@@ -268,6 +271,12 @@ module LapisLazuli
       end
       # By default we don't have errors
       return false
+    end
+
+    def has_js_errors?
+      return self.browser.execute_script <<-JS
+        return lapis_lazuli
+      JS
     end
 
     ##

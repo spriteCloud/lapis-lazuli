@@ -136,5 +136,5 @@ end
 
 Then(/^I expect javascript errors$/) do
 	ll.log.info("JS Errors not supported yet")
-	pending
+	p ll.browser.has_js_errors?
 end
