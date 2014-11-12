@@ -28,8 +28,6 @@ module LapisLazuli
 
       # Select the correct browser
       case browser_name.downcase
-        when 'firefox'
-          browser = Watir::Browser.new :firefox
         when 'chrome'
           # Check Platform running script
           if RUBY_PLATFORM.downcase.include?("linux")
@@ -53,7 +51,6 @@ module LapisLazuli
           end
         else
           # Defaults to firefox
-          @ll.log.info("Couldn't determine the browser to use. Using firefox")
           browser = Watir::Browser.new :firefox
       end
       return browser
@@ -191,11 +188,19 @@ module LapisLazuli
 
       element = nil
       # A Watir collection
-      if result.is_a? Watir::ElementCollection
-        element =  result.first
-      # or an array
-      elsif result.is_a? Array
-        element = result[0]
+      if result.is_a? Watir::ElementCollection or result.is_a? Array
+        # By default pick the first
+        element = result.first
+        # Do we need to pic a different one?
+        if settings.has_key? :pick
+          if settings[:pick] == :last
+            # The last
+            element = result.last
+          elsif settings[:pick].is_a? Numeric
+            # Or based on a number
+            element = result[settings[:pick]]
+          end
+        end
       else
         # We didn't get the result we wanted
         @ll.error("Incorrect settings for find #{result}")
