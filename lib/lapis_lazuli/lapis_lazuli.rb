@@ -18,14 +18,12 @@ module LapisLazuli
   # ll.scenario.name
   class LapisLazuli
     include Singleton
-    # The browser
-    @browser
     # Loaded configuration file
     @config
     # Current environment
     @env
     attr_reader :log, :scenario, :time
-    attr_accessor :scenario, :time
+    attr_accessor :scenario, :time, :browser
 
     ##
     # Initialize of the singleton. Only called once

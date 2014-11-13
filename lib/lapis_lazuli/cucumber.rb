@@ -20,15 +20,17 @@ After do |scenario|
     sleep ll.env("step_pause_time", 0)
   end
 
-  # Take a screenshot if needed
-  if scenario.failed? and ll.has_config?('make_screenshot_on_failed_scenario')
-    ll.browser.take_screenshot()
-  end
-
   # Show the URL if we failed
-  if scenario.failed? or ll.browser.has_error?
+  if (scenario.failed? or (ll.scenario.check_browser_errors and ll.browser.has_error?))
+    # Take a screenshot if needed
+    if ll.has_config?('make_screenshot_on_failed_scenario')
+      ll.browser.take_screenshot()
+    end
+
+    ll.browser.close_after_scenario(scenario)
     raise "Scenario failed: #{ll.browser.url}"
   end
+  ll.browser.close_after_scenario(scenario)
 end
 
 # Can be used for debug purposes
@@ -39,5 +41,4 @@ end
 
 # Closing the browser after the test, no reason to leave them lying around
 at_exit do
-  ll.browser.close
 end

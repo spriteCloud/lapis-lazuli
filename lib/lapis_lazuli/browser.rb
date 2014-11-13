@@ -30,9 +30,6 @@ module LapisLazuli
       case browser_name.downcase
         when 'chrome'
           # Check Platform running script
-          if RUBY_PLATFORM.downcase.include?("linux")
-            Watir::Browser::Chrome.path = "/usr/lib/chromium-browser/chromium-browser"
-          end
           browser = Watir::Browser.new :chrome
         when 'safari'
           browser = Watir::Browser.new :safari
@@ -62,8 +59,50 @@ module LapisLazuli
     ##
     # Close and create a new browser
     def restart
+      @ll.log.debug "Restarting browser"
       @browser.close
       @browser = self.create
+    end
+
+    ##
+    # Closes the browser and updates LL so that it will open a new one if needed
+    def close
+      @ll.log.debug "Closing browser"
+      @browser.close
+      # Update LL that we don't have a browser anymore...
+      @ll.browser = nil
+    end
+
+    ##
+    # Close after scenario will close the browser depending on the close_browser_after
+    # configuration
+    #
+    # Valid config options: feature, scenario, never
+    # Default: feature
+    def close_after_scenario(scenario)
+      # Determine the config
+      close_browser_after = "feature"
+      # First check the environment
+      if @ll.has_env?("close_browser_after")
+        close_browser_after = @ll.env("close_browser_after")
+      # before checking the global config
+      elsif @ll.has_config?("close_browser_after")
+        close_browser_after = @ll.config("close_browser_after")
+      end
+
+      case close_browser_after
+      when "scenario"
+        # We always close it
+        self.close
+      when "never"
+        # Do nothing: party time, excellent!
+      else
+        # Is this scenario the last one of its feature?
+        if scenario.feature.feature_elements.last == scenario
+          # Close it
+          self.close
+        end
+      end
     end
 
     ##
@@ -249,33 +288,65 @@ module LapisLazuli
     # Does this page have errors?
     # Checks the pagetext for error_strings that are specified in the config
     def has_error?
-      # Need some error strings
-      if not @ll.has_config?("error_strings")
-        return false
+      errors = self.get_html_errors
+      js_errors = self.get_js_errors
+      if not js_errors.nil?
+        errors += js_errors
       end
 
-      begin
-        # Get the HTML of the page
-        page_text = @browser.html
-        # Try to find all errors
-        @ll.config("error_strings").each {|error|
-          if page_text.scan(error)[0]
-            # Stop if we found one
-            return true
+      if errors.length > 0 or self.get_http_status.to_i > 299
+        errors.each do |error|
+          if error.is_a? Hash
+            @ll.log.debug("#{error["message"]} #{error["url"]} #{error["line"]} #{error["column"]}\n#{error["stack"]}")
+          else
+            @ll.log.debug("#{error}")
           end
-        }
-      rescue RuntimeError => err
-        # An error?
-        # TODO: Check if we need to return true here
-        @ll.log.debug "Cannot read the html for page #{@browser.url}: #{err}"
+        end
+        return true
       end
-      # By default we don't have errors
       return false
     end
 
-    def has_js_errors?
+    def get_html_errors
+      result = []
+      # Need some error strings
+      if @ll.has_config?("error_strings")
+        begin
+          # Get the HTML of the page
+          page_text = @browser.html
+          # Try to find all errors
+          @ll.config("error_strings").each {|error|
+            if page_text.include? error
+              # Add to the result list
+              result.push error
+            end
+          }
+        rescue RuntimeError => err
+          # An error?
+          @ll.log.debug "Cannot read the html for page #{@browser.url}: #{err}"
+        end
+      end
+      # By default we don't have errors
+      return result
+    end
+
+    def get_js_errors
       return self.browser.execute_script <<-JS
-        return lapis_lazuli
+        try {
+          return lapis_lazuli.errors;
+        } catch(err){
+          return null;
+        }
+      JS
+    end
+
+    def get_http_status
+      return self.browser.execute_script <<-JS
+        try{
+          return lapis_lazuli.http.statusCode;
+        } catch(err){
+          return null;
+        }
       JS
     end
 

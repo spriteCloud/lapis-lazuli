@@ -7,10 +7,13 @@ module LapisLazuli
     attr_reader :name
     attr_reader :time
     attr_accessor :running
+    attr_accessor :check_browser_errors
 
     ##
     # Update the scenario with a new one
     def update(scenario)
+      # Reset the fail attribute
+      @check_browser_errors = true
       # The original scenario from cucumber
       @data = scenario
       # A name without special characters

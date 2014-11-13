@@ -135,6 +135,35 @@ Then(/^a screenshot should have been created$/) do
 end
 
 Then(/^I expect javascript errors$/) do
-	ll.log.info("JS Errors not supported yet")
-	p ll.browser.has_js_errors?
+	if ll.browser.get_js_errors.length > 0
+		ll.scenario.check_browser_errors = false
+	else
+		ll.error(
+			:message => "No Javascript errors detected",
+			:groups => ["error"]
+		)
+	end
+end
+
+Then(/^I expect a (\d+) status code$/) do |expected|
+	expected = expected.to_i
+	if ll.browser.get_http_status == expected && expected > 299
+		ll.scenario.check_browser_errors = false
+	elsif ll.browser.get_http_status != expected
+		ll.error(
+			:message => "Incorrect status code: #{ll.browser.get_http_status}",
+			:groups => ["error"]
+		)
+	end
+end
+
+Then(/^I expect (no|\d+) HTML errors?$/) do |expected|
+	expected = expected.to_i
+	ll.scenario.check_browser_errors = false
+	if ll.browser.get_html_errors.length != expected
+		ll.error(
+			:message => "Expected #{expected} errors: #{ll.browser.get_html_errors}",
+			:groups => ["error"]
+		)
+	end
 end
