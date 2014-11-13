@@ -41,4 +41,12 @@ end
 
 # Closing the browser after the test, no reason to leave them lying around
 at_exit do
+  begin
+    if not ll.browser.nil?
+      ll.browser.close
+    end
+  rescue
+    # Nope...
+    ll.log.debug("Failed to close the browser, probably chrome")
+  end
 end
