@@ -1,17 +1,26 @@
+require "securerandom"
 module LapisLazuli
   ##
   # Stores the Cucumber scenario
   # Includes timing, running state and a name
   class Scenario
-    @data
-    attr_reader :name
-    attr_reader :time
-    attr_accessor :running
-    attr_accessor :check_browser_errors
+    attr_reader :name, :time, :uuid, :data
+    attr_accessor :running, :check_browser_errors
 
+    def initialize
+      @uuid = SecureRandom.hex
+      @running = false
+      @name = "start_of_test_run"
+      # The current time
+      @time = {
+        :timestamp => Time.now.strftime('%y%m%d_%H%M%S'),
+        :epoch => Time.now.to_i.to_s
+      }
+    end
     ##
     # Update the scenario with a new one
     def update(scenario)
+      @uuid = SecureRandom.hex
       # Reset the fail attribute
       @check_browser_errors = true
       # The original scenario from cucumber

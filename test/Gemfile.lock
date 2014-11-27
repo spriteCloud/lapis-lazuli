@@ -1,6 +1,6 @@
 GIT
   remote: git@github.com:spriteCloud/lapis-lazuli.git
-  revision: 083386934404d398f3a355000ea6179caafc8cd3
+  revision: 58ce312546779adfbfe9220b10039b5cf569b806
   branch: onno
   specs:
     lapis_lazuli (0.0.1)

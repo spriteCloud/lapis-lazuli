@@ -1,5 +1,6 @@
 require "json"
 require "singleton"
+require "securerandom"
 require "lapis_lazuli/logger"
 require "lapis_lazuli/scenario"
 require "lapis_lazuli/browser"
@@ -22,6 +23,8 @@ module LapisLazuli
     @config
     # Current environment
     @env
+    # session key
+    @uuid
     attr_reader :log, :scenario, :time
     attr_accessor :scenario, :time, :browser
 
@@ -32,12 +35,17 @@ module LapisLazuli
       if ENV["TEST_ENV"]
         @env = ENV["TEST_ENV"]
       end
+      time = Time.now
 
       @time = {
-        :timestamp => Time.now.strftime('%y%m%d_%H%M%S'),
-        :epoch => Time.now.to_i.to_s
+        :timestamp => time.strftime('%y%m%d_%H%M%S'),
+        :epoch => time.to_i.to_s
       }
 
+      @uuid = SecureRandom.hex
+
+      # Current scenario information
+      @scenario = Scenario.new
     end
 
     ##
@@ -58,9 +66,6 @@ module LapisLazuli
         log_file = self.env("logfile")
       end
       @log = TeeLogger.new(log_file)
-
-      # Current scenario information
-      @scenario = Scenario.new
     end
 
     ##
@@ -282,10 +287,32 @@ module LapisLazuli
 
     ##
     # Update the variable with timestamps
-    # TODO: Add random data like random-email or random-name
     def variable(string)
-      string.gsub!("EPOCH_TIMESTAMP", @time[:epoch])
-      string.gsub!("TIMESTAMP",@time[:timestamp])
+      email_domain = "spriteymail.net"
+      if self.has_config?("email_domain")
+        email_domain = self.config("email_domain")
+      end
+      random_uuid = SecureRandom.hex
+      string % {
+        :epoch => @time[:epoch],
+        :timestamp => @time[:timestamp],
+        :uuid => @uuid,
+        :email => "test_#{@uuid}@#{email_domain}",
+        :scenario_name => @scenario.name,
+        :scenario_epoch => @scenario.time[:epoch],
+        :scenario_timestamp => @scenario.time[:timestamp],
+        :scenario_email => "test_#{@uuid}_scenario_#{@scenario.uuid}@#{email_domain}",
+        :scenario_uuid => @scenario.uuid,
+        :random => rand(9999),
+        :random_small => rand(99),
+        :random_lange => rand(999999),
+        :random_uuid => random_uuid,
+        :random_email => "test_#{@uuid}_random_#{random_uuid}@#{email_domain}"
+      }
+    end
+
+    def variable!(string)
+      string.replace(self.variable(string))
     end
   end
 end

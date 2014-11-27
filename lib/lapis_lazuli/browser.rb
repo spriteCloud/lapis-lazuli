@@ -97,10 +97,17 @@ module LapisLazuli
       when "never"
         # Do nothing: party time, excellent!
       else
-        # Is this scenario the last one of its feature?
-        if scenario.feature.feature_elements.last == scenario
-          # Close it
-          self.close
+        case scenario
+        when Cucumber::Ast::Scenario
+          # Is this scenario the last one of its feature?
+          if scenario.feature.feature_elements.last == scenario
+            # Close it
+            self.close
+          end
+        when Cucumber::Ast::OutlineTable::ExampleRow
+          if scenario.scenario_outline.feature.feature_elements.last == scenario.scenario_outline
+            self.close
+          end
         end
       end
     end
