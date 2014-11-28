@@ -217,6 +217,25 @@ module LapisLazuli
     end
 
     ##
+    # Checks if a variabl exist in the env or config
+    def has_env_or_config?(variable)
+      return self.has_env?(variable) || self.has_config?(variable)
+    end
+
+    ##
+    # Get a variable from the config
+    # First checks the environment section, before it checks the global part
+    def env_or_config(variable, default=nil)
+      if self.has_env?(variable)
+        return self.env(variable, default)
+      elsif self.has_config?(variable)
+        return self.config(variable, default)
+      else
+        return nil
+      end
+    end
+
+    ##
     # Checks if there is a browser started
     def has_browser?
       return !@browser.nil?

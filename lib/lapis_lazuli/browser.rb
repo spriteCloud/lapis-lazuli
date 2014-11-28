@@ -8,51 +8,84 @@ module LapisLazuli
   class Browser
     @ll
     @browser
+    @cached_browser_wanted
+    @cached_optional_data
 
     def initialize(ll, *args)
       @ll = ll
       # Create a new browser with optional arguments
-      @browser = self.send(:create, *args)
+      @browser = self.send(:init, *args)
+    end
+
+    ##
+    # The main browser window for testing
+    def init(browser_wanted=(no_browser_wanted=true;nil), optional_data=(no_optional_data=true;nil))
+      # Store the optional data so on restart of the browser it still has the
+      # correct configuration
+      if no_optional_data and optional_data.nil? and @cached_optional_data
+        optional_data = @cached_optional_data
+      elsif optional_data.nil?
+        optional_data = {}
+      else
+        # Duplicate the data as Webdriver modifies it
+        @cached_optional_data = optional_data.dup
+      end
+
+      # Do the same caching stuff for the browser
+      if no_browser_wanted and browser_wanted.nil? and @cached_browser_wanted
+        browser_wanted = @cached_browser_wanted
+      elsif browser_wanted.nil?
+        browser_wanted = ENV['BROWSER']
+      else
+        @cached_browser_wanted = browser_wanted
+      end
+
+      # Create the browser
+      self.create(browser_wanted, optional_data)
     end
 
     ##
     # Create a new browser depending on settings
-    def create(browser_wanted=nil, optional_data={})
+    # Always cached the supplied arguments
+    def create(browser_wanted=nil, optional_data=nil)
       browser = nil
-      # Use the supplied browser or from the ENV
-      browser_name = browser_wanted || ENV['BROWSER']
-      # Do we have a browser in the config, default to firefox
-      # TODO: Should we check the ll.env instead of ll.config?
-      if browser_name.nil?
-        browser_name = @ll.config('browser', 'firefox')
+
+      # No browser? Does the config have a browser? Default to firefox
+      if browser_wanted.nil?
+        browser_wanted = @ll.env_or_config('browser', 'firefox')
       end
 
-      @ll.log.debug("Creating browser: #{browser_name}")
-
       # Select the correct browser
-      case browser_name.downcase
+      case browser_wanted.to_s.downcase
         when 'chrome'
           # Check Platform running script
-          browser = Watir::Browser.new :chrome, optional_data
+          browser = :chrome
         when 'safari'
-          browser = Watir::Browser.new :safari, optional_data
+          browser = :safari
         when 'ie'
           require 'rbconfig'
           if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
-            browser = Watir::Browser.new :ie, optional_data
+            browser = :ie
           else
             @ll.error("You can't run IE tests on non-Windows machine")
           end
         when 'ios'
           if RUBY_PLATFORM.downcase.include?("darwin")
-            browser = Watir::Browser.new :iphone, optional_data
+            browser = :iphone
           else
             @ll.error("You can't run IOS tests on non-mac machine")
           end
         else
-          browser = Watir::Browser.new :firefox, optional_data
+          browser = :firefox
       end
-      return browser
+
+      args = [browser]
+      if not optional_data.nil?
+        args.push(optional_data)
+      end
+
+      browser_instance = Watir::Browser.send(:new, *args)
+      return browser_instance
     end
 
     ##
@@ -60,7 +93,7 @@ module LapisLazuli
     def restart
       @ll.log.debug "Restarting browser"
       @browser.close
-      @browser = self.create
+      @browser = self.init
     end
 
     ##
