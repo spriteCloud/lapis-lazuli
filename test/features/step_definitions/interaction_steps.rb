@@ -36,3 +36,26 @@ Given(/I click (the|a) (first|last|random|[0-9]+[a-z]+) (.*)$/) do |arg1, index,
   type_element = ll.browser.find(options)
   type_element.click
 end
+
+
+Given(/^I create a firefox browser named "(.*?)"( with proxy to "(.*?)")$/) do |name, proxy, proxy_url|
+  browser = nil
+  if proxy
+    ll.log.debug("Starting with profile")
+    profile = Selenium::WebDriver::Firefox::Profile.new
+    profile.proxy = Selenium::WebDriver::Proxy.new :http => proxy_url
+    browser = ll.browser.create :firefox, :profile => profile
+  else
+    browser = ll.browser.create :firefox
+  end
+  ll.scenario.storage.set(name, browser)
+end
+
+Given(/^I close the browser named "(.*?)"$/) do |name|
+  if ll.scenario.storage.has? name
+    browser = ll.scenario.storage.get name
+    browser.close
+  else
+    ll.error("No item in the storage named #{name}")
+  end
+end

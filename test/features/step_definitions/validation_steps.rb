@@ -167,3 +167,14 @@ Then(/^I expect (no|\d+) HTML errors?$/) do |expected|
 		)
 	end
 end
+
+Then(/^the firefox browser named "(.*?)" has a profile$/) do |name|
+	if ll.scenario.storage.has? name
+		browser = ll.scenario.storage.get name
+		if browser.driver.capabilities.firefox_profile.nil?
+			raise "Profile is not set"
+		end
+	else
+		ll.error("No item in the storage named #{name}")
+	end
+end

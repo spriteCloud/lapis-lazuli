@@ -106,6 +106,12 @@ module LapisLazuli
     end
 
     ##
+    # Same as close
+    def quit
+      self.close
+    end
+
+    ##
     # Close after scenario will close the browser depending on the close_browser_after
     # configuration
     #
