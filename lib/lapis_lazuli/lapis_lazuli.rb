@@ -217,10 +217,19 @@ module LapisLazuli
     end
 
     ##
+    # Checks if there is a browser started
+    def has_browser?
+      return !@browser.nil?
+    end
+
+    ##
     # Get the current main browser
-    def browser
+    def browser(*args)
       if @browser.nil?
-        @browser = Browser.new(self)
+        # Add LL to the arguments for the browser
+        browser_args = args.unshift(self)
+        # Create a new browser object
+        @browser = Browser.send(:new, *browser_args)
       end
       return @browser
     end

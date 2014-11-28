@@ -1,6 +1,7 @@
 require 'selenium-webdriver'
 require 'watir-webdriver'
 require "watir-webdriver/extensions/alerts"
+
 module LapisLazuli
   ##
   # Extension to the Watir browser
@@ -8,50 +9,48 @@ module LapisLazuli
     @ll
     @browser
 
-    def initialize(ll)
+    def initialize(ll, *args)
       @ll = ll
-      # Create a new browser
-      @browser = self.create
+      # Create a new browser with optional arguments
+      @browser = self.send(:create, *args)
     end
 
     ##
     # Create a new browser depending on settings
-    def create(browser_wanted=nil)
+    def create(browser_wanted=nil, optional_data={})
       browser = nil
       # Use the supplied browser or from the ENV
       browser_name = browser_wanted || ENV['BROWSER']
       # Do we have a browser in the config, default to firefox
       # TODO: Should we check the ll.env instead of ll.config?
       if browser_name.nil?
-        browser_name =  @ll.config('browser', 'firefox')
+        browser_name = @ll.config('browser', 'firefox')
       end
+
+      @ll.log.debug("Creating browser: #{browser_name}")
 
       # Select the correct browser
       case browser_name.downcase
         when 'chrome'
           # Check Platform running script
-          browser = Watir::Browser.new :chrome
+          browser = Watir::Browser.new :chrome, optional_data
         when 'safari'
-          browser = Watir::Browser.new :safari
+          browser = Watir::Browser.new :safari, optional_data
         when 'ie'
           require 'rbconfig'
           if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
-            browser = Watir::Browser.new :ie
+            browser = Watir::Browser.new :ie, optional_data
           else
             @ll.error("You can't run IE tests on non-Windows machine")
           end
         when 'ios'
           if RUBY_PLATFORM.downcase.include?("darwin")
-            browser = Watir::Browser.new :iphone
+            browser = Watir::Browser.new :iphone, optional_data
           else
             @ll.error("You can't run IOS tests on non-mac machine")
           end
         else
-          profile = Selenium::WebDriver::Firefox::Profile.new
-          profile.proxy = Selenium::WebDriver::Proxy.new :http => 'localhost:8008'
-          browser = Watir::Browser.new :firefox, :profile => profile
-          # Defaults to firefox
-          #browser = Watir::Browser.new :firefox
+          browser = Watir::Browser.new :firefox, optional_data
       end
       return browser
     end

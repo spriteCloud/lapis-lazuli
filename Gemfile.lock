@@ -2,14 +2,24 @@ PATH
   remote: .
   specs:
     lapis_lazuli (0.0.1)
+      byebug (~> 3.5.1)
       facets (~> 2.9)
+      json (~> 1.8.1)
       thor (~> 0.19)
 
 GEM
   remote: https://rubygems.org/
   specs:
+    byebug (3.5.1)
+      columnize (~> 0.8)
+      debugger-linecache (~> 1.2)
+      slop (~> 3.6)
+    columnize (0.8.9)
+    debugger-linecache (1.2.0)
     facets (2.9.3)
+    json (1.8.1)
     rake (10.3.2)
+    slop (3.6.0)
     thor (0.19.1)
 
 PLATFORMS

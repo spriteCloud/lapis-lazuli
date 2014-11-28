@@ -42,7 +42,7 @@ end
 # Closing the browser after the test, no reason to leave them lying around
 at_exit do
   begin
-    if not ll.browser.nil?
+    if ll.has_browser?
       ll.browser.close
     end
   rescue

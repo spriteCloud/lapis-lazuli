@@ -8,5 +8,6 @@ require 'lapis_lazuli/cucumber'
 ll = LapisLazuli::LapisLazuli.instance
 ll.init("config/config.yml");
 
+ll.browser(:firefox)
 # Transition function from old codebase to new
 load 'server/start.rb'
