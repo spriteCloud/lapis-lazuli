@@ -303,7 +303,9 @@ module LapisLazuli
       end
 
       # Write the error to the log
-      self.log.error(message)
+      if self.log
+        self.log.error(message)
+      end
 
       if ENV['BREAKPOINT_ON_FAILURE'] || self.config("breakpoint_on_failure")
         require "byebug"
