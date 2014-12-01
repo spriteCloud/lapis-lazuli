@@ -214,26 +214,69 @@ module LapisLazuli
     # Find DOM elements
     #
     # Examples:
+    # findAll(:like => [:a, :href, "account/login"])
     # findAll(:text_field => {:name => "test"})
     # findAll(:text_field => "test") (xpath search based on name, id or text)
+    # findAll(:text_field => {})
     def findAll(settings)
+      context = @browser
+      has_context = false
+
+      if settings.include? :context
+        context = settings[:context]
+        has_context = true
+        settings.delete :context
+      end
+
+      if settings.include? :like
+        like_opts = settings[:like]
+        # Convert array shorthand to full Hash
+        if like_opts.is_a? Array and like_opts.length == 3
+          like_opts = {
+            :element => like_opts[0],
+            :attribute => like_opts[1],
+            :include => like_opts[2]
+          }
+        end
+
+        # Did we receive the correct input
+        if like_opts.is_a? Hash and
+          like_opts.include? :element and
+          like_opts.include? :attribute and
+          like_opts.include? :include
+            #Do we need to match text or an attirbute
+            if like_opts[:attribute] == :text
+              like_opts[:attribute] = "text()"
+            else
+              like_opts[:attribute] = "@#{like_opts[:attribute]}"
+            end
+
+            # Create the XPath query
+            return context.elements(
+              :xpath,
+              "#{'.' if has_context}//#{like_opts[:element]}[contains(concat(' ',#{like_opts[:attribute]},' '), '#{like_opts[:include]}')]"
+            )
+        end
+        @ll.error("Incorrect settings for find like")
+      end
+
       # For all settings
       settings.each do |key, value|
         # Find the one the browser responds to
         # Example : text_fields or buttons
         function_name = "#{key.to_s}s"
-        if @browser.respond_to? function_name
+        if context.respond_to? function_name
           # If the value is a hash use it as arguments for this function
           if value.is_a? Hash
-            return @browser.send(function_name, value)
+            return context.send(function_name, value)
           else
             string = value.to_s
             begin
               # Find it based on name,id or text
-              xpath = @browser.send(
+              xpath = context.send(
                   function_name,
                   :xpath,
-                  "//*[@name='#{string}' or @id='#{string}' or text()='#{string}']"
+                  "#{'.' if has_context}//*[@name='#{string}' or @id='#{string}' or text()='#{string}']"
                 )
               return xpath
             rescue
