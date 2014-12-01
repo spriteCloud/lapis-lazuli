@@ -222,6 +222,10 @@ module LapisLazuli
       context = @browser
       has_context = false
 
+      # A context is starting position for the search
+      # Example:
+      #  parent = ll.browser.find(:div => "some_parent")
+      #  ll.browser.find(:a => "some_link", :context => parent)
       if settings.include? :context
         context = settings[:context]
         has_context = true
