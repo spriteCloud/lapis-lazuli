@@ -14,11 +14,7 @@ module LapisLazuli
       @storage = Storage.new
       @running = false
       @name = "start_of_test_run"
-      # The current time
-      @time = {
-        :timestamp => Time.now.strftime('%y%m%d_%H%M%S'),
-        :epoch => Time.now.to_i.to_s
-      }
+      self.update_timestamp
     end
     ##
     # Update the scenario with a new one
@@ -30,11 +26,17 @@ module LapisLazuli
       @data = scenario
       # A name without special characters
       @name = scenario.name.gsub(/^.*(\\|\/)/, '').gsub(/[^\w\.\-]/, '_').squeeze('_')
+      self.update_timestamp
+    end
+
+    def update_timestamp
+      now = Time.now
       # The current time
       @time = {
-        :timestamp => Time.now.strftime('%y%m%d_%H%M%S'),
-        :epoch => Time.now.to_i.to_s
+        :timestamp => now.strftime('%y%m%d_%H%M%S'),
+        :epoch => now.to_i.to_s
       }
     end
+
   end
 end
