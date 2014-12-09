@@ -323,10 +323,6 @@ module LapisLazuli
         self.log.error(message)
       end
 
-      if ENV['BREAKPOINT_ON_FAILURE'] || self.config("breakpoint_on_failure")
-        require "byebug"
-        byebug
-      end
       # Raise the message
       raise message
     end
@@ -361,6 +357,21 @@ module LapisLazuli
       string.replace(self.variable(string))
     end
 
+    def start_debugger
+      # First try the more modern 'byebug'
+      begin
+        require "byebug"
+        byebug
+      rescue LoadError
+        # If that fails, try the older debugger
+        begin
+          require 'debugger'
+          debugger
+        rescue LoadError
+          self.log.info "No debugger found, can't break on failures."
+        end
+      end
+    end
 
     def before_scenario(scenario)
       # Update the scenario informaton
@@ -385,6 +396,12 @@ module LapisLazuli
         if self.has_config?('make_screenshot_on_failed_scenario')
           self.browser.take_screenshot()
         end
+
+        # Start debugger if requested.
+        if ENV['BREAKPOINT_ON_FAILURE'] || self.config("breakpoint_on_failure")
+          self.start_debugger
+        end
+
       end
       # Close browser if needed
       self.browser.close_after_scenario(scenario)
