@@ -70,3 +70,6 @@ a github or release version by running:
     $ bundle install
 
 That will resolve the `lapis_lazuli` dependency to the local version.
+
+## License
+Copyright (c) 2013-2014 spriteCloud B.V. and other node-apinator contributors. See [the LICENSE file](LICENSE) for details.
