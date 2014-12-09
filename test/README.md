@@ -2,7 +2,7 @@
 
 This cucumber project contains a web server with simple test cases to validate Lapis Lazuli behavior.
 
-Author: "Onno Steenbergen" <onno@steenbe.nl>
+Author: "Onno Steenbergen" <onno@spritecloud.com>
 
 # Setup
 
@@ -18,10 +18,9 @@ Author: "Onno Steenbergen" <onno@steenbe.nl>
 
     $ bundle install
 
-- Run cucumber or regressinator through bundler:
+- Run cucumber through bundler:
 
     $ bundle exec cucumber
-    $ bundle exec regressinator legacy cucumber
 
 # Contributing
 
