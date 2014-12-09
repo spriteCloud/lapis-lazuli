@@ -1,6 +1,10 @@
-#################################################################################
-# Copyright 2013,2014 spriteCloud B.V. All rights reserved.
-# Author: "Jens Finkhaeuser" <jens@spritecloud.com>
+#
+# LapisLazuli
+# https://github.com/spriteCloud/lapis-lazuli
+#
+# Copyright (c) 2013-2014 spriteCloud B.V. and other LapisLazuli contributors.
+# All rights reserved.
+#
 
 require 'lapis_lazuli/version'
 
