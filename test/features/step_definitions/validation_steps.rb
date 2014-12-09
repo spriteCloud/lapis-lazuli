@@ -125,7 +125,7 @@ end
 Then(/^a screenshot should have been created$/) do
 	# Check if there is a screenshot with the correct name
   folder = ll.config("screenshot_dir","screenshots")
-	screenshot_prefix = ll.scenario.time[:timestamp] + "_" + ll.scenario.name
+	screenshot_prefix = ll.scenario.time[:timestamp] + "_" + ll.scenario.id
 	if not Dir["#{folder}/#{screenshot_prefix}*"]
 		ll.error(
 			:message => "Didn't find a screenshot for this scenario",
@@ -176,5 +176,32 @@ Then(/^the firefox browser named "(.*?)" has a profile$/) do |name|
 		end
 	else
 		ll.error("No item in the storage named #{name}")
+	end
+end
+
+Then(/^I expect the "(.*?)" to exist$/) do |name|
+	ll.browser.find(name)
+end
+
+Then(/^I expect an? (.*?) element to exist$/) do |element|
+	ll.browser.find(element.to_sym)
+end
+
+Then(/^I expect to find an? (.*?) element with (.*?) "(.*?)"$/) do |element, attribute, text|
+	settings = [
+		{element.downcase => { attribute.to_sym => /#{text}/}},
+		{:like =>{
+			:element => element.downcase,
+			:attribute => attribute,
+			:include => text
+			}}
+	]
+	settings.each do |setting|
+		# Find always throws an error if not found
+		elem_find = ll.browser.find(setting)
+		elem_findall = ll.browser.findAll(setting).first
+		if elem_find != elem_findall
+			ll.error "Incorrect results"
+		end
 	end
 end

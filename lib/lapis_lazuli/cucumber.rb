@@ -8,7 +8,7 @@ Before do |scenario|
   ll.scenario.running = true
   ll.scenario.update(scenario)
   # Show the name
-  ll.log.info("Starting Scenario: #{ll.scenario.name}")
+  ll.log.info("Starting Scenario: #{ll.scenario.id}")
 end
 
 After do |scenario|
@@ -20,16 +20,14 @@ After do |scenario|
     sleep ll.env("step_pause_time", 0)
   end
 
-  # Show the URL if we failed
+  # Did we fail?
   if (scenario.failed? or (ll.scenario.check_browser_errors and ll.browser.has_error?))
     # Take a screenshot if needed
     if ll.has_config?('make_screenshot_on_failed_scenario')
       ll.browser.take_screenshot()
     end
-
-    ll.browser.close_after_scenario(scenario)
-    raise "Scenario failed: #{ll.browser.url}"
   end
+  # Close browser if needed
   ll.browser.close_after_scenario(scenario)
 end
 

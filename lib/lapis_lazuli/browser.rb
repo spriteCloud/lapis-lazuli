@@ -222,6 +222,8 @@ module LapisLazuli
       context = @browser
       has_context = false
 
+      settings = parseFindSettings settings
+
       # A context is starting position for the search
       # Example:
       #  parent = ll.browser.find(:div => "some_parent")
@@ -241,24 +243,37 @@ module LapisLazuli
             :attribute => like_opts[1],
             :include => like_opts[2]
           }
+        elsif like_opts.is_a? Symbol
+          like_opts = {
+            :element => like_opts,
+          }
         end
 
         # Did we receive the correct input
         if like_opts.is_a? Hash and
-          like_opts.include? :element and
-          like_opts.include? :attribute and
-          like_opts.include? :include
-            #Do we need to match text or an attirbute
-            if like_opts[:attribute] == :text
-              like_opts[:attribute] = "text()"
-            else
-              like_opts[:attribute] = "@#{like_opts[:attribute]}"
+          like_opts.include? :element
+            # Basic xpath to find an element
+            xpath = "#{'.' if has_context}//#{like_opts[:element]}"
+
+            # Add options to the xpath
+            if like_opts.include? :attribute and like_opts.include? :include
+              # Create new variable so we don't overwrite the old one
+              attribute = nil
+              # Do we need to match text or an attirbute
+              if like_opts[:attribute] == :text
+                attribute = "text()"
+              else
+                attribute = "@#{like_opts[:attribute]}"
+              end
+
+              # Add the options to the xpath query
+              xpath = "#{xpath}[contains(concat(' ',#{attribute},' '), '#{like_opts[:include]}')]"
             end
 
             # Create the XPath query
             return context.elements(
               :xpath,
-              "#{'.' if has_context}//#{like_opts[:element]}[contains(concat(' ',#{like_opts[:attribute]},' '), '#{like_opts[:include]}')]"
+              xpath
             )
         end
         @ll.error("Incorrect settings for find like")
@@ -291,7 +306,7 @@ module LapisLazuli
         end
       end
       # We need one function to respond..
-      @ll.error("Incorrect settings for find")
+      @ll.error("Incorrect settings for find #{settings}")
     end
 
     ##
@@ -330,6 +345,9 @@ module LapisLazuli
     # TODO: Add :last, :random instead of first of always having the first element
     def find(settings)
       error = true
+
+      settings = parseFindSettings settings
+
       if settings.has_key? :error and not settings[:error]
         error = false
       end
@@ -363,7 +381,7 @@ module LapisLazuli
         end
       else
         # We didn't get the result we wanted
-        @ll.error("Incorrect settings for find #{result}")
+        @ll.error("Incorrect settings for find #{settings} #{result}")
       end
 
       # Throw an error if not found
@@ -453,12 +471,18 @@ module LapisLazuli
         # - scenario name
         # - random number between 0 and 10000
         fileloc = @ll.config("screenshot_dir","screenshots") +
-          '/' + @ll.scenario.time[:timestamp] + "_" + @ll.scenario.name +
+          '/' + @ll.scenario.time[:timestamp] + "-" + @ll.scenario.id +
           '-' + Random.rand(10000).to_s + '.png'
+
+        if @ll.config("old_portal", false)
+          name = @ll.scenario.data.name.gsub(/^.*(\\|\/)/, '').gsub(/[^\w\.\-]/, '_').squeeze('_')
+          fileloc = @ll.config("screenshot_dir","screenshots") +
+            '/' + @ll.time[:timestamp] + "_" + name + '.png'
+        end
         # Save the screenshot
         @browser.screenshot.save fileloc
         @ll.log.debug "Screenshot saved: #{fileloc}"
-      rescue RuntimeError => e
+      rescue StandardError => e
         @ll.log.debug "Failed to save screenshot. Error message #{e.message}"
       end
     end
@@ -472,6 +496,20 @@ module LapisLazuli
         return @browser.send(meth.to_s, *args, &block)
       end
       @ll.error("Browser Method Missing: #{meth}")
+    end
+
+    private
+
+    ##
+    # Convert all shortcut settings to a full settings hash
+    def parseFindSettings(settings)
+      if settings.is_a? String
+        settings = {:element => settings}
+      elsif settings.is_a? Symbol
+        settings = {:like => settings}
+      end
+
+      return settings
     end
   end
 end

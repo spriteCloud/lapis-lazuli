@@ -16,7 +16,7 @@ module LapisLazuli
   # ll.config("default_env")
   # ll.browser.goto("http://www.spritecloud.com")
   # ll.log.debug("LL example")
-  # ll.scenario.name
+  # ll.scenario.id
   class LapisLazuli
     include Singleton
     # Loaded configuration file
@@ -285,6 +285,10 @@ module LapisLazuli
                       exists + " found"
           end
 
+          if settings.has_key? :scenario
+            message = "Scenario failed: #{settings[:scenario]}"
+          end
+
           # Grouping of errors
           if settings.has_key? :groups
             grouping = settings[:groups]
@@ -295,6 +299,11 @@ module LapisLazuli
             end
           end
         end
+      end
+
+      # Include URL if we have a browser
+      if self.has_browser?
+        message += " (#{self.browser.url})"
       end
 
       # Add the groups to the message
@@ -328,7 +337,7 @@ module LapisLazuli
         :timestamp => @time[:timestamp],
         :uuid => @uuid,
         :email => "test_#{@uuid}@#{email_domain}",
-        :scenario_name => @scenario.name,
+        :scenario_id => @scenario.id,
         :scenario_epoch => @scenario.time[:epoch],
         :scenario_timestamp => @scenario.time[:timestamp],
         :scenario_email => "test_#{@uuid}_scenario_#{@scenario.uuid}@#{email_domain}",
