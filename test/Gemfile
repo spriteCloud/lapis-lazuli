@@ -11,7 +11,14 @@ gem 'rspec'
 gem 'gherkin'
 gem 'xml-simple'
 gem 'mechanize'
-gem 'byebug'
+
+# Debuggers
+platforms :ruby_18, :ruby_19 do
+  gem 'debugger'
+end
+platforms :ruby_20, :ruby_21 do
+  gem 'byebug'
+end
 
 # Windows specific
 platforms :mswin, :mingw do
@@ -28,4 +35,4 @@ gem 'cucumber'
 
 # spriteCloud specific
 gem 'regressinator'
-gem 'lapis_lazuli', :git => 'git@github.com:spriteCloud/lapis-lazuli.git', :branch => 'onno'
+gem 'lapis_lazuli', :github => 'spriteCloud/lapis-lazuli', :branch => 'master'
