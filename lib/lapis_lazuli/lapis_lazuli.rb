@@ -360,5 +360,35 @@ module LapisLazuli
     def variable!(string)
       string.replace(self.variable(string))
     end
+
+
+    def before_scenario(scenario)
+      # Update the scenario informaton
+      self.scenario.running = true
+      self.scenario.update(scenario)
+      # Show the name
+      self.log.info("Starting Scenario: #{self.scenario.id}")
+    end
+
+    def after_scenario(scenario)
+      # The current scenario has finished
+      self.scenario.running = false
+
+      # Sleep if needed
+      if self.has_env?("step_pause_time")
+        sleep self.env("step_pause_time", 0)
+      end
+
+      # Did we fail?
+      if (scenario.failed? or (self.scenario.check_browser_errors and self.browser.has_error?))
+        # Take a screenshot if needed
+        if self.has_config?('make_screenshot_on_failed_scenario')
+          self.browser.take_screenshot()
+        end
+      end
+      # Close browser if needed
+      self.browser.close_after_scenario(scenario)
+
+    end
   end
 end
