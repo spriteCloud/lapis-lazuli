@@ -59,3 +59,8 @@ Given(/^I close the browser named "(.*?)"$/) do |name|
     ll.error("No item in the storage named #{name}")
   end
 end
+
+When(/^I find "(.*?)" and name it "(.*?)"$/) do |id, name|
+  element = ll.browser.find(id)
+  ll.scenario.storage.set(name, element)
+end

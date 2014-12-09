@@ -25,3 +25,38 @@ Scenario Outline: Find by attribute
   | element | attribute | text |
   | button | class | submit |
   | a | href | /full/link |
+  | div | text | Second |
+
+@find_04
+Scenario Outline: Find one of multiple
+  Given I navigate to the find test page
+  Then I expect to find a <element1> element or a <element2> element
+
+  Examples:
+  | element1 | element2 |
+  | a | does_not_exist |
+  | does_not_exist | a |
+
+@find_05
+Scenario Outline: Find with context
+  Given I navigate to the find test page
+  When I find "<context>" and name it "test_element"
+  Then I should find "<element>" using "test_element" as context
+  And I should not find "<error_element>" using "test_element" as context
+
+  Examples:
+  | context | element | error_element |
+  | deep3 | deep6 | deep1 |
+  | deep2 | deep7 | deep1 |
+  | deep6 | deep7 | header |
+
+@find_06
+Scenario Outline: FindAllPresent with context
+  Given I navigate to the find test page
+  When I find "<context>" and name it "test_element"
+  Then I should find "<element>" <number> times using "test_element" as context
+  Examples:
+  | context | element | number |
+  | deep3 | deep6 | 1 |
+  | deep3 | count | 4 |
+  | deep3 | does_not_exist | 0 |
