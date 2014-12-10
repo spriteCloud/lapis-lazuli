@@ -4,13 +4,24 @@
     <meta charset="utf-8">
     <script>
     var addContent = function(){
-      var content = document.createElement('span')
-      content.innerHTML = "content";
-
       // Clear the body first
       document.body.innerHTML = ""
+
       // Add our new content to the body
+      var content = document.createElement('span')
+      content.innerHTML = "content";
       document.body.appendChild(content);
+
+      // Add a few more things...
+      var span = document.createElement('span')
+      span.innerHTML = "foo";
+      span.className = "asdf-foo-bar";
+      document.body.appendChild(span);
+
+      var div = document.createElement('div');
+      div.innerHTML = "bar";
+      div.id = "bar";
+      document.body.appendChild(div);
     }
     setTimeout(addContent, 2500);
     </script>

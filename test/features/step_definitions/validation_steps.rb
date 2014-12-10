@@ -4,6 +4,10 @@
 # Author: "Onno Steenbergen" <onno@steenbe.nl>
 
 require 'lapis_lazuli'
+require 'test/unit/assertions'
+
+include Test::Unit::Assertions
+
 ll = LapisLazuli::LapisLazuli.instance
 
 Then(/(first|last|random|[0-9]+[a-z]+) (.*) should (not )?be the (first|last|[0-9]+[a-z]+) element on the page$/) do |index, type, differ, location_on_page|
@@ -85,7 +89,7 @@ Then(/(first|last|random|[0-9]+[a-z]+) (.*) should (not )?be present$/) do |inde
 	end
 end
 
-Then(/^within (\d+) seconds I should see "(.*?)"( disappear)?$/) do |timeout, text, condition|
+Then(/^within (\d+) seconds I should see "([^"]+?)"( disappear)?$/) do |timeout, text, condition|
   if condition
 		condition = :while
 	else
@@ -97,6 +101,46 @@ Then(/^within (\d+) seconds I should see "(.*?)"( disappear)?$/) do |timeout, te
 		:text => text,
 		:condition => condition,
 		:groups => ["wait"]
+	)
+end
+
+Then(/^within (\d+) seconds I should see "([^"]+?)" and "([^"]+?)"( disappear)?$/) do |timeout, first, second, condition|
+	if condition
+		condition = :while
+	else
+		condition = :until
+	end
+
+	ll.browser.wait_multiple(
+		:timeout => timeout,
+		:condition => condition,
+		:operator => :all_of,
+		:groups => ["wait"],
+		:list => [
+			{ :tag_name => 'span', :class => /foo/ },
+			{ :tag_name => 'div', :id => 'bar' }
+		]
+	)
+end
+
+Then(/^within (\d+) seconds I should see added elements with matching$/) do |timeout|
+	elems = ll.browser.wait_multiple(
+		:timeout => timeout,
+		:condition => :until,
+		:operator => :all_of,
+		:groups => ["wait"],
+		:list => [
+			{ :tag_name => 'span', :class => /foo/, :text => /foo/ },
+			{ :tag_name => 'div', :id => 'bar', :html => "bar" }
+		]
+	)
+ 	assert 2 == elems.length
+end
+
+Then(/^within 10 seconds I should see either added element/) do
+	ll.browser.wait_multiple(
+			{ :tag_name => 'a', :class => /foo/ },
+			{ :tag_name => 'div', :id => 'bar' }
 	)
 end
 

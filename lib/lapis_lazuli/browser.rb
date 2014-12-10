@@ -9,11 +9,14 @@
 require 'selenium-webdriver'
 require 'watir-webdriver'
 require "watir-webdriver/extensions/alerts"
+require 'test/unit/assertions'
 
 module LapisLazuli
   ##
   # Extension to the Watir browser
   class Browser
+    include Test::Unit::Assertions
+
     @ll
     @browser
     @cached_browser_wanted
@@ -156,6 +159,204 @@ module LapisLazuli
           end
         end
       end
+    end
+
+
+    ##
+    # Waits for multiple elements, each specified by any number of watir
+    # selectors. Instead of using tag name function directly, specify the
+    # :tag_name field, e.g.:
+    #
+    # elements = wait_multiple(
+    #   {:tag_name => 'a', :class => /foo/},
+    #   {:tag_name => 'div', :id => "bar"}
+    # )
+    #
+    # By default, the function waits for an element to become present. You
+    # can, however, specify which condition the function should wait for for
+    # each individual element:
+    #
+    # elements = wait_multiple(
+    #   {:tag_name => 'a', :class => /foo/, :wait_for => :exists?},
+    #   {:tag_name => 'div', :id => "bar", :wait_for => :present?}
+    # )
+    #
+    # In addition to standard watir selectors, this function accepts the
+    # following:
+    #   :text       - searches for the given text. The value may be a regular
+    #                 expression (slow).
+    #   :html       - searches for the given HTML.
+    #
+    # Finally, wait_multiple accepts options; if options are specified, then
+    # the element list to wait for must be provided as the :list option, e.g.:
+    #
+    # elements.wait_multiple(
+    #   :timeout => 3,
+    #   :list => [
+    #     {:tag_name => 'a', :class => /foo/, :wait_for => :exists?},
+    #     {:tag_name => 'div', :id => "bar", :wait_for => :present?}
+    #  ]
+    # )
+    #
+    # The options wait_multiple accepts are:
+    #   :timeout    - a timeout to wait for, in seconds. Defaults to 10
+    #   :operator   - either :one_of or :all_of; specifies whether one or all
+    #                 of the elements must fulfil their :wait_for condition
+    #                 for the condition to be successful. Defaults to :one_of.
+    #   :condition  - either :until or :while; specifies whether the function
+    #                 waits until the conditions are met, or while the
+    #                 conditions are met. Defaults to :until
+    #
+    def wait_multiple(*args)
+      # Default options
+      options = {
+        :timeout => 10,
+        :condition => :until,
+        :operator => :one_of,
+        :list => args
+      }
+
+      # If we have a single hash argument, we'll treat this as options, and
+      # expect the :list field.
+      if 1 == args.length and args[0].is_a? Hash
+        opts = args[0]
+        options.each do |k, v|
+          if not opts.has_key? k
+            opts[k] = v
+          end
+        end
+
+        assert opts.has_key?(:list), "Need to provide a list of element selectors."
+
+        options = opts
+      end
+
+      # Ensure correct types
+      options[:timeout] = options[:timeout].to_i
+      options[:condition] = options[:condition].to_sym
+      options[:operator] = options[:operator].to_sym
+
+      # pp "Options", options
+
+      # Construct the code to be evaluated
+      all = []
+      checks = {}
+      options[:list].each do |item|
+        extra = {}
+
+        # Extract and store additional information
+        method = item.fetch(:wait_for, "present?").to_sym
+        item.delete(:wait_for)
+
+        extra[:html] = item.fetch(:html, nil)
+        item.delete(:html)
+
+        extra[:text] = item.fetch(:text, nil)
+        item.delete(:text)
+
+        checks[item] = extra
+
+        # Basic element, just using the method
+        all << lambda {
+          res = self.element(item).send(method)
+          # @ll.log.debug("Checking element(#{item}).#{method.to_s} => #{res}")
+          return res
+        }
+      end
+
+      # p "Eval: #{all}"
+
+      # Generate the block for evaluating "all" items.
+      all_block = nil
+      case options[:operator]
+      when :all_of
+        all_block = lambda {
+          all.each do |func|
+            res = func.call
+            # @ll.log.debug("Got: #{res}")
+            if not res
+              return false
+            end
+          end
+          return true
+        }
+      when :one_of
+        all_block = lambda {
+          all.each do |func|
+            res = func.call
+            # @ll.log.debug("Got: #{res}")
+            if res
+              return true
+            end
+          end
+          return false
+        }
+      else
+        options[:message] = "Invalid operatior '#{options[:operator]}'."
+        @ll.error(options)
+      end
+
+      # Wait for it all to happen. What we're calling depends on the
+      # condition.
+      err = nil
+      begin
+        case options[:condition]
+        when :until
+          res = Watir::Wait.until(options[:timeout]) { all_block.call }
+        when :while
+          res = Watir::Wait.while(options[:timeout]) { all_block.call }
+        else
+          options[:message] = "Invalid condition '#{options[:condition]}'."
+          @ll.error(options)
+        end
+      rescue Watir::Wait::TimeoutError => e
+        @ll.log.debug("Caught timeout: #{e}")
+        err = e
+      end
+
+      # p "Error: #{err}"
+
+      # If we didn't get a timeout error, we know that some of the specified
+      # arguments meet their condition; let's find out which ones.
+      results = []
+      options[:list].each do |item|
+        elem = self.element(item)
+        if not elem
+          continue
+        end
+
+        # Find the actual element, and add it to the results, but only if it
+        # matches the text/html filters.
+        if checks[item].has_key?(:text) and not checks[item][:text].nil?
+          # Text match
+          text = checks[item][:text]
+          if text.is_a? Regexp
+            if elem.text =~ text
+              results << elem
+            end
+          else
+            if elem.text.include? text
+              results << elem
+            end
+          end
+        elsif checks[item].has_key?(:html) and not checks[item][:html].nil?
+          # HTML match
+          if elem.text.include? checks[item][:html]
+            results << elem
+          end
+        else
+          # No filters, just add the thing
+          results << elem
+        end
+      end
+
+      # p "Results: #{results}"
+
+      if not err.nil? and results.empty?
+        raise err.class, "#{err.message}: #{options[:list]}", err.backtrace
+      end
+
+      results
     end
 
     ##
