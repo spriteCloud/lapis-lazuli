@@ -8,11 +8,7 @@
 
 ################################################################################
 # Set the global variables
-default_env: production                   # defines the environment
-screenshots_dir: screenshots              # where to save the screenshots
-step_pause_time: 1                        # Waiting time in seconds defined after a step completes
-make_screenshot_on_failed_scenario: true  # make a screenshot after a scenario fails
-
+default_env: production              # defines the environment
 
 ################################################################################
 # List of error strings. Step will fail if one of these strings is detected.
@@ -21,7 +17,6 @@ error_strings:
     "Server Error",
     "Error: Page Not Found"
   ]
-
 
 ################################################################################
 # Environment specific variables
