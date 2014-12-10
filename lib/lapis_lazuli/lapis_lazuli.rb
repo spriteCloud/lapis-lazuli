@@ -323,6 +323,11 @@ module LapisLazuli
         self.log.error(message)
       end
 
+      # Start debugger, if necessary
+      if ENV['BREAKPOINT_ON_FAILURE'] || self.config("breakpoint_on_failure")
+        self.start_debugger
+      end
+
       # Raise the message
       raise message
     end
@@ -396,16 +401,9 @@ module LapisLazuli
         if self.has_config?('make_screenshot_on_failed_scenario')
           self.browser.take_screenshot()
         end
-
-        # Start debugger if requested.
-        if ENV['BREAKPOINT_ON_FAILURE'] || self.config("breakpoint_on_failure")
-          self.start_debugger
-        end
-
       end
       # Close browser if needed
       self.browser.close_after_scenario(scenario)
-
     end
   end
 end
