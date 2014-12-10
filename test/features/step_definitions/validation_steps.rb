@@ -161,21 +161,19 @@ Then(/^within (\d+) seconds I get an error waiting for "(.*?)"( disappear)?$/) d
 		)
 		ll.error(
 			:message => "Didn't receive an error with this timeout",
-			:screenshot => false,
+			:screenshot => true,
 			:groups => ["wait"]
 		)
-	rescue RuntimeError => err
+	rescue StandardError => err
 	end
 end
 
 Then(/^a screenshot should have been created$/) do
 	# Check if there is a screenshot with the correct name
-	folder = ll.config("screenshot_dir","screenshots")
-	screenshot_prefix = ll.scenario.time[:timestamp] + "_" + ll.scenario.id
- 	pattern = "#{folder}/#{screenshot_prefix}*"
-	if Dir[pattern].empty?
+	name = ll.browser.screenshot_name
+	if Dir[name].empty?
 		ll.error(
-			:message => "Didn't find a screenshot for this scenario: #{pattern}",
+			:message => "Didn't find a screenshot for this scenario: #{name}",
 			:groups => ["screenshot"]
 		)
 	end
