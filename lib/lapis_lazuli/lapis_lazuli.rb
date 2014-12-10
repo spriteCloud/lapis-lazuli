@@ -211,17 +211,29 @@ module LapisLazuli
 
       # Otherwise try to find it in the configuration object
       variable.split(".").each do |part|
-        if result.nil?
-          raise "Incorrect configuration variable"
+        if default.nil? and result.nil?
+          raise "Unknown configuration variable '#{variable}' and no default given!"
         end
         result = result[part]
       end
-      return result || default
+
+      if default.nil? and result.nil?
+        if CONFIG_OPTIONS.has_key? variable
+          return CONFIG_OPTIONS[variable][0]
+        else
+          raise "Unknown configuration variable '#{variable}' and no default given!"
+        end
+      else
+        return result || default
+      end
     end
 
     ##
     # Does the environment have a certain config variable
     def has_env?(variable)
+      if @env.nil?
+        return false
+      end
       return self.has_config?("#{@env}.#{variable}")
     end
 
@@ -279,7 +291,8 @@ module LapisLazuli
     # ll.error("Simple message") => "Simple message"
     # ll.error(:message => "Simple message") => "Simple message"
     # ll.error(:env => "test") => "Environment setting 'test' not found"
-    # ll.error(:env => "test", :exists: true) => "Environment setting 'test' found"
+    # ll.error(:env => "test", :exists => true) => "Environment setting 'test' found"
+    # ll.error(:screenshot => true, :message => "Simple") => "Simple", and screenshot is taken with the message name included.
     def error(settings=nil)
       # Default message
       message = "An unknown error occurred"
@@ -335,8 +348,13 @@ module LapisLazuli
         self.log.error(message)
       end
 
+      # Take screenshot, if necessary
+      if settings.has_key? :screenshot and settings[:screenshot]
+        self.browser.take_screenshot(message)
+      end
+
       # Start debugger, if necessary
-      if self.config("breakpoint_on_error")
+      if self.env_or_config("breakpoint_on_error")
         self.start_debugger
       end
 
@@ -348,8 +366,8 @@ module LapisLazuli
     # Update the variable with timestamps
     def variable(string)
       email_domain = "spriteymail.net"
-      if self.has_config?("email_domain")
-        email_domain = self.config("email_domain")
+      if self.has_env_or_config?("email_domain")
+        email_domain = self.env_or_config("email_domain")
       end
       random_uuid = SecureRandom.hex
       string % {
@@ -418,14 +436,14 @@ module LapisLazuli
       self.scenario.running = false
 
       # Sleep if needed
-      if self.has_env?("step_pause_time")
-        sleep self.env("step_pause_time", 0)
+      if self.has_env_or_config?("step_pause_time")
+        sleep self.env_or_config("step_pause_time")
       end
 
       # Did we fail?
       if (scenario.failed? or (self.scenario.check_browser_errors and self.browser.has_error?))
         # Take a screenshot if needed
-        if self.has_config?('make_screenshot_on_failed_scenario')
+        if self.has_env_or_config?('screenshot_on_failure')
           self.browser.take_screenshot()
         end
       end
