@@ -306,7 +306,7 @@ module LapisLazuli
     # ll.error(:screenshot => true, :message => "Simple") => "Simple", and screenshot is taken with the message name included.
     def error(settings=nil)
       # Default message
-      message = "An unknown error occurred"
+      message = nil
       groups = nil
       # Do we have settings
       if not settings.nil?
@@ -346,6 +346,17 @@ module LapisLazuli
         end
       end
 
+      # Exception message shouldn't get lost
+      if settings.has_key? :exception and not settings[:exception].nil?
+        if message.nil?
+          message = settings[:exception].message
+        else
+          message = "#{message} - #{settings[:exception].message}"
+        end
+      elsif message.nil?
+        message = "An unknown error occurred."
+      end
+
       # Include URL if we have a browser
       if self.has_browser?
         message += " (#{self.browser.url})"
@@ -372,7 +383,13 @@ module LapisLazuli
       end
 
       # Raise the message
-      raise message
+      if settings.has_key? :exception and not settings[:exception].nil?
+        ex = settings[:exception]
+        # message already contains ex.message here - or it should
+        raise ex.class, message, ex.backtrace
+      else
+        raise message
+      end
     end
 
     ##
