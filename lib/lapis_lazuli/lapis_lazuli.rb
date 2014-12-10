@@ -194,10 +194,13 @@ module LapisLazuli
     #
     # Raises error if traversing the object is impossible
     def config(variable=false, default=nil)
+      # No variable given? Return the entire object.
       result = @config
       if not variable
         return result
       end
+
+      # Otherwise try to find it in the configuration object
       variable.split(".").each do |part|
         if result.nil?
           raise "Incorrect configuration variable"
@@ -358,10 +361,15 @@ module LapisLazuli
       }
     end
 
+    ##
+    # Same as variable, but modify the string.
     def variable!(string)
       string.replace(self.variable(string))
     end
 
+    ##
+    # If byebug (ruby >= 2.0) or debugger (ruby < 2.0) are installed, start
+    # the debugger now.
     def start_debugger
       # First try the more modern 'byebug'
       begin
@@ -378,10 +386,14 @@ module LapisLazuli
       end
     end
 
+    ##
+    # Hook invoked in AfterConfiguration
     def after_configuration(config)
       config.options[:formats] << ["LapisLazuli::Formatter", STDERR]
     end
 
+    ##
+    # Hook invoked in BeforeScenario
     def before_scenario(scenario)
       # Update the scenario informaton
       self.scenario.running = true
@@ -390,6 +402,8 @@ module LapisLazuli
       self.log.info("Starting Scenario: #{self.scenario.id}")
     end
 
+    ##
+    # Hook invoked in AfterScenario
     def after_scenario(scenario)
       # The current scenario has finished
       self.scenario.running = false
