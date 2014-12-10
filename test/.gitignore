@@ -1,1 +1,7 @@
 .*.sw*
+
+logs
+tmp
+version_tmp
+screenshots
+Gemfile.lock

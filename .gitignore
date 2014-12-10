@@ -12,10 +12,6 @@ bundle
 pkg
 rdoc
 spec/reports
-test/tmp
-test/version_tmp
-test/screenshots/
-test/Gemfile.lock
 tmp
 .ruby-version
 
