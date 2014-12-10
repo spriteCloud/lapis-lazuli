@@ -213,7 +213,9 @@ module LapisLazuli
         :timeout => 10,
         :condition => :until,
         :operator => :one_of,
-        :list => args
+        :list => args,
+        :screenshot => false,
+        :groups => nil,
       }
 
       # If we have a single hash argument, we'll treat this as options, and
@@ -240,28 +242,56 @@ module LapisLazuli
 
       # Construct the code to be evaluated
       all = []
-      checks = {}
       options[:list].each do |item|
-        extra = {}
-
         # Extract and store additional information
         method = item.fetch(:wait_for, "present?").to_sym
         item.delete(:wait_for)
 
-        extra[:html] = item.fetch(:html, nil)
+        # :text and :html are synonymous
+        text = item.fetch(:text, item.fetch(:html, nil))
+        item.delete(:text)
         item.delete(:html)
 
-        extra[:text] = item.fetch(:text, nil)
-        item.delete(:text)
+        # Function for finding/filtering the element
+        matcher = lambda {
+          # Basics: find it.
+          if item.empty?
+            # @ll.log.debug("No element specified; starting with the entire document.")
+            elem = @browser
+          else
+            elem = self.element(item)
+            # @ll.log.debug("Finding element(#{item}) => #{elem}")
+          end
 
-        checks[item] = extra
+          # Check whether the method returns true
+          if not item.empty?
+            res = elem.send(method)
+            # @ll.log.debug("Checking elem.#{method} => #{res}")
+            if not res
+              return false
+            end
+          end
 
-        # Basic element, just using the method
-        all << lambda {
-          res = self.element(item).send(method)
-          # @ll.log.debug("Checking element(#{item}).#{method.to_s} => #{res}")
-          return res
+          # Now do the text matching
+          if not text.nil?
+            if text.is_a? Regexp and elem.text =~ text
+              # @ll.log.debug("Matched against regex #{text}")
+              return elem
+            elsif elem.text.include? text
+              # @ll.log.debug("Matched to include string #{text}")
+              return elem
+            else
+              # @ll.log.debug("No text match")
+              return false
+            end
+
+          else
+            # No matching to perform
+            return elem
+          end
         }
+
+        all << matcher
       end
 
       # p "Eval: #{all}"
@@ -319,41 +349,19 @@ module LapisLazuli
       # If we didn't get a timeout error, we know that some of the specified
       # arguments meet their condition; let's find out which ones.
       results = []
-      options[:list].each do |item|
-        elem = self.element(item)
-        if not elem
-          continue
-        end
-
-        # Find the actual element, and add it to the results, but only if it
-        # matches the text/html filters.
-        if checks[item].has_key?(:text) and not checks[item][:text].nil?
-          # Text match
-          text = checks[item][:text]
-          if text.is_a? Regexp
-            if elem.text =~ text
-              results << elem
-            end
-          else
-            if elem.text.include? text
-              results << elem
-            end
-          end
-        elsif checks[item].has_key?(:html) and not checks[item][:html].nil?
-          # HTML match
-          if elem.text.include? checks[item][:html]
-            results << elem
-          end
-        else
-          # No filters, just add the thing
-          results << elem
+      all.each do |func|
+        res = func.call
+        if res
+          results << res
         end
       end
 
       # p "Results: #{results}"
 
+      # Handle errors
       if not err.nil? and results.empty?
-        raise err.class, "#{err.message}: #{options[:list]}", err.backtrace
+        options[:exception] = err
+        @ll.error(options)
       end
 
       results
@@ -367,56 +375,30 @@ module LapisLazuli
     # wait(:timeout => 5, :text => /Hello World/i)
     # wait(:timeout => 10, :html => "<span>", :condition => :while)
     def wait(settings)
-      # Default Message
-      message = "Waiting"
-      # Timeout
-      timeout = 10
-      # Set the timeout if settings has one
-      if settings.has_key? :timeout
-        timeout = settings[:timeout].to_i
-      end
+      # Get options
+      options = {}
 
-      # Placeholder for the block we want
-      block = nil
-      if settings.has_key? :text
-        # Waiting for text
-        text = settings[:text]
-        message = "Waiting for text '#{text}'"
-        # Do we use regular expressions
-        if text.is_a? Regexp
-          block = lambda {|arg|
-            self.browser.text =~ text
-          }
-        else
-          # Plain-text matching
-          block = lambda {|arg|
-            self.browser.text.include?(text)
-          }
-        end
-      # Waiting for HTML
-      elsif settings.has_key? :html
-        html = settings[:html]
-        message = "Waiting for html '#{html}'"
-        block = lambda {|arg|
-          self.browser.html.include?(html)
-        }
-      end
+      options[:timeout] = settings.fetch(:timeout, 10)
+      settings.delete(:timeout)
 
-      begin
-        if block.nil?
-          # We need a block to execute the waiting
-          @ll.error("Incorrect settings")
-        elsif settings.has_key? :condition and settings[:condition] == :while
-          # Do a while wait if asked nicely
-          Watir::Wait.while(timeout, message, &block)
-        else
-          # By default do a wait until
-          Watir::Wait.until(timeout, message, &block)
-        end
-      rescue Watir::Wait::TimeoutError => err
-        settings[:message] = err.message
-        @ll.error(settings)
+      options[:condition] = settings.fetch(:condition, :until)
+      settings.delete(:condition)
+
+      options[:groups] = settings.fetch(:groups, nil)
+      settings.delete(:groups)
+
+      options[:screenshot] = settings.fetch(:screenshot, false)
+      settings.delete(:screenshot)
+
+      # List of one element
+      options[:list] = [settings]
+
+      elems = self.wait_multiple(options)
+
+      if elems.length > 0
+        return elems.first
       end
+      return nil
     end
 
     ##
@@ -687,6 +669,28 @@ module LapisLazuli
     end
 
     ##
+    # Returns the name of the screenshot, if take_screenshot is called now.
+    def screenshot_name(suffix="")
+      dir = @ll.env_or_config("screenshot_dir")
+
+      # Generate the file name according to the new or old scheme.
+      name = nil
+      case @ll.env_or_config("screenshot_scheme")
+      when "new"
+        # FIXME random makes this non-repeatable, sadly
+        name = "#{@ll.scenario.time[:iso_short]}-#{@ll.scenario.id}-#{Random.rand(10000).to_s}.png"
+      else # 'old' and default
+        name = @ll.scenario.data.name.gsub(/^.*(\\|\/)/, '').gsub(/[^\w\.\-]/, '_').squeeze('_')
+        name = @ll.time[:timestamp] + "_" + name + '.png'
+      end
+
+      # Full file location
+      fileloc = "#{dir}#{File::SEPARATOR}#{name}"
+
+      return fileloc
+    end
+
+    ##
     # Taking a screenshot of the current page.
     # Using the name as defined at the start of every scenario
     def take_screenshot(suffix="")
@@ -700,18 +704,7 @@ module LapisLazuli
         # not concurrency safe.
       end
 
-      # Generate the file name according to the new or old scheme.
-      name = nil
-      case @ll.env_or_config("screenshot_scheme")
-      when "new"
-        name = "#{@ll.scenario.time[:iso_short]}-#{@ll.scenario.id}-#{Random.rand(10000).to_s}.png"
-      else # 'old' and default
-        name = @ll.scenario.data.name.gsub(/^.*(\\|\/)/, '').gsub(/[^\w\.\-]/, '_').squeeze('_')
-        name = @ll.time[:timestamp] + "_" + name + '.png'
-      end
-
-      # Full file location
-      fileloc = "#{dir}#{File::SEPARATOR}#{name}"
+      fileloc = self.screenshot_name(suffix)
 
       # Write screenshot
       begin
