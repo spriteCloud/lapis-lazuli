@@ -69,7 +69,8 @@ just top-level keys, e.g.:
 The configuration files can contain any configuration options, but a few are
 interpreted by LapisLazuli. Note that instead of specifying these supported
 options in the configuraiton file, you may also provide them in the environment
-(convert option name to upper case).
+(convert option name to upper case). Environment variables override the
+configuration file contents.
 
 INTRO
       STDOUT.flush
