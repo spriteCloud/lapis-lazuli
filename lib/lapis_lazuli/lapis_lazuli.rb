@@ -378,6 +378,10 @@ module LapisLazuli
       end
     end
 
+    def after_configuration(config)
+      config.options[:formats] << ["LapisLazuli::Formatter", STDERR]
+    end
+
     def before_scenario(scenario)
       # Update the scenario informaton
       self.scenario.running = true

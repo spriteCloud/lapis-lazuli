@@ -24,6 +24,10 @@ AfterStep('@pause') do |scenario|
   STDIN.getc
 end
 
+AfterConfiguration do |config|
+  ll.after_configuration(config)
+end
+
 # Closing the browser after the test, no reason to leave them lying around
 at_exit do
   begin
