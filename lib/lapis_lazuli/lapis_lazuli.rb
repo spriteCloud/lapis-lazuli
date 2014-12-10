@@ -336,7 +336,7 @@ module LapisLazuli
       end
 
       # Start debugger, if necessary
-      if self.config("breakpoint_on_failure")
+      if self.config("breakpoint_on_error")
         self.start_debugger
       end
 
