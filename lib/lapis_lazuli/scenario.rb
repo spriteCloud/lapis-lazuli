@@ -61,6 +61,8 @@ module LapisLazuli
       # The current time
       @time = {
         :timestamp => now.strftime('%y%m%d_%H%M%S'),
+        :iso_timestamp => now.utc.strftime("%FT%TZ"),
+        :iso_short => now.utc.strftime("%y%m%dT%H%M%SZ"),
         :epoch => now.to_i.to_s
       }
     end
