@@ -170,11 +170,12 @@ end
 
 Then(/^a screenshot should have been created$/) do
 	# Check if there is a screenshot with the correct name
-  folder = ll.config("screenshot_dir","screenshots")
+	folder = ll.config("screenshot_dir","screenshots")
 	screenshot_prefix = ll.scenario.time[:timestamp] + "_" + ll.scenario.id
-	if not Dir["#{folder}/#{screenshot_prefix}*"]
+ 	pattern = "#{folder}/#{screenshot_prefix}*"
+	if Dir[pattern].empty?
 		ll.error(
-			:message => "Didn't find a screenshot for this scenario",
+			:message => "Didn't find a screenshot for this scenario: #{pattern}",
 			:groups => ["screenshot"]
 		)
 	end
