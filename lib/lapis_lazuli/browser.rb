@@ -127,14 +127,7 @@ module LapisLazuli
     # Default: feature
     def close_after_scenario(scenario)
       # Determine the config
-      close_browser_after = "feature"
-      # First check the environment
-      if @ll.has_env?("close_browser_after")
-        close_browser_after = @ll.env("close_browser_after")
-      # before checking the global config
-      elsif @ll.has_config?("close_browser_after")
-        close_browser_after = @ll.config("close_browser_after")
-      end
+      close_browser_after = @ll.env_or_config("close_browser_after", "feature")
 
       case close_browser_after
       when "scenario"
