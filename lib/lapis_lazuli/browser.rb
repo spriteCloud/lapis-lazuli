@@ -419,12 +419,12 @@ module LapisLazuli
     def get_html_errors
       result = []
       # Need some error strings
-      if @ll.has_config?("error_strings")
+      if @ll.has_env_or_config?("error_strings")
         begin
           # Get the HTML of the page
           page_text = @browser.html
           # Try to find all errors
-          @ll.config("error_strings").each {|error|
+          @ll.env_or_config("error_strings").each {|error|
             if page_text.include? error
               # Add to the result list
               result.push error
@@ -462,27 +462,37 @@ module LapisLazuli
     ##
     # Taking a screenshot of the current page.
     # Using the name as defined at the start of every scenario
-    def take_screenshot
+    def take_screenshot(suffix="")
+      # If the target directory does not exist, create it.
+      dir = @ll.env_or_config("screenshot_dir")
       begin
-        # Filename is the
-        # - screenshot directory
-        # - scenario timestamp
-        # - scenario name
-        # - random number between 0 and 10000
-        fileloc = @ll.config("screenshot_dir","screenshots") +
-          '/' + @ll.scenario.time[:timestamp] + "-" + @ll.scenario.id +
-          '-' + Random.rand(10000).to_s + '.png'
+        Dir.mkdir dir
+      rescue SystemCallError => ex
+        # Swallow this error; it occurs (amongst other situations) when the
+        # directory exists. Checking for an existing directory beforehand is
+        # not concurrency safe.
+      end
 
-        if @ll.config("old_portal", false)
-          name = @ll.scenario.data.name.gsub(/^.*(\\|\/)/, '').gsub(/[^\w\.\-]/, '_').squeeze('_')
-          fileloc = @ll.config("screenshot_dir","screenshots") +
-            '/' + @ll.time[:timestamp] + "_" + name + '.png'
-        end
+      # Generate the file name according to the new or old scheme.
+      name = nil
+      case @ll.env_or_config("screenshot_scheme")
+      when "new"
+        name = "#{@ll.scenario.time[:iso_short]}-#{@ll.scenario.id}-#{Random.rand(10000).to_s}.png"
+      else # 'old' and default
+        name = @ll.scenario.data.name.gsub(/^.*(\\|\/)/, '').gsub(/[^\w\.\-]/, '_').squeeze('_')
+        name = @ll.time[:timestamp] + "_" + name + '.png'
+      end
+
+      # Full file location
+      fileloc = "#{dir}#{File::SEPARATOR}#{name}"
+
+      # Write screenshot
+      begin
         # Save the screenshot
         @browser.screenshot.save fileloc
         @ll.log.debug "Screenshot saved: #{fileloc}"
-      rescue StandardError => e
-        @ll.log.debug "Failed to save screenshot. Error message #{e.message}"
+      rescue RuntimeError => e
+        @ll.log.debug "Failed to save screenshot to '#{fileloc}'. Error message #{e.message}"
       end
     end
 
