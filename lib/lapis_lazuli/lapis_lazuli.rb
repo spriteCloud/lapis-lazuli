@@ -67,13 +67,24 @@ module LapisLazuli
         raise "Could not load a configuration"
       end
 
+      # Make log directory
+      dir = self.env_or_config('log_dir')
+      begin
+        Dir.mkdir dir
+      rescue SystemCallError => ex
+        # Swallow this error; it occurs (amongst other situations) when the
+        # directory exists. Checking for an existing directory beforehand is
+        # not concurrency safe.
+      end
+
       # Start the logger with the config filename
-      log_file = "log/#{File.basename(config_name, ".*")}.log"
+      log_file = "#{dir}#{File::SEPARATOR}#{File.basename(config_name, ".*")}.log"
       # Or a filename from the environment
-      if self.has_env?("logfile")
-        log_file = self.env("logfile")
+      if self.has_env_or_config?("log_file")
+        log_file = self.env_or_config("log_file")
       end
       @log = TeeLogger.new(log_file)
+      @log.level = self.env_or_config("log_level")
     end
 
     ##
