@@ -112,10 +112,12 @@ Then(/^within (\d+) seconds I get an error waiting for "(.*?)"( disappear)?$/) d
 			:timeout => timeout,
 			:text => text,
 			:condition => condition,
+			:screenshot => true,
 			:groups => ["wait"]
 		)
 		ll.error(
 			:message => "Didn't receive an error with this timeout",
+			:screenshot => false,
 			:groups => ["wait"]
 		)
 	rescue RuntimeError => err
