@@ -1,1 +1,6 @@
+# Editor files
 .*.sw*
+
+# Directories created by LapisLazuli
+logs
+screenshots
