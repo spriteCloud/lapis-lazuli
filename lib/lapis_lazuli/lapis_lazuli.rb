@@ -11,6 +11,7 @@ require "securerandom"
 require "lapis_lazuli/logger"
 require "lapis_lazuli/scenario"
 require "lapis_lazuli/browser"
+require "lapis_lazuli/options"
 
 module LapisLazuli
   ##
@@ -200,6 +201,14 @@ module LapisLazuli
         return result
       end
 
+      # Environment variables for known options override the option.
+      if CONFIG_OPTIONS.has_key? variable
+        env = variable.upcase
+        if ENV.has_key? env
+          return ENV[env]
+        end
+      end
+
       # Otherwise try to find it in the configuration object
       variable.split(".").each do |part|
         if result.nil?
@@ -327,7 +336,7 @@ module LapisLazuli
       end
 
       # Start debugger, if necessary
-      if ENV['BREAKPOINT_ON_FAILURE'] || self.config("breakpoint_on_failure")
+      if self.config("breakpoint_on_failure")
         self.start_debugger
       end
 

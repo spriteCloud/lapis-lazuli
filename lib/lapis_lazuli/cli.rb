@@ -30,9 +30,9 @@ module LapisLazuli
     register(LapisLazuli::Generators::Cucumber, "create", "create PROJECT", "Creates a cucumber project with some common step definitions.")
     register(LapisLazuli::Generators::Cucumber, "update", "update PROJECT", "Updates a project. Alias for 'create'.")
 
-    desc "config", "List available configuration options."
-    def config 
 
+    desc "config", "Describe how LapisLazuli configuration works."
+    def config 
       STDOUT.write <<-INTRO
 LapisLazuli searches for configuration files in the `config' subdirectory of
 the current working directory, taking the stated test environment into
@@ -84,8 +84,8 @@ INTRO
         else
           display_default = "Defaults to '#{display_default}'."
         end
-        printf "              #{display_default}\n"
-        printf "              #{value[1]}\n\n"
+        printf "                 #{display_default}\n"
+        printf "                 #{value[1]}\n\n"
 
       end
     end

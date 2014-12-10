@@ -12,6 +12,8 @@ module LapisLazuli
     "close_browser_after" => ["feature", "Close the browser after every scenario, feature, etc. Possible values are 'feature', 'scenario' and 'never'."],
     "error_strings" => [nil, "List of strings that indicate errors when detected on a web page."],
     "default_env" => [nil, "Indicates which environment specific configuration to load when no test environment is provided explicitly."],
+    "test_env" => [nil, "Indicates which environment specific configuration to load in this test run."],
+    "browser" => ['firefox', 'Indicates the browser in which to run tests.'],
     "email_domain" => ["google.com", "FIXME"],
     "screenshot_on_failure" => [true, "Toggle whether failed scenarios should result in a screenshot being taken automatically."],
     "screenshot_dir" => ["FIXME", "Location prefix for the screenshot path."],
