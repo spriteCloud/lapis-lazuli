@@ -16,8 +16,9 @@ module LapisLazuli
     "browser" => ['firefox', "Indicates the browser in which to run tests. Possible values are 'firefox', 'chrome', 'safari', 'ie', 'ios'."],
     "email_domain" => ["google.com", "FIXME"],
     "screenshot_on_failure" => [true, "Toggle whether failed scenarios should result in a screenshot being taken automatically."],
-    "screenshot_dir" => ["FIXME", "Location prefix for the screenshot path."],
-    "screenshot_scheme" => ["old", "Naming scheme for screenshots. Possible values are 'old' and 'new'. This option will be deprecated in the near future."],
+    "screenshot_dir" => [".#{File::SEPARATOR}screenshots", "Location prefix for the screenshot path."],
+    "screenshot_scheme" => ["old", "Naming scheme for screenshots. Possible values are 'old' and 'new'. This option will be deprecated in the near future, and only the new scheme will be supported."],
     "breakpoint_on_error" => [false, "If the error() function is used to create errors, should the debugger be started?"],
+    "step_pause_time" => [0, "(Deprecated) Number of seconds to wait after each cucumber step is executed."],
   }
 end # module LapisLazuli
