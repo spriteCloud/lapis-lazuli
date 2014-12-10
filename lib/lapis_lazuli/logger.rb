@@ -16,14 +16,34 @@ module LapisLazuli
 
     ##
     # Start with a filename
-    def initialize(name)
+    def initialize(name, io = STDOUT)
       # Store the name for later usage
       @filename = name
       # Create the logger
-      @log = Logger.new(filename)
+      @file = File.new(@filename, File::WRONLY | File::APPEND | File::CREAT)
+      @log = Logger.new @file
+      # IO handle
+      @io = io
       # Write that we are logging to this file
       self.info("Logging to '#{@filename}'")
     end
+
+    ##
+    # Set log level; override this to also accept strings
+    def level=(val)
+      # Convert strings to the constant value
+      if val.is_a? String
+        begin
+          val = Logger.const_get val
+        rescue NameError
+          val = Logger::WARN
+        end
+      end
+
+      # Whatever the result of the above, try to set the log level
+      @log.level = val
+    end
+
 
     ##
     # Log an exception
@@ -35,14 +55,14 @@ module LapisLazuli
     # Every function this class doesn't have should be mapped to the original
     # logger
     def method_missing(meth, *args, &block)
-      # Write to STDOUT
+      # Write to IO stream and the logger
       if @log.respond_to? meth
         if args.length > 1
-          STDOUT.write("#{meth}: #{args}\n")
+          @io.write("#{meth}: #{args}\n")
         else
-          STDOUT.write("#{meth}: #{args[0]}\n")
+          @io.write("#{meth}: #{args[0]}\n")
         end
-        STDOUT.flush()
+        @io.flush()
         # Call the logger
         @log.send(meth.to_s, *args, &block)
       end
