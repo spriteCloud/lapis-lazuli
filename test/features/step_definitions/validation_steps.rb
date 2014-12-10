@@ -196,7 +196,8 @@ Then(/^I expect to find an? (.*?) element with (.*?) "(.*?)"$/) do |element, att
 			:element => element.downcase,
 			:attribute => attribute,
 			:include => text
-			}}
+			}},
+		{:like => [element.downcase, attribute, text]}
 	]
 	settings.each do |setting|
 		# Find always throws an error if not found
@@ -204,6 +205,32 @@ Then(/^I expect to find an? (.*?) element with (.*?) "(.*?)"$/) do |element, att
 		elem_findall = ll.browser.findAll(setting).first
 		if elem_find != elem_findall
 			ll.error "Incorrect results"
+		end
+	end
+end
+
+Then(/^I expect to find an? (.*?) element or an? (.*?) element$/) do |element1, element2|
+	element = ll.browser.find([element1.to_sym, element2.to_sym])
+end
+
+Then(/^I should (not )?find "(.*?)" ([0-9]+ times )?using "(.*?)" as context$/) do |result, number, id, name|
+	context = ll.scenario.storage.get name
+	if context.nil?
+		ll.error(:not_found => "Find context in storage")
+	end
+	begin
+		settings = {:element => id, :context => context}
+		if number == "a"
+			element = ll.browser.find(settings)
+		else
+			elements = ll.browser.findAllPresent(settings)
+			if elements.length != number.to_i
+				ll.error("Incorrect number of elements: #{elements.length}")
+			end
+		end
+	rescue
+		if result.nil?
+			raise $!
 		end
 	end
 end

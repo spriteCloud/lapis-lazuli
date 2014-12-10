@@ -142,8 +142,17 @@ module LapisLazuli
             self.close
           end
         when Cucumber::Ast::OutlineTable::ExampleRow
+          # Is this the last scenario in this feature?
           if scenario.scenario_outline.feature.feature_elements.last == scenario.scenario_outline
-            self.close
+            # And is this the last example in the table?
+            is_last_example = false
+            scenario.scenario_outline.each_example_row do |row|
+              is_last_example = row == scenario
+            end
+            # Then close it
+            if is_last_example
+              self.close
+            end
           end
         end
       end
@@ -230,7 +239,6 @@ module LapisLazuli
       if settings.include? :context
         context = settings[:context]
         has_context = true
-        settings.delete :context
       end
 
       if settings.include? :like
@@ -259,7 +267,7 @@ module LapisLazuli
               # Create new variable so we don't overwrite the old one
               attribute = nil
               # Do we need to match text or an attirbute
-              if like_opts[:attribute] == :text
+              if like_opts[:attribute].to_sym == :text
                 attribute = "text()"
               else
                 attribute = "@#{like_opts[:attribute]}"
@@ -341,11 +349,29 @@ module LapisLazuli
     ##
     # By default it selects the first element of findAllPresent
     # add settings[:present] = false to use findAll
-    # TODO: Add :last, :random instead of first of always having the first element
     def find(settings)
       error = true
-
       settings = parseFindSettings settings
+
+      # Find the first one that is present on the page
+      if settings.is_a? Array
+        result = nil
+        i = 0
+        while i < settings.length do
+          setting = settings[i]
+          config = setting.dup
+          # Do not throw errors, except on the last search
+          if i != settings.length - 1
+            config[:error] = false
+          end
+          result = self.find(config)
+          break unless result.nil?
+          i += 1
+        end
+
+        #return the result
+        return result
+      end
 
       if settings.has_key? :error and not settings[:error]
         error = false
@@ -516,6 +542,10 @@ module LapisLazuli
         settings = {:element => settings}
       elsif settings.is_a? Symbol
         settings = {:like => settings}
+      elsif settings.is_a? Array
+        settings = settings.map do |setting|
+          parseFindSettings setting
+        end
       end
 
       return settings

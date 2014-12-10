@@ -330,6 +330,8 @@ module LapisLazuli
 
           if settings.has_key? :scenario
             message = "Scenario failed: #{settings[:scenario]}"
+          elsif settings.has_key? :not_found
+            message = "Not found: #{settings[:not_found]}"
           end
 
           # Grouping of errors
