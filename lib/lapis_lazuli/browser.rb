@@ -42,8 +42,6 @@ module LapisLazuli
       # Do the same caching stuff for the browser
       if no_browser_wanted and browser_wanted.nil? and @cached_browser_wanted
         browser_wanted = @cached_browser_wanted
-      elsif browser_wanted.nil?
-        browser_wanted = ENV['BROWSER']
       else
         @cached_browser_wanted = browser_wanted
       end
