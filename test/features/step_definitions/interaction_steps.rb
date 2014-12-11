@@ -72,7 +72,7 @@ When(/^I find "(.*?)" and name it "(.*?)"$/) do |id, name|
 end
 
 xpath_fragment = nil
-Given(/^I specify a needle "(.+?)" and a node "(.+?)" (and an empty separator )?to contains$/) do |needle, node, empty_sep|
+Given(/^I specify a needle "(.+?)" and a node "(.+?)" (and an empty separator )?to xp_contains$/) do |needle, node, empty_sep|
   if empty_sep.nil?
     xpath_fragment = xp_contains(node, needle)
   else

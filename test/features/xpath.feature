@@ -6,7 +6,7 @@ Then I expect the xpath helper functions to work
 @xpath_01
 Scenario Outline: xpath_01 - contains helper without sepearator
   Given I navigate to the xpath test page
-  And I specify a needle "<needle>" and a node "<node>" to xpath_contains
+  And I specify a needle "<needle>" and a node "<node>" to xp_contains
   Then I expect an xpath fragment "<fragment>"
   And I expect the fragment "<fragment>" to find <n> element(s).
 
@@ -18,7 +18,7 @@ Scenario Outline: xpath_01 - contains helper without sepearator
 @xpath_02
 Scenario Outline: xpath_02 - contains helper with sepearator
   Given I navigate to the xpath test page
-  And I specify a needle "<needle>" and a node "<node>" and an empty separator to xpath_contains
+  And I specify a needle "<needle>" and a node "<node>" and an empty separator to xp_contains
   Then I expect an xpath fragment "<fragment>"
   And I expect the fragment "<fragment>" to find <n> element(s).
 
