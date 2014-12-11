@@ -4,7 +4,7 @@
 # Author: "Onno Steenbergen" <onno@steenbe.nl>
 require 'lapis_lazuli'
 require 'lapis_lazuli/cucumber'
- 
+
 LapisLazuli.config_file = "config/config.yml"
 World(LapisLazuli)
 
