@@ -4,6 +4,12 @@
 # Author: "Onno Steenbergen" <onno@steenbe.nl>
 
 require 'lapis_lazuli'
+require 'lapis_lazuli/xpath'
+require 'test/unit/assertions'
+
+include LapisLazuli::XPath
+include Test::Unit::Assertions
+
 ll = LapisLazuli::LapisLazuli.instance
 
 Given(/^I navigate to the (.*) test page$/) do |page|
@@ -64,3 +70,32 @@ When(/^I find "(.*?)" and name it "(.*?)"$/) do |id, name|
   element = ll.browser.find(id)
   ll.scenario.storage.set(name, element)
 end
+
+xpath_fragment = nil
+Given(/^I specify a needle "(.+?)" and a node "(.+?)" (and an empty separator )?to contains$/) do |needle, node, empty_sep|
+  if empty_sep.nil?
+    xpath_fragment = xp_contains(node, needle)
+  else
+    xpath_fragment = xp_contains(node, needle, '')
+  end
+end
+
+Then(/^I expect an xpath fragment "(.*?)"$/) do |fragment|
+  assert fragment == xpath_fragment, "Fragment was not as expected: got '#{xpath_fragment}' vs expected '#{fragment}'."
+end
+
+Then(/^I expect the fragment "(.*?)" to find (\d+) element\(s\)\.$/) do |fragment, n|
+  elems = ll.browser.elements(:xpath => "//div[#{fragment}]")
+  assert n.to_i == elems.length, "Mismatched amount: got #{elems.length} vs. expected #{n}"
+end
+
+elems = []
+Given(/^I search for elements where node "(.+?)" contains "(.+?)" and not "(.+?)"$/) do |node, first, second|
+  clause = xp_and(xp_contains(node, first), xp_not(xp_contains(node, second)))
+  elems = ll.browser.elements(:xpath => "//div[#{clause}]")
+end
+
+Then(/^I expect to find (\d+) elements\.$/) do |n|
+  assert n.to_i == elems.length, "Mismatched amount: got #{elems.length} vs. expected #{n}"
+end
+
