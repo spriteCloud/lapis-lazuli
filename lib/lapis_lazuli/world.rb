@@ -8,13 +8,21 @@
 require "json"
 require "singleton"
 require "securerandom"
+
+# Classes
 require "lapis_lazuli/logger"
 require "lapis_lazuli/scenario"
 require "lapis_lazuli/browser"
-require "lapis_lazuli/options"
+
+# Modules
 require "lapis_lazuli/config"
 require "lapis_lazuli/variable"
 require "lapis_lazuli/error"
+require "lapis_lazuli/xpath"
+
+# Other
+require "lapis_lazuli/options"
+
 
 module LapisLazuli
   ##
@@ -35,6 +43,7 @@ module LapisLazuli
     include LapisLazuli::Config
     include LapisLazuli::Variable
     include LapisLazuli::Error
+    include LapisLazuli::XPath
 
     # session key
     @uuid
@@ -103,9 +112,28 @@ module LapisLazuli
         browser_args = args.unshift(self)
         # Create a new browser object
         @browser = Browser.send(:new, *browser_args)
+
+        # Register a finalizer, so we can clean up the browser again
+        ObjectSpace.define_finalizer(self, self.class.browser_destroy(@browser, @log))
       end
       return @browser
     end
+
+  private
+
+    def self.browser_destroy(browser, log)
+      proc {
+        if not browser.nil?
+          begin
+            browser.close
+          rescue
+            log.debug("Failed to close the browser, probably chrome")
+          end
+        end
+      }
+    end
+
+
 
   end # class World
 end # module LapisLazuli

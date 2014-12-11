@@ -26,7 +26,3 @@ end
 AfterConfiguration do |config|
   after_configuration_hook(config)
 end
-
-at_exit do
-  at_exit_hook
-end

@@ -47,21 +47,5 @@ module LapisLazuli
       # Close browser if needed
       self.browser.close_after_scenario(scenario)
     end
-
-
-    ##
-    # Hook invoked in at_exit
-    def at_exit_hook
-      # Closing the browser after the test, no reason to leave them lying around
-      begin
-        if self.has_browser?
-          self.browser.close
-        end
-      rescue
-        # Nope...
-        self.log.debug("Failed to close the browser, probably chrome")
-      end
-    end
-
   end # module Hooks
 end # module LapisLazuli
