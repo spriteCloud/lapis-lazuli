@@ -4,6 +4,7 @@ require "securerandom"
 require "lapis_lazuli/logger"
 require "lapis_lazuli/scenario"
 require "lapis_lazuli/browser"
+require "lapis_lazuli/api"
 
 module LapisLazuli
   ##
@@ -25,7 +26,7 @@ module LapisLazuli
     @env
     # session key
     @uuid
-    attr_reader :log, :scenario, :time
+    attr_reader :log, :scenario, :time, :api, :proxy
     attr_accessor :scenario, :time, :browser
 
     ##
@@ -41,6 +42,8 @@ module LapisLazuli
         :timestamp => time.strftime('%y%m%d_%H%M%S'),
         :epoch => time.to_i.to_s
       }
+
+      @api = API.new
 
       @uuid = SecureRandom.hex
 
@@ -66,6 +69,23 @@ module LapisLazuli
         log_file = self.env("logfile")
       end
       @log = TeeLogger.new(log_file)
+
+      # Check if we can start a proxy
+      begin
+        proxy_ip = "localhost"
+        proxy_port = 10000
+        proxy_master = true
+        if self.has_env_or_config?("proxy.ip") and
+          self.has_env_or_config?("proxy.port")
+          proxy_ip = self.env_or_config("proxy.ip")
+          proxy_port = self.env_or_config("proxy.port")
+          proxy_master = self.env_or_config("proxy.spritecloud", true)
+        end
+        @proxy = Proxy.new(proxy_ip, proxy_port, proxy_master)
+        @log.debug("Started proxy on: #{proxy_ip}:#{proxy_port}, spritecloud: #{proxy_master}")
+      rescue
+        @log.debug("No proxy available")
+      end
     end
 
     ##
