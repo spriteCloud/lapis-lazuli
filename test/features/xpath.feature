@@ -11,9 +11,9 @@ Scenario Outline: xpath_01 - contains helper without sepearator
   And I expect the fragment "<fragment>" to find <n> element(s).
 
   Examples:
-    | node   | needle | fragment                                                       | n |
-    | @class | foo    | [contains(concat(' ', normalize-space(@class), ' '), ' foo ')] | 4 |
-    | text() | foo    | [contains(concat(' ', normalize-space(text()), ' '), ' foo ')] | 4 |
+    | node   | needle | fragment                                                     | n |
+    | @class | foo    | contains(concat(' ', normalize-space(@class), ' '), ' foo ') | 4 |
+    | text() | foo    | contains(concat(' ', normalize-space(text()), ' '), ' foo ') | 4 |
 
 @xpath_02
 Scenario Outline: xpath_02 - contains helper with sepearator
@@ -23,9 +23,9 @@ Scenario Outline: xpath_02 - contains helper with sepearator
   And I expect the fragment "<fragment>" to find <n> element(s).
 
   Examples:
-    | node   | needle | fragment                                                   | n |
-    | @class | foo    | [contains(concat('', normalize-space(@class), ''), 'foo')] | 5 |
-    | text() | foo    | [contains(concat('', normalize-space(text()), ''), 'foo')] | 5 |
+    | node   | needle | fragment                                                 | n |
+    | @class | foo    | contains(concat('', normalize-space(@class), ''), 'foo') | 5 |
+    | text() | foo    | contains(concat('', normalize-space(text()), ''), 'foo') | 5 |
 
 @xpath_03
 Scenario Outline: xpath_03 - operators
