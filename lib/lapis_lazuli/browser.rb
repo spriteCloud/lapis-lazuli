@@ -10,12 +10,14 @@ require 'selenium-webdriver'
 require 'watir-webdriver'
 require "watir-webdriver/extensions/alerts"
 require 'test/unit/assertions'
+require 'lapis_lazuli/xpath'
 
 module LapisLazuli
   ##
   # Extension to the Watir browser
   class Browser
     include Test::Unit::Assertions
+    include LapisLazuli::XPath
 
     @ll
     @browser
@@ -457,7 +459,7 @@ module LapisLazuli
               end
 
               # Add the options to the xpath query
-              xpath = "#{xpath}[contains(concat(' ',#{attribute},' '), '#{like_opts[:include]}')]"
+              xpath = "#{xpath}[#{xp_contains(attribute, like_opts[:include], '')}]"
             end
 
             # Create the XPath query
