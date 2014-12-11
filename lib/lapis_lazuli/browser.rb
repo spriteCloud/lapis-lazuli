@@ -411,6 +411,7 @@ module LapisLazuli
     # findAll(:text_field => {:name => "test"})
     # findAll(:text_field => "test") (xpath search based on name, id or text)
     # findAll(:text_field => {})
+    # findAll(:tag_name => "a", :text => /foo/)
     def findAll(settings)
       context = @browser
       has_context = false
@@ -468,7 +469,22 @@ module LapisLazuli
               xpath
             )
         end
-        @ll.error("Incorrect settings for find like")
+
+        settings[:message] = "Incorrect settings for find"
+        settings[:groups] = ['find by like']
+        @ll.error(settings)
+      end
+
+      # If we have a :tag_name field, we just pass all the settings to the browser
+      if settings.has_key? :tag_name
+        begin
+          return context.elements(settings)
+        rescue RuntimeError => err
+          settings[:message] = "Incorrect settings for find"
+          settings[:groups] = ['find by tag name']
+          settings[:exception] = err
+          @ll.error(settings)
+        end
       end
 
       # For all settings
@@ -490,8 +506,10 @@ module LapisLazuli
                   "#{'.' if has_context}//*[@name='#{string}' or @id='#{string}' or text()='#{string}']"
                 )
               return xpath
-            rescue
+            rescue RuntimeError => err
               settings[:message] = "Could not find any #{function_name} with name, id or text equal to '#{string}'"
+              settings[:groups] = ['find by method']
+              settings[:exception] = err
               @ll.error(settings)
             end
           end
@@ -591,13 +609,16 @@ module LapisLazuli
         end
       else
         # We didn't get the result we wanted
-        @ll.error("Incorrect settings for find #{settings} #{result}")
+        settings[:message] = "Incorrect settings for find #{settings} #{result}"
+        settings[:groups] = ['find']
+        @ll.error(settings)
       end
 
       # Throw an error if not found
       if error and element.nil?
         # Send all settings to the error function, allows for groups information ext.
         settings[:message] = "Could not find element with settings: #{settings}"
+        settings[:groups] = ['find']
         @ll.error(settings)
       else
         return element

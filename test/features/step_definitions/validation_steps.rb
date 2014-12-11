@@ -232,23 +232,23 @@ Then(/^I expect an? (.*?) element to exist$/) do |element|
 	ll.browser.find(element.to_sym)
 end
 
-Then(/^I expect to find an? (.*?) element with (.*?) "(.*?)"$/) do |element, attribute, text|
-	settings = [
-		{element.downcase => { attribute.to_sym => /#{text}/}},
-		{:like =>{
+Then(/^I expect to find an? (.*?) element with (.*?) "(.*?)" using (.*?) settings$/) do |element, attribute, text, setting_choice|
+	settings = {
+		"method" => {element.downcase => { attribute.to_sym => /#{text}/}},
+		"like with hash" => {:like =>{
 			:element => element.downcase,
 			:attribute => attribute,
 			:include => text
 			}},
-		{:like => [element.downcase, attribute, text]}
-	]
-	settings.each do |setting|
-		# Find always throws an error if not found
-		elem_find = ll.browser.find(setting)
-		elem_findall = ll.browser.findAll(setting).first
-		if elem_find != elem_findall
-			ll.error "Incorrect results"
-		end
+		"like with array" => {:like => [element.downcase, attribute, text]},
+		"tag name" => {:tag_name => element.downcase, attribute.to_sym => /#{text}/}
+	}
+	setting = settings[setting_choice]
+	# Find always throws an error if not found
+	elem_find = ll.browser.find(setting)
+	elem_findall = ll.browser.findAll(setting).first
+	if elem_find != elem_findall
+		ll.error "Incorrect results"
 	end
 end
 

@@ -19,13 +19,23 @@ Scenario: Find by element
 @find_03
 Scenario Outline: Find by attribute
   Given I navigate to the find test page
-  Then I expect to find a <element> element with <attribute> "<text>"
+  Then I expect to find a <element> element with <attribute> "<text>" using <settings> settings
 
   Examples:
-  | element | attribute | text |
-  | button | class | submit |
-  | a | href | /full/link |
-  | div | text | Second |
+  | element | attribute | text       | settings        |
+  | button  | class     | submit     | method          |
+  | a       | href      | /full/link | method          |
+  | div     | text      | Second     | method          |
+  | button  | class     | submit     | like with hash  |
+  | a       | href      | /full/link | like with hash  |
+  | div     | text      | Second     | like with hash  |
+  | button  | class     | submit     | like with array |
+  | a       | href      | /full/link | like with array |
+  | div     | text      | Second     | like with array |
+  | button  | class     | submit     | tag name        |
+# :tag_name + :href not supported by watir
+# | a       | href      | /full/link | tag name        |
+  | div     | text      | Second     | tag name        |
 
 @find_04
 Scenario Outline: Find one of multiple
