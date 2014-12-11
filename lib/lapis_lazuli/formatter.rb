@@ -15,7 +15,7 @@ module LapisLazuli
     end
 
     def exception(error, status, *args)
-      ll = LapisLazuli.instance
+      ll = LapisLazuli::World.instance
       ll.scenario.update_error(error)
     end
 
