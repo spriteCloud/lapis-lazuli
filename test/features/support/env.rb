@@ -4,9 +4,9 @@
 # Author: "Onno Steenbergen" <onno@steenbe.nl>
 require 'lapis_lazuli'
 require 'lapis_lazuli/cucumber'
-
-ll = LapisLazuli::LapisLazuli.instance
-ll.init("config/config.yml");
+ 
+LapisLazuli.config_file = "config/config.yml"
+World(LapisLazuli)
 
 # Transition function from old codebase to new
 load 'server/start.rb'
