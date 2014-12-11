@@ -67,7 +67,7 @@ module LapisLazuli
     #
     # The default for :pick is :first
     def find(options)
-      options = parse_find_settings(options)
+      options = parse_find_options(options)
 
       pick = options.fetch(:pick, "first")
       options.delete(:pick)
@@ -99,7 +99,7 @@ module LapisLazuli
     #
     #   multi_find_all(selector1, selector2)
     def multi_find_all(*args)
-      options = parse_multi_find_settings(*args)
+      options = parse_multi_find_options(*args)
 
       options, func = multi_find_lambda(options)
 
@@ -116,7 +116,7 @@ module LapisLazuli
     ##
     # Same as multi_find_all, but accepts the :pick parameter as find does.
     def multi_find(*args)
-      options = parse_multi_find_settings(*args)
+      options = parse_multi_find_options(*args)
 
       # Extract pick option
       pick = options.fetch(:pick, "first").to_sym
@@ -136,8 +136,8 @@ module LapisLazuli
   private
 
     ##
-    # Parse extra options in multi_find settings
-    def parse_multi_find_settings(*args)
+    # Parse extra options in multi_find options
+    def parse_multi_find_options(*args)
       # Default options
       options = {
         :mode => :match_one
@@ -166,23 +166,23 @@ module LapisLazuli
     end
 
     ##
-    # Convert all shortcut settings to a full settings hash
-    def parse_find_settings(settings)
-      # First convert outer shorthand. Afterwards, settings is guaranteed
+    # Convert all shortcut options to a full options hash
+    def parse_find_options(options)
+      # First convert outer shorthand. Afterwards, options is guaranteed
       # to be a hash.
-      if settings.is_a? String
-        settings = {:element => settings}
-      elsif settings.is_a? Symbol
-        settings = {:like => settings}
-      elsif settings.is_a? Array
-        settings = settings.map do |setting|
-          parse_find_settings setting
+      if options.is_a? String
+        options = {:element => options}
+      elsif options.is_a? Symbol
+        options = {:like => options}
+      elsif options.is_a? Array
+        options = options.map do |setting|
+          parse_find_options setting
         end
       end
 
       # Now ensure the :like parameter is a full hash
-      if settings.include? :like
-        like_opts = settings[:like]
+      if options.include? :like
+        like_opts = options[:like]
         # Convert array shorthand to full Hash
         if like_opts.is_a? Array and like_opts.length == 3
           like_opts = {
@@ -196,15 +196,15 @@ module LapisLazuli
           }
         end
 
-        settings[:like] = like_opts
+        options[:like] = like_opts
         if not like_opts.has_key? :element
-          settings[:message] = "Like options are missing the :element key."
-          settings[:groups] = ['find', 'settings']
-          @ll.error(settings)
+          options[:message] = "Like options are missing the :element key."
+          options[:groups] = ['find', 'options']
+          @ll.error(options)
         end
       end
 
-      return settings
+      return options
     end
 
 
@@ -216,8 +216,8 @@ module LapisLazuli
     #
     # There are a number of different modes, triggered by the presence or
     # absence of particular parameters. Note that the parameters passed
-    # here are passed through parse_find_settings() before being evaluated:
-    # that function expands shorthand settings to a full hash.
+    # here are passed through parse_find_options() before being evaluated:
+    # that function expands shorthand options to a full hash.
     #
     # That said:
     #   - The presence of :like will construct an XPath selector from the
@@ -226,9 +226,9 @@ module LapisLazuli
     #     that the special attribute :text is interpreted as meaning the
     #     text content of the element.
     #
-    def find_lambda(settings)
-      # Parse settings
-      settings = parse_find_settings settings
+    def find_lambda(options)
+      # Parse options
+      options = parse_find_options options
 
       # A context is starting position for the search
       # Example:
@@ -236,35 +236,35 @@ module LapisLazuli
       #  ll.browser.find(:a => "some_link", :context => parent)
       context = @browser
       has_context = false
-      if settings.has_key? :context
-        context = settings[:context]
-        settings.delete(:context)
+      if options.has_key? :context
+        context = options[:context]
+        options.delete(:context)
         has_context = true
       end
 
       # Do we have :like options? Create an appropriate lambda
-      if settings.has_key? :like
-        return find_lambda_like(context, has_context, settings)
+      if options.has_key? :like
+        return find_lambda_like(context, has_context, options)
       end
 
-      # If one of the settings keys is a method of the context, then we'll
-      # invoke that method. The settings value is passed to the method if it is
+      # If one of the options keys is a method of the context, then we'll
+      # invoke that method. The options value is passed to the method if it is
       # a hash; if it's anything else, it's assumed to be a tag name, id or text
       # contents we'll find with XPath.
-      settings.each do |key, value|
+      options.each do |key, value|
         # Find the one the browser responds to
         # Example: text_fields or buttons
         function_name = "#{key.to_s}s"
         if context.respond_to? function_name
           # If the value is a hash use it as arguments for this function
           if value.is_a? Hash
-            return settings, lambda {
+            return options, lambda {
               return context.send(function_name, value)
             }
           else
             # Find it based on name, id or text
             str = value.to_s
-            return settings, lambda {
+            return options, lambda {
               return context.send(
                 function_name,
                 :xpath,
@@ -278,8 +278,8 @@ module LapisLazuli
       # Finally, if no field is given, we'll just pass on everything to
       # the elements function as-is, in case there's a regular Watir selector
       # in it.
-      return settings, lambda {
-        return context.elements(settings)
+      return options, lambda {
+        return context.elements(options)
       }
     end
 
@@ -288,7 +288,7 @@ module LapisLazuli
     # Similar to find_lambda, but filters the returned elements by the given
     # :filter_by function (defaults to :present?).
     def find_lambda_filtered(options)
-      options = parse_find_settings(options)
+      options = parse_find_options(options)
 
       filter_by = options.fetch(:filter_by, nil)
       options.delete(:filter_by)
@@ -316,9 +316,9 @@ module LapisLazuli
     ##
     # Component of find_lambda; returns the lambda for when :like
     # options are present.
-    def find_lambda_like(context, has_context, settings)
+    def find_lambda_like(context, has_context, options)
       # Shortcuts
-      like_opts = settings[:like]
+      like_opts = options[:like]
 
       # Basic xpath to find an element
       xpath = "#{'.' if has_context}//#{like_opts[:element]}"
@@ -339,7 +339,7 @@ module LapisLazuli
       end
 
       # Create the XPath query
-      return settings, lambda {
+      return options, lambda {
         return context.elements(
           :xpath,
           xpath
