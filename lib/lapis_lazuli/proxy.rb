@@ -6,7 +6,7 @@ module LapisLazuli
   ##
   # Proxy class to map to sc-proxy
   class Proxy
-    attr_reader :has_master :api, :ip, :master_port, :port
+    attr_reader :has_master, :api, :ip, :master_port, :port
 
     ##
     # Create a new LL Proxy
@@ -15,7 +15,7 @@ module LapisLazuli
       # Save the information
       @ip = ip
       @has_master = master
-      if no_master
+      if master
         @master_port = port
       else
         @port = port
