@@ -66,7 +66,7 @@ Scenario Outline: FindAllPresent with context
   When I find "<context>" and name it "test_element"
   Then I should find "<element>" <number> times using "test_element" as context
   Examples:
-  | context | element | number |
-  | deep3 | deep6 | 1 |
-  | deep3 | count | 4 |
-  | deep3 | does_not_exist | 0 |
+  | context | element        | number |
+  | deep3   | deep6          | 1      |
+  | deep3   | count          | 4      |
+  | deep3   | does_not_exist | 0      |

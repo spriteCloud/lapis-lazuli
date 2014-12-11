@@ -64,8 +64,7 @@ Then(/(first|last|random|[0-9]+[a-z]+) (.*) should (not )?be present$/) do |inde
 		pick = index.to_i - 1
 	end
 
-	# Options for findAll
-	options = {:present => false}
+	# Options for find_all
 	# Select the correct element
 	options[type.to_sym] = {}
 	# Pick the correct one
@@ -73,8 +72,10 @@ Then(/(first|last|random|[0-9]+[a-z]+) (.*) should (not )?be present$/) do |inde
 	# Execute the find
 	type_element = ll.browser.find(options)
 	# Find all
-	all_elements = ll.browser.findAll(options)
-	all_present = ll.browser.findAllPresent(options)
+	all_elements = ll.browser.find_all(options)
+
+  options[:filter_by] = :present?
+	all_present = ll.browser.find_all(options)
 
 	if hidden and type_element.present?
 		ll.error("Hidden element is visible")
@@ -82,10 +83,10 @@ Then(/(first|last|random|[0-9]+[a-z]+) (.*) should (not )?be present$/) do |inde
 		ll.error("Element is hidden")
 	elsif hidden and not type_element.present? and
 		(not all_elements.include?(type_element) or all_present.include?(type_element))
-		ll.error("Hidden element (not) found via findAll(Present)")
+		ll.error("Hidden element (not) found via find_all(:filter_by => :present?)")
 	elsif not hidden and type_element.present? and
 		(not all_elements.include?(type_element) or not all_present.include?(type_element))
-		ll.error("Visible element (not) found via findAll(Present)")
+		ll.error("Visible element (not) found via find_all(:filter_by => :present?)")
 	end
 end
 
@@ -246,14 +247,14 @@ Then(/^I expect to find an? (.*?) element with (.*?) "(.*?)" using (.*?) setting
 	setting = settings[setting_choice]
 	# Find always throws an error if not found
 	elem_find = ll.browser.find(setting)
-	elem_findall = ll.browser.findAll(setting).first
+	elem_findall = ll.browser.find_all(setting).first
 	if elem_find != elem_findall
 		ll.error "Incorrect results"
 	end
 end
 
 Then(/^I expect to find an? (.*?) element or an? (.*?) element$/) do |element1, element2|
-	element = ll.browser.find([element1.to_sym, element2.to_sym])
+	element = ll.browser.multi_find(element1.to_sym, element2.to_sym)
 end
 
 Then(/^I should (not )?find "(.*?)" ([0-9]+ times )?using "(.*?)" as context$/) do |result, number, id, name|
@@ -266,7 +267,8 @@ Then(/^I should (not )?find "(.*?)" ([0-9]+ times )?using "(.*?)" as context$/) 
 		if number == "a"
 			element = ll.browser.find(settings)
 		else
-			elements = ll.browser.findAllPresent(settings)
+			settings[:filter_by] = :present?
+			elements = ll.browser.find_all(settings)
 			if elements.length != number.to_i
 				ll.error("Incorrect number of elements: #{elements.length}")
 			end
