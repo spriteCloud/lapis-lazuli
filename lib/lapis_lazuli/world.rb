@@ -137,7 +137,7 @@ module LapisLazuli
         # Add LL to the arguments for the browser
         browser_args = args.unshift(self)
         # Create a new browser object
-        @browser = Browser.send(:new, *browser_args)
+        @browser = Browser.new(*browser_args)
 
         # Register a finalizer, so we can clean up the browser again
         ObjectSpace.define_finalizer(self, self.class.browser_destroy(@browser, @log))

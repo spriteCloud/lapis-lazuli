@@ -29,7 +29,7 @@ module LapisLazuli
     def initialize(ll, *args)
       @ll = ll
       # Create a new browser with optional arguments
-      @browser = self.send(:init, *args)
+      @browser = self.init(*args)
     end
 
     ##
@@ -97,7 +97,7 @@ module LapisLazuli
         args.push(optional_data)
       end
 
-      browser_instance = Watir::Browser.send(:new, *args)
+      browser_instance = Watir::Browser.new(*args)
       return browser_instance
     end
 
