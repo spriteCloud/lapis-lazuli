@@ -7,7 +7,6 @@
 #
 
 require "faraday"
-require "faraday_middleware"
 
 module LapisLazuli
   ##
@@ -25,7 +24,7 @@ module LapisLazuli
 
     def ll
       if @ll.nil?
-        @ll = LapisLazuli.instance
+        @ll = World.instance
       end
       return @ll
     end
@@ -41,5 +40,5 @@ module LapisLazuli
         self.ll.error("Browser Method Missing: #{meth}")
       end
     end
-  end
-end
+  end # class API
+end # module LapisLazuli
