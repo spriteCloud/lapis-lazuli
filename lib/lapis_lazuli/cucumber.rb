@@ -2,6 +2,7 @@ require "lapis_lazuli"
 
 # A reference to our library
 ll = LapisLazuli::LapisLazuli.instance
+World(ll)
 
 Before do |scenario|
   # Update the scenario informaton
@@ -40,6 +41,9 @@ end
 # Closing the browser after the test, no reason to leave them lying around
 at_exit do
   begin
+    if ll.has_proxy?
+      ll.proxy.close
+    end
     if ll.has_browser?
       ll.browser.close
     end

@@ -6,17 +6,17 @@ module LapisLazuli
   ##
   # Proxy class to map to sc-proxy
   class Proxy
-    attr_reader :has_master, :api, :ip, :master_port, :port
+    attr_reader :is_scproxy, :api, :ip, :scproxy_port, :port
 
     ##
     # Create a new LL Proxy
     # What is the ip/port of the master?
-    def initialize(ip, port, master=true)
+    def initialize(ip, port, scproxy=true)
       # Save the information
       @ip = ip
-      @has_master = master
-      if master
-        @master_port = port
+      @is_scproxy = scproxy
+      if scproxy
+        @scproxy_port = port
       else
         @port = port
       end
@@ -24,20 +24,19 @@ module LapisLazuli
       if !is_port_open?(ip, port)
         raise "Proxy not online"
       end
-      # Create an API connection to the master
-      @api = API.new()
-      @api.set_conn("http://#{@ip}:#{@master_port}/") do |conn|
-        conn.response :xml,  :content_type => /\bxml$/
-        conn.response :json, :content_type => /\bjson$/
+      if @is_scproxy
+        # Create an API connection to the master
+        @api = API.new()
+        @api.set_conn("http://#{@ip}:#{@scproxy_port}/") do |conn|
+          conn.response :xml,  :content_type => /\bxml$/
+          conn.response :json, :content_type => /\bjson$/
 
-        conn.adapter Faraday.default_adapter
+          conn.adapter Faraday.default_adapter
+        end
       end
     end
 
     def has_session?()
-      if !@has_master and !port.nil?
-        return true
-      end
       return !@port.nil? && is_port_open?(@ip, @port);
     end
 
@@ -45,19 +44,25 @@ module LapisLazuli
     # Creates a new session with the proxy
     def create()
       # Do we already have a connection?
-      if @has_master and self.has_session?
+      if @is_scproxy and self.has_session?
         # Close it before starting a new one
         self.close()
       end
+      # Create a new
+      if @is_scproxy and @api
+        # Let the master create a new proxy
+        response = @api.get("/proxy/new")
+        # Did we get on?
+        if response.body["status"] == true
+          @port = response.body["result"]["port"]
+        else
+          # Show the error
+          raise response.body["message"]
+        end
+      end
 
-      # Let the master create a new proxy
-      response = @api.get("/proxy/new")
-      # Did we get on?
-      if response.body["status"] == true
-        @port = response.body["result"]["port"]
-      else
-        # Show the error
-        raise response.body["message"]
+      if @port.nil?
+        raise "Coult not create a new proxy"
       end
 
       return @port
@@ -67,7 +72,7 @@ module LapisLazuli
     # Close the session with the proxy
     def close()
       # If we don't have one we don't do anything
-      return if !@has_masster or !self.has_session?
+      return if !@is_scproxy or !self.has_session?
 
       # Send the call to the master
       response = @api.get("/proxy/close") do |req|

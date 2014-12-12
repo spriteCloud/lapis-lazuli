@@ -80,8 +80,22 @@ module LapisLazuli
       end
 
       args = [browser]
-      if not optional_data.nil?
+      if not optional_data.nil? and not optional_data.empty?
+        @ll.log.debug("Got optional data: #{optional_data}")
         args.push(optional_data)
+      elsif @ll.has_proxy?
+        # Create a session if needed
+        if !@ll.proxy.has_session?
+          @ll.proxy.create()
+        end
+
+        proxy_url = "#{@ll.proxy.ip}:#{@ll.proxy.port}"
+        if browser == :firefox
+          @ll.log.debug("Configuring Firefox proxy: #{proxy_url}")
+          profile = Selenium::WebDriver::Firefox::Profile.new
+          profile.proxy = Selenium::WebDriver::Proxy.new :http => proxy_url, :ssl => proxy_url
+          args.push({:profile => profile})
+        end
       end
 
       browser_instance = Watir::Browser.send(:new, *args)

@@ -64,3 +64,7 @@ When(/^I find "(.*?)" and name it "(.*?)"$/) do |id, name|
   element = ll.browser.find(id)
   ll.scenario.storage.set(name, element)
 end
+
+When(/^I go to "(.*?)"$/) do |url|
+  browser.goto url
+end

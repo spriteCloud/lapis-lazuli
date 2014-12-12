@@ -76,19 +76,19 @@ module LapisLazuli
         # Default proxy settings
         proxy_ip = "localhost"
         proxy_port = 10000
-        proxy_master = true
+        scproxy = true
 
         # Do we have a config?
         if self.has_env_or_config?("proxy.ip") and
           self.has_env_or_config?("proxy.port")
           proxy_ip = self.env_or_config("proxy.ip")
           proxy_port = self.env_or_config("proxy.port")
-          proxy_master = self.env_or_config("proxy.spritecloud", true)
+          scproxy = self.env_or_config("proxy.spritecloud", true)
         end
 
         # Try to start the proxy
-        @proxy = Proxy.new(proxy_ip, proxy_port, proxy_master)
-        @log.debug("Found proxy: #{proxy_ip}:#{proxy_port}, spritecloud: #{proxy_master}")
+        @proxy = Proxy.new(proxy_ip, proxy_port, scproxy)
+        @log.debug("Found proxy: #{proxy_ip}:#{proxy_port}, spritecloud: #{scproxy}")
       rescue StandardError => err
         @log.debug("No proxy available")
       end
@@ -259,6 +259,12 @@ module LapisLazuli
       else
         return nil
       end
+    end
+
+    ##
+    # Checks if there is a browser started
+    def has_proxy?
+      return !@proxy.nil?
     end
 
     ##
