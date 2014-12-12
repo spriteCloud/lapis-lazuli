@@ -134,6 +134,37 @@ module BrowserModule
       end
     end
 
+
+    ##
+    # Pick implementation for find and multi_find, but can be used standalone.
+    #
+    # pick may be one of :first, :last, :random or a numeric index. Returns the
+    # element from the collection corresponding to the pick parameter.
+    def pick_one(pick, elems)
+      if pick.is_a? String
+        pick = pick.to_sym
+      end
+
+      case pick
+      when :first
+        return elems.first
+      when :last
+        return elems.last
+      when :random
+        return elems.to_a.shuffle.first
+      else
+        if pick.is_a? Numeric
+          return elems[pick.to_i]
+        else
+          options[:message] = "Invalid :pick value #{pick}."
+          options[:groups] = ['find', 'pick']
+          @ll.error(options)
+        end
+      end
+    end
+
+
+
   private
 
     ##
@@ -392,31 +423,6 @@ module BrowserModule
       end
     end
 
-
-    ##
-    # Pick implementation for find and multi_find
-    def pick_one(pick, elems)
-      if pick.is_a? String
-        pick = pick.to_sym
-      end
-
-      case pick
-      when :first
-        return elems.first
-      when :last
-        return elems.last
-      when :random
-        return elems.to_a.shuffle.first
-      else
-        if pick.is_a? Numeric
-          return elems[pick.to_i]
-        else
-          options[:message] = "Invalid :pick value #{pick}."
-          options[:groups] = ['find', 'pick']
-          @ll.error(options)
-        end
-      end
-    end
 
   end # module Find
 end # module BrowserModule
