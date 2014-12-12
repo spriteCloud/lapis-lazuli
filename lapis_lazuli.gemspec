@@ -24,4 +24,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "thor", "~> 0.19"
   spec.add_dependency "facets", "~> 2.9"
   spec.add_dependency "json", "~> 1.8.1"
+  spec.add_dependency "faraday", "~> 0.9.0"
 end
