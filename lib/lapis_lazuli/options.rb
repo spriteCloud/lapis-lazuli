@@ -9,7 +9,7 @@ module LapisLazuli
   ##
   # Configuration options and their default values
   CONFIG_OPTIONS = {
-    "close_browser_after" => ["feature", "Close the browser after every scenario, feature, etc. Possible values are 'feature', 'scenario' and 'never'."],
+    "close_browser_after" => ["feature", "Close the browser after every scenario, feature, etc. Possible values are 'feature', 'scenario', 'end' and 'never'."],
     "error_strings" => [nil, "List of strings that indicate errors when detected on a web page."],
     "default_env" => [nil, "Indicates which environment specific configuration to load when no test environment is provided explicitly."],
     "test_env" => [nil, "Indicates which environment specific configuration to load in this test run."],
