@@ -7,6 +7,7 @@
 #
 
 require 'test/unit/assertions'
+require 'lapis_lazuli/argparse'
 
 module LapisLazuli
 module BrowserModule
@@ -15,6 +16,7 @@ module BrowserModule
   # Find functionality for LapisLazuli::Browser. Don't use outside of that
   # class.
   module Find
+    include LapisLazuli::ArgParse
 
     ##
     # Finds all elements corresponding to some specification; the supported
@@ -43,9 +45,15 @@ module BrowserModule
     # - :filter_by expects a symbol that the elements respond to; if calling
     #   the method returns true, the element is returned, otherwise it is
     #   ignored. Use e.g. { :filter_by => :present? }
-    def find_all(options)
-      opts, func = find_lambda_filtered(options)
+    def find_all(*args)
+      # Parse args into options
+      options = parse_find_options({}, *args)
 
+      # We only care about the first selector here.
+      merged = merge_options(options[:selectors][0], options)
+
+      # Find filtered.
+      opts, func = find_lambda_filtered(merged)
       begin
         return func.call
       rescue RuntimeError => err
@@ -67,12 +75,18 @@ module BrowserModule
     # element is returned.
     #
     # The default for :pick is :first
-    def find(options)
-      options = parse_find_options(options)
+    def find(*args)
+      # Parse args into options
+      options = {
+        :pick => :first,
+      }
+      options = parse_find_options(options, *args)
 
+      # Extract the extra "pick" option
       pick = options.fetch(:pick, "first")
       options.delete(:pick)
 
+      # Pick one of the find all results
       return pick_one(pick, find_all(options))
     end
 
@@ -100,10 +114,14 @@ module BrowserModule
     #
     #   multi_find_all(selector1, selector2)
     def multi_find_all(*args)
-      options = parse_multi_find_options(*args)
+      # Parse args into options
+      options = {
+        :mode => :match_one,
+      }
+      options = parse_find_options(options, *args)
 
-      options, func = multi_find_lambda(options)
-
+      # Find all for the given selectors
+      opts, func = multi_find_lambda(options)
       begin
         return func.call
       rescue RuntimeError => err
@@ -117,21 +135,19 @@ module BrowserModule
     ##
     # Same as multi_find_all, but accepts the :pick parameter as find does.
     def multi_find(*args)
-      options = parse_multi_find_options(*args)
+      # Parse args into options
+      options = {
+        :mode => :match_one,
+        :pick => :first,
+      }
+      options = parse_find_options(options, *args)
 
-      # Extract pick option
-      pick = options.fetch(:pick, "first").to_sym
+      # Extract the extra "pick" option
+      pick = options.fetch(:pick, "first")
       options.delete(:pick)
 
-      options, func = multi_find_lambda(options)
-
-      begin
-        return pick_one(pick, func.call)
-      rescue RuntimeError => err
-        opts[:message] = "Error in multi_find"
-        opts[:exception] = err
-        @ll.error(opts)
-      end
+      # Pick one of the find all results
+      return pick_one(pick, multi_find_all(options))
     end
 
 
@@ -141,10 +157,6 @@ module BrowserModule
     # pick may be one of :first, :last, :random or a numeric index. Returns the
     # element from the collection corresponding to the pick parameter.
     def pick_one(pick, elems)
-      if pick.is_a? String
-        pick = pick.to_sym
-      end
-
       case pick
       when :first
         return elems.first
@@ -197,26 +209,59 @@ module BrowserModule
       return options
     end
 
+
     ##
-    # Convert all shortcut options to a full options hash
-    def parse_find_options(options)
-      # First convert outer shorthand. Afterwards, options is guaranteed
-      # to be a hash.
-      if options.is_a? String
-        options = {:element => options}
-      elsif options.is_a? Symbol
-        options = {:like => options}
-      elsif options.is_a? Array
-        options = options.map do |setting|
-          parse_find_options setting
+    # Uses parse_args to parse find options. Then ensures that for each
+    # selector, the expected fields exist.
+    def parse_find_options(options, *args)
+      # First, parse the arguments into an options hash
+      options = parse_args(options, :selectors, *args)
+
+      # Verify/sanitize common options
+      if options.has_key? :mode
+        options[:mode] = options[:mode].to_sym
+        assert [:match_all, :match_one].include?(options[:mode]), ":mode needs to be one of :match_one or :match_all"
+      end
+
+      if options.has_key? :pick
+        if not options[:pick].is_a? Numeric
+          options[:pick] = options[:pick].to_sym
         end
+        assert ([:first, :last, :random].include?(options[:pick]) or options[:pick].is_a?(Numeric)), ":pick must be one of :first, :last, :random or a numeric value"
+      end
+
+      if options.has_key? :filter_by
+        options[:filter_by] = options.to_sym
+      end
+
+      # Next, expand all selectors.
+      expanded = []
+      options[:selectors].each do |sel|
+        expanded << expand_selector(sel)
+      end
+      options[:selectors] = expanded
+
+      return options
+    end
+
+
+
+    ##
+    # Expands a selector and verifies it.
+    def expand_selector(selector)
+      # First convert outer shorthand. Afterwards, selector is guaranteed
+      # to be a hash.
+      if selector.is_a? String
+        selector = {:element => selector}
+      elsif selector.is_a? Symbol
+        selector = {:like => selector}
       end
 
       # Now ensure the :like parameter is a full hash
-      if options.include? :like
-        like_opts = options[:like]
+      if selector.include? :like
+        like_opts = selector[:like]
         # Convert array shorthand to full Hash
-        if like_opts.is_a? Array and like_opts.length == 3
+        if like_opts.is_a? Array and like_opts.length >= 3
           like_opts = {
             :element => like_opts[0],
             :attribute => like_opts[1],
@@ -228,15 +273,27 @@ module BrowserModule
           }
         end
 
-        options[:like] = like_opts
+        selector[:like] = like_opts
         if not like_opts.has_key? :element
-          options[:message] = "Like options are missing the :element key."
-          options[:groups] = ['find', 'options']
-          @ll.error(options)
+          selector[:message] = "Like selector are missing the :element key."
+          selector[:groups] = ['find', 'selector']
+          @ll.error(selector)
         end
       end
 
-      return options
+      return selector
+    end
+
+
+    ##
+    # Merge options into selector
+    def merge_options(selector, options)
+      options.each do |k, v|
+        if :selectors != k
+          selector[k] = v
+        end
+      end
+      return selector
     end
 
 
@@ -248,8 +305,7 @@ module BrowserModule
     #
     # There are a number of different modes, triggered by the presence or
     # absence of particular parameters. Note that the parameters passed
-    # here are passed through parse_find_options() before being evaluated:
-    # that function expands shorthand options to a full hash.
+    # here must have been passed through parse_find_options() before.
     #
     # That said:
     #   - The presence of :like will construct an XPath selector from the
@@ -259,9 +315,6 @@ module BrowserModule
     #     text content of the element.
     #
     def find_lambda(options)
-      # Parse options
-      options = parse_find_options options
-
       # A context is starting position for the search
       # Example:
       #  parent = ll.browser.find(:div => "some_parent")
@@ -320,8 +373,6 @@ module BrowserModule
     # Similar to find_lambda, but filters the returned elements by the given
     # :filter_by function (defaults to :present?).
     def find_lambda_filtered(options)
-      options = parse_find_options(options)
-
       filter_by = options.fetch(:filter_by, nil)
       options.delete(:filter_by)
 
