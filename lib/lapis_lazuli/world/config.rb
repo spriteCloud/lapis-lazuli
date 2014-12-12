@@ -7,6 +7,7 @@
 #
 
 module LapisLazuli
+module WorldModule
   ##
   # Module with configuration loading related functions
   #
@@ -208,4 +209,5 @@ module LapisLazuli
 
 
   end # module Config
+end # module WorldModule
 end # module LapisLazuli

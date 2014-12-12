@@ -17,10 +17,10 @@ require "lapis_lazuli/api"
 require "lapis_lazuli/proxy"
 
 # Modules
-require "lapis_lazuli/config"
-require "lapis_lazuli/variable"
-require "lapis_lazuli/error"
-require "lapis_lazuli/xpath"
+require "lapis_lazuli/world/config"
+require "lapis_lazuli/world/variable"
+require "lapis_lazuli/world/error"
+require "lapis_lazuli/generic/xpath"
 
 # Other
 require "lapis_lazuli/options"
@@ -42,10 +42,10 @@ module LapisLazuli
   class World
     include Singleton
 
-    include LapisLazuli::Config
-    include LapisLazuli::Variable
-    include LapisLazuli::Error
-    include LapisLazuli::XPath
+    include LapisLazuli::WorldModule::Config
+    include LapisLazuli::WorldModule::Variable
+    include LapisLazuli::WorldModule::Error
+    include LapisLazuli::GenericModule::XPath
 
     # session key
     @uuid

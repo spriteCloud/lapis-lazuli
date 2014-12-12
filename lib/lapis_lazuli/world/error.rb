@@ -7,8 +7,9 @@
 #
 
 module LapisLazuli
+module WorldModule
   ##
-  # Module with error handling related functionality (World)
+  # Module with error handling related functionality
   module Error
     ##
     # Throw an error based on some settings
@@ -204,6 +205,5 @@ module LapisLazuli
     end
 
   end # module Error
+end # module WorldModule
 end # module LapisLazuli
-
-

@@ -9,6 +9,7 @@
 require 'test/unit/assertions'
 
 module LapisLazuli
+module BrowserModule
 
   ##
   # Find functionality for LapisLazuli::Browser. Don't use outside of that
@@ -418,4 +419,5 @@ module LapisLazuli
     end
 
   end # module Find
+end # module BrowserModule
 end # module LapisLazuli

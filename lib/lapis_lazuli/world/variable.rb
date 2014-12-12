@@ -7,8 +7,9 @@
 #
 
 module LapisLazuli
+module WorldModule
   ##
-  # Module for variable replacement (part of World)
+  # Module for variable replacement
   #
   # Uses the following managed by World:
   #   @time
@@ -49,4 +50,5 @@ module LapisLazuli
 
 
   end # module Variable
+end # module WorldModule
 end # module LapisLazuli

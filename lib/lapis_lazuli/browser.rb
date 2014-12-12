@@ -10,16 +10,21 @@ require 'selenium-webdriver'
 require 'watir-webdriver'
 require "watir-webdriver/extensions/alerts"
 require 'test/unit/assertions'
-require 'lapis_lazuli/xpath'
-require 'lapis_lazuli/find'
+
+# Modules
+require 'lapis_lazuli/browser/find'
+require "lapis_lazuli/browser/error"
+require 'lapis_lazuli/generic/xpath'
 
 module LapisLazuli
   ##
   # Extension to the Watir browser
   class Browser
     include Test::Unit::Assertions
-    include LapisLazuli::XPath
-    include LapisLazuli::Find
+
+    include LapisLazuli::BrowserModule::Find
+    include LapisLazuli::BrowserModule::Error
+    include LapisLazuli::GenericModule::XPath
 
     @ll
     @browser

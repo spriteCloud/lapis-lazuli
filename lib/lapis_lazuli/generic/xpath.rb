@@ -6,6 +6,10 @@
 # All rights reserved.
 #
 module LapisLazuli
+module GenericModule
+
+  ##
+  # Helper functions for XPath composition
   module XPath
 
 
@@ -41,4 +45,5 @@ module LapisLazuli
 
 
   end # module XPath
+end # module GenericModule
 end # module LapisLazuli
