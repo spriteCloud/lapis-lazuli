@@ -179,7 +179,8 @@ Then(/^a screenshot should have been created$/) do
 end
 
 Then(/^I expect javascript errors$/) do
-	if browser.get_js_errors.length > 0
+	errors = browser.get_js_errors
+	if !errors.nil? and errors.length > 0
 		scenario.check_browser_errors = false
 	else
 		error(

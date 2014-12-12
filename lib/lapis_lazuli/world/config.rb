@@ -53,12 +53,12 @@ module WorldModule
       # Turn suffixes into files to try
       files = []
       suffixes.each do |suffix|
-        files << "#{dir}/#{basename}-#{suffix}#{ext}"
+        files << "#{dir}#{File::SEPARATOR}#{basename}-#{suffix}#{ext}"
       end
       files << config_name
 
       # Try all files in order
-      files.each do |file| 
+      files.each do |file|
         begin
           # Try to load a config file
           return self.load_config_from_file(file)
