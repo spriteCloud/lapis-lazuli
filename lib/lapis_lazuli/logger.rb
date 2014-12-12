@@ -54,6 +54,10 @@ module LapisLazuli
     ##
     # Every function this class doesn't have should be mapped to the original
     # logger
+    def respond_to?(meth)
+      return (!@log.nil? and @log.respond_to? meth)
+    end
+
     def method_missing(meth, *args, &block)
       # Write to IO stream and the logger
       if @log.respond_to? meth

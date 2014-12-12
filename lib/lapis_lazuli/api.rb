@@ -30,6 +30,10 @@ module LapisLazuli
     end
     ##
     # Map any missing method to the conn object or Faraday
+    def respond_to?(meth)
+      return (!@conn.nil? and @conn.respond_to? meth)
+    end
+
     def method_missing(meth, *args, &block)
       if !@conn.nil? and @conn.respond_to? meth
         return @conn.send(meth.to_s, *args, &block)

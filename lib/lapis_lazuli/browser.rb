@@ -204,6 +204,10 @@ module LapisLazuli
     # Map any missing method to the browser object
     # Example
     # ll.browser.goto "http://www.spritecloud.com"
+    def respond_to?(meth)
+      return (!@browser.nil? and @browser.respond_to? meth)
+    end
+
     def method_missing(meth, *args, &block)
       if @browser.respond_to? meth
         return @browser.send(meth.to_s, *args, &block)

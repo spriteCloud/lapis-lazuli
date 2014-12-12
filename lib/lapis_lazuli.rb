@@ -23,8 +23,6 @@ module LapisLazuli
   ##
   # Pass just about everything on to the World class
   def respond_to?(meth)
-    p LapisLazuli.instance_methods
-    p "respond to ? #{meth}"
     return World.instance.respond_to? meth
   end
 
