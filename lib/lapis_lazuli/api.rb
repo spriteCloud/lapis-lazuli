@@ -12,8 +12,6 @@ module LapisLazuli
   ##
   # Proxy class to map to sc-proxy
   class API
-    # Link to main lapis_lazuli class
-    @ll
     attr_reader :conn
     def initialize()
     end
@@ -22,12 +20,6 @@ module LapisLazuli
       @conn = Faraday.new(url, options, &block)
     end
 
-    def ll
-      if @ll.nil?
-        @ll = World.instance
-      end
-      return @ll
-    end
     ##
     # Map any missing method to the conn object or Faraday
     def respond_to?(meth)
@@ -38,11 +30,7 @@ module LapisLazuli
       if !@conn.nil? and @conn.respond_to? meth
         return @conn.send(meth.to_s, *args, &block)
       end
-      begin
-        return Faraday.send(meth.to_s, *args, &block)
-      rescue
-        self.ll.error("Browser Method Missing: #{meth}")
-      end
+      return Faraday.send(meth.to_s, *args, &block)
     end
   end # class API
 end # module LapisLazuli
