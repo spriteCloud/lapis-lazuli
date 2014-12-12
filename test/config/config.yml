@@ -12,6 +12,7 @@ default_env: production                   # defines the environment
 screenshots_dir: screenshots              # where to save the screenshots
 step_pause_time: 1                        # Waiting time in seconds defined after a step completes
 make_screenshot_on_failed_scenario: true  # make a screenshot after a scenario fails
+old_portal: true
 close_browser_after: feature
 
 
@@ -31,6 +32,6 @@ test:
 uat:
 
 production:
-  close_browser_after: scenario
+  close_browser_after: feature
   server:
       url: http://localhost:9090/
