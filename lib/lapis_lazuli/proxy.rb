@@ -54,13 +54,13 @@ module LapisLazuli
       # Create a new
       if @is_scproxy and @api
         # Let the master create a new proxy
-        response = @api.get("/proxy/new")
+        response = self.proxy_new
         # Did we get on?
-        if response.body["status"] == true
-          @port = response.body["result"]["port"]
+        if response["status"] == true
+          @port = response["result"]["port"]
         else
           # Show the error
-          raise response.body["message"]
+          raise response["message"]
         end
       end
 
@@ -78,18 +78,15 @@ module LapisLazuli
       return if !@is_scproxy or !self.has_session?
 
       # Send the call to the master
-      response = @api.get("/proxy/close") do |req|
-        # Which port do we want to close?
-        req.params["port"] = @port
-      end
+      response = self.proxy_close :port => @port
 
       # Did we close it?
-      if response.body["status"] == true
+      if response["status"] == true
         # Clear our session
         @port = nil
       else
         # Show an error
-        raise response.body["message"]
+        raise response["message"]
       end
     end
 
@@ -113,6 +110,42 @@ module LapisLazuli
 
       # Sorry port is closed
       return false
+    end
+
+    ##
+    # Map any missing method to the API object
+    #
+    # Example
+    # proxy.har_get
+    # proxy.proxy_close :port => 10002
+    def method_missing(meth, *args, &block)
+      # We should have no arguments or a Hash
+      if args.length > 1 or (args.length == 1 and not args[0].is_a? Hash)
+        raise "Incorrect arguments: #{args}"
+      end
+
+      # A custom block or arguments?
+      block = block_given? ? block : Proc.new do |req|
+        if args.length == 1
+          args[0].each do |key,value|
+            req.params[key.to_s] = value.to_s
+          end
+        end
+      end
+      # Call the API
+      response = @api.get("/#{meth.to_s.gsub("_","/")}", nil, &block)
+      # Only return the body if we could parse the JSOn
+      if response.body.is_a? Hash
+        return response.body
+      else
+        # Got a serious issue here, label as code 500
+        return {
+          "code" => 500,
+          "status" => false,
+          "message" => "Incorrect response from proxy",
+          "result" => response
+        }
+      end
     end
   end
 end
