@@ -36,4 +36,4 @@ gem 'cucumber'
 
 # spriteCloud specific
 gem 'regressinator'
-gem 'lapis_lazuli', :github => 'spriteCloud/lapis-lazuli', :branch => 'master'
+gem 'lapis_lazuli', :github => 'spriteCloud/lapis-lazuli', :branch => 'onno'
