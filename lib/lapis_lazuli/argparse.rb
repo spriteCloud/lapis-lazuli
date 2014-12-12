@@ -1,0 +1,82 @@
+#
+# LapisLazuli
+# https://github.com/spriteCloud/lapis-lazuli
+#
+# Copyright (c) 2013-2014 spriteCloud B.V. and other LapisLazuli contributors.
+# All rights reserved.
+#
+
+require 'test/unit/assertions'
+
+module LapisLazuli
+
+  ##
+  # Simple module that helps with function argument parsing.
+  module ArgParse
+
+    ##
+    # Parses its arguments, returning an options hash. Use it in a function that
+    # just accepts *args to handle both a single hash argument and a list of
+    # arguments:
+    #
+    # Example:
+    #   def foo(*args)
+    #     defaults = {}
+    #     options = parse_args(defaults, "bar", *args)
+    #   end
+    #
+    # The function essentially handles three distinct cases:
+    # 1. The arguments are a list:
+    #    foo(1, 2)
+    #      -> {"bar" => [1, 2]} merged with defaults
+    # 2. The first argument is a hash, and it contains "bar":
+    #    foo(:x => 1, "bar" => [1, 2])
+    #      -> {:x => 1, "bar" => [1, 2]} merged with defaults
+    # 3. The first argument is a hash and it does not contain "bar"
+    #    foo(:x => 1)
+    #      -> {"bar" => [{:x => 1}]} merged with defaults
+    #
+    # Either option ensures that the second parameter "bar" exists and is an
+    # array. Also, all defaults are merged into the options hash.
+    def parse_args(defaults, list, *args, &block)
+      options = {}
+
+      # If we have a single hash argument, we'll treat it as defaults, and expect
+      # the list field to be an Array
+      if 1 == args.length and args[0].is_a? Hash
+        tmp = args[0]
+
+        if tmp.has_key? list
+          # Assert that the list argument is a list. Duh.
+          assert tmp[list].is_a?(Array), "Need to provide an Array for #{list}."
+
+          # Merge defaults
+          defaults.each do |k, v|
+            if not tmp.has_key? k
+              tmp[k] = v
+            end
+          end
+
+          options = tmp
+        else
+          # No list means that we only have a single argument, which
+          # is meant to be the single list item.
+          options = defaults
+          options[list] = [tmp]
+        end
+
+      else
+        options = defaults
+        options[list] = args
+      end
+
+      # If a block is given, it may be used to process the defaults further
+      if not block.nil?
+        options = block.call(options)
+      end
+
+      return options
+    end
+
+  end # module ArgParse
+end # module LapisLazuli
