@@ -57,7 +57,7 @@ module LapisLazuli
           assert tmp[list].is_a?(Array), "Need to provide an Array for #{list}."
 
           # Merge defaults
-          tmp.merge! defaults
+          tmp = defaults.merge tmp
 
           options = tmp
         else
