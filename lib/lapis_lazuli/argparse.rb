@@ -13,6 +13,12 @@ module LapisLazuli
   ##
   # Simple module that helps with function argument parsing.
   module ArgParse
+    # Error related options.
+    ERROR_OPTIONS = {
+      :exception => nil,
+      :message => nil,
+      :groups => nil,
+    }
 
     ##
     # Parses its arguments, returning an options hash. Use it in a function that
@@ -38,7 +44,7 @@ module LapisLazuli
     #
     # Either option ensures that the second parameter "bar" exists and is an
     # array. Also, all defaults are merged into the options hash.
-    def parse_args(defaults, list, *args, &block)
+    def parse_args(defaults, list, *args)
       options = {}
 
       # If we have a single hash argument, we'll treat it as defaults, and expect
@@ -51,17 +57,20 @@ module LapisLazuli
           assert tmp[list].is_a?(Array), "Need to provide an Array for #{list}."
 
           # Merge defaults
-          defaults.each do |k, v|
-            if not tmp.has_key? k
-              tmp[k] = v
-            end
-          end
+          tmp.merge! defaults
 
           options = tmp
         else
           # No list means that we only have a single argument, which
-          # is meant to be the single list item.
+          # is meant to be the single list item. Any option with defaults
+          # must be taken from tmp, if it exists there.
           options = defaults
+          tmp.each do |k, v|
+            if options.has_key? k
+              options[k] = tmp[k]
+              tmp.delete(k)
+            end
+          end
           options[list] = [tmp]
         end
 
@@ -70,9 +79,11 @@ module LapisLazuli
         options[list] = args
       end
 
-      # If a block is given, it may be used to process the defaults further
-      if not block.nil?
-        options = block.call(options)
+      # Finally, prune options: remove all nil values
+      options.each do |k, v|
+        if v.nil?
+          options.delete k
+        end
       end
 
       return options
