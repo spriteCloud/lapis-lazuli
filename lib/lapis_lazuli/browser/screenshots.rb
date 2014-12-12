@@ -58,6 +58,7 @@ module BrowserModule
       rescue RuntimeError => e
         @ll.log.debug "Failed to save screenshot to '#{fileloc}'. Error message #{e.message}"
       end
+      return fileloc
     end
   end # module Screenshots
 end # module BrowserModule

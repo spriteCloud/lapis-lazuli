@@ -25,5 +25,25 @@ module LapisLazuli
     def has?(key)
       return @data.include? key
     end
+
+    ##
+    # Write all stored data to file
+    def writeToFile(filename)
+      File.open(filename, 'w') { |file|
+        # Write the JSON to the file
+        file.write(@data.to_json)
+      }
+    end
+
+    ##
+    # This will be called during the destruction of the world
+    def destroy(world)
+      filename = world.config("storage_dir", ".#{File::SEPARATOR}storage") +
+        File::SEPARATOR +
+        world.time[:timestamp] +
+        ".json"
+      world.log.debug("Writing storage to: #{filename}")
+      self.writeToFile(filename)
+    end
   end
 end

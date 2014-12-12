@@ -211,9 +211,6 @@ module LapisLazuli
       end
     end
 
-
-
-
     ##
     # Map any missing method to the browser object
     # Example
@@ -230,6 +227,16 @@ module LapisLazuli
         return @browser.send(meth.to_s, *args, &block)
       end
       return super
+    end
+
+    def destroy(world)
+      if "end" == world.env_or_config("close_browser_after")
+        begin
+          self.close "end"
+        rescue
+          world.log.debug("Failed to close the browser, probably chrome")
+        end
+      end
     end
   end
 end

@@ -49,7 +49,7 @@ module LapisLazuli
 
     # session key
     @uuid
-    attr_reader :log, :scenario, :time, :api, :proxy
+    attr_reader :log, :scenario, :time, :api, :proxy, :storage
     attr_accessor :scenario, :time, :browser
 
     ##
@@ -72,6 +72,11 @@ module LapisLazuli
 
       # Current scenario information
       @scenario = Scenario.new
+
+      # Storage for the entire test run
+      @storage = Storage.new
+      @storage.set("time", @time)
+      @storage.set("uuid", @uuid)
 
       # Load the configuration file
       self.load_config(LapisLazuli.config_file)
@@ -118,14 +123,13 @@ module LapisLazuli
         # Try to start the proxy
         @proxy = Proxy.new(proxy_ip, proxy_port, proxy_master)
 
-
-        # Register a finalizer, so we can clean up the browser again
-        ObjectSpace.define_finalizer(self, self.class.proxy_destroy(@proxy, @log))
-
         @log.debug("Found proxy: #{proxy_ip}:#{proxy_port}, spritecloud: #{proxy_master}")
       rescue StandardError => err
         @log.debug("No proxy available: #{err}")
       end
+
+      # Register a finalizer, so we can clean up the proxy again
+      ObjectSpace.define_finalizer(self, self.class.destroy(self))
     end
 
     ##
@@ -148,9 +152,6 @@ module LapisLazuli
         browser_args = args.unshift(self)
         # Create a new browser object
         @browser = Browser.new(*browser_args)
-
-        # Register a finalizer, so we can clean up the browser again
-        ObjectSpace.define_finalizer(self, self.class.browser_destroy(self.env_or_config("close_browser_after"), @browser, @log))
       end
 
       if not @browser.is_open?
@@ -162,28 +163,21 @@ module LapisLazuli
 
   private
 
-    def self.browser_destroy(close_browser_after, browser, log)
-      proc {
-        if "end" == close_browser_after and not browser.nil?
-          begin
-            browser.close "end"
-          rescue
-            log.debug("Failed to close the browser, probably chrome")
-          end
+    def self.destroy(world)
+      Proc.new do
+        # First close the browser
+        if world.has_browser?
+          world.browser.destroy(world)
         end
-      }
-    end
+        # Then the proxy
+        if world.has_proxy?
+          world.proxy.destroy(world)
+        end
 
-    def self.proxy_destroy(proxy, log)
-      proc {
-        if not proxy.nil?
-          begin
-            proxy.close
-          rescue
-            log.debug("Failed to close the proxy")
-          end
-        end
-      }
+        # Finaly the storage
+        # This will write a file with all data for this test
+        world.storage.destroy(world)
+      end
     end
 
   end # class World

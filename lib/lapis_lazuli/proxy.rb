@@ -35,7 +35,6 @@ module LapisLazuli
       if @is_scproxy
         # Create an API connection to the master
         @api = API.new()
-        @api.set_conn("http://#{@ip}:#{@scproxy_port}/")
       end
     end
 
@@ -54,7 +53,7 @@ module LapisLazuli
       # Create a new
       if @is_scproxy and @api
         # Let the master create a new proxy
-        response = self.proxy_new
+        response = self.proxy_new :master => true
         # Did we get on?
         if response["status"] == true
           @port = response["result"]["port"]
@@ -78,7 +77,7 @@ module LapisLazuli
       return if !@is_scproxy or !self.has_session?
 
       # Send the call to the master
-      response = self.proxy_close :port => @port
+      response = self.proxy_close :port => @port, :master => true
 
       # Did we close it?
       if response["status"] == true
@@ -119,19 +118,29 @@ module LapisLazuli
     # proxy.har_get
     # proxy.proxy_close :port => 10002
     def method_missing(meth, *args, &block)
+      # Only for spritecloud proxies
+      if !@is_scproxy
+        raise "Incorrect method: #{meth}"
+      end
+
       # We should have no arguments or a Hash
       if args.length > 1 or (args.length == 1 and not args[0].is_a? Hash)
         raise "Incorrect arguments: #{args}"
       end
+      settings = args[0] || {}
 
       # A custom block or arguments?
       block = block_given? ? block : Proc.new do |req|
         if args.length == 1
-          args[0].each do |key,value|
+          settings.each do |key,value|
             req.params[key.to_s] = value.to_s
           end
         end
       end
+
+      # Pick the master proxy or the proxy for this session
+      @api.set_conn("http://#{@ip}:#{(settings.has_key? :master) ? @scproxy_port : @port}/")
+
       # Call the API
       response = @api.get("/#{meth.to_s.gsub("_","/")}", nil, &block)
       # Only return the body if we could parse the JSOn
@@ -145,6 +154,25 @@ module LapisLazuli
           "message" => "Incorrect response from proxy",
           "result" => response
         }
+      end
+    end
+
+    ##
+    # During the end of the test run all data should be added to the storage
+    def destroy(world)
+      begin
+        # Is it a spriteCloud proxy?
+        if @is_scproxy
+          # Request HAR data
+          response = self.har_get
+          if response["status"] == true
+            # Add it to the storage
+            world.storage.set("har", response["result"])
+          end
+        end
+        self.close
+      rescue StandardError => err
+        world.log.debug("Failed to close the proxy: #{err}")
       end
     end
   end

@@ -23,5 +23,6 @@ module LapisLazuli
     "log_dir" => [".#{File::SEPARATOR}logs", "Location for log files; they'll be named like the configuration file but with the '.log' extension."],
     "log_file" => [nil, "Location of log file; overrides 'log_dir'."],
     "log_level" => ['DEBUG', "Log level; see ruby Logger class for details."],
+    "storage_dir" => [".#{File::SEPARATOR}storage", "Location prefix where to output test information file with the '.json' extension."]
   }
 end # module LapisLazuli

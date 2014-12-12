@@ -153,6 +153,7 @@ module WorldModule
         if default.nil? and result.nil?
           raise "Unknown configuration variable '#{variable}' and no default given!"
         end
+        break if result.nil?
         result = result[part]
       end
 

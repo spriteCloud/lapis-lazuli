@@ -41,7 +41,8 @@ module LapisLazuli
       if (scenario.failed? or (self.scenario.check_browser_errors and self.browser.has_error?))
         # Take a screenshot if needed
         if self.has_env_or_config?('screenshot_on_failure')
-          self.browser.take_screenshot()
+          fileloc = self.browser.take_screenshot()
+          embed(fileloc, "image/png", "SCREENSHOT")
         end
       end
       # Close browser if needed
