@@ -49,11 +49,8 @@ module BrowserModule
       # Parse args into options
       options = parse_find_options({}, *args)
 
-      # We only care about the first selector here.
-      merged = merge_options(options[:selectors][0], options)
-
       # Find filtered.
-      opts, func = find_lambda_filtered(merged)
+      opts, func = find_lambda_filtered(options[:selectors][0])
       begin
         return func.call
       rescue RuntimeError => err
@@ -186,6 +183,7 @@ module BrowserModule
       options = {
         :mode => :match_one
       }
+      options.merge! ERROR_OPTIONS
 
       # If we have a single hash argument, we'll treat it as options, and expect
       # the :selectors field.
@@ -216,6 +214,7 @@ module BrowserModule
     def parse_find_options(options, *args)
       # First, parse the arguments into an options hash
       options = parse_args(options, :selectors, *args)
+      options.merge! ERROR_OPTIONS
 
       # Verify/sanitize common options
       if options.has_key? :mode
@@ -241,6 +240,7 @@ module BrowserModule
       end
       options[:selectors] = expanded
 
+      # p "-> options: #{options}"
       return options
     end
 
@@ -285,18 +285,6 @@ module BrowserModule
     end
 
 
-    ##
-    # Merge options into selector
-    def merge_options(selector, options)
-      options.each do |k, v|
-        if :selectors != k
-          selector[k] = v
-        end
-      end
-      return selector
-    end
-
-
 
     ##
     # Return a lambda function that can be executed to find an element.
@@ -326,6 +314,8 @@ module BrowserModule
         options.delete(:context)
         has_context = true
       end
+
+      # pp "find options: #{options}"
 
       # Do we have :like options? Create an appropriate lambda
       if options.has_key? :like
