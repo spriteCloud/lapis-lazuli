@@ -142,9 +142,9 @@ module WorldModule
 
       # Environment variables for known options override the option.
       if CONFIG_OPTIONS.has_key? variable
-        env = variable.upcase
-        if ENV.has_key? env
-          return ENV[env]
+        var = variable.upcase
+        if ENV.has_key? var
+          return ENV[var]
         end
       end
 
@@ -183,6 +183,16 @@ module WorldModule
       if not variable
         return self.config(@env)
       end
+
+      # Environment variables for known options override environment specific
+      # options, too
+      if CONFIG_OPTIONS.has_key? variable
+        var = variable.upcase
+        if ENV.has_key? var
+          return ENV[var]
+        end
+      end
+
       return self.config("#{@env}.#{variable}",default)
     end
 
