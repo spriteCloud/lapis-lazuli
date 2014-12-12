@@ -117,12 +117,22 @@ module LapisLazuli
 
         # Try to start the proxy
         @proxy = Proxy.new(proxy_ip, proxy_port, proxy_master)
+
+
+        # Register a finalizer, so we can clean up the browser again
+        ObjectSpace.define_finalizer(self, self.class.proxy_destroy(@proxy, @log))
+
         @log.debug("Found proxy: #{proxy_ip}:#{proxy_port}, spritecloud: #{proxy_master}")
       rescue StandardError => err
-        @log.debug("No proxy available")
+        @log.debug("No proxy available: #{err}")
       end
     end
 
+    ##
+    # Checks if there is a proxy
+    def has_proxy?
+      return !@proxy.nil?
+    end
 
     ##
     # Checks if there is a browser started
@@ -159,7 +169,17 @@ module LapisLazuli
       }
     end
 
-
+    def self.proxy_destroy(proxy, log)
+      proc {
+        if not proxy.nil?
+          begin
+            proxy.close
+          rescue
+            log.debug("Failed to close the proxy")
+          end
+        end
+      }
+    end
 
   end # class World
 end # module LapisLazuli

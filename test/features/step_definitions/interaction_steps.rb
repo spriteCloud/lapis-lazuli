@@ -94,3 +94,6 @@ Then(/^I expect to find (\d+) elements\.$/) do |n|
   assert n.to_i == elems.length, "Mismatched amount: got #{elems.length} vs. expected #{n}"
 end
 
+When(/^I go to "(.*?)"$/) do |url|
+  browser.goto url
+end
