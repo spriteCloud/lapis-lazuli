@@ -110,12 +110,12 @@ Then(/^within (\d+) seconds I should see "([^"]+?)" and "([^"]+?)"( disappear)?$
 		condition = :until
 	end
 
-	browser.wait_multiple(
+	browser.multi_wait_all(
 		:timeout => timeout,
 		:condition => condition,
-		:operator => :all_of,
+		:mode => :match_all,
 		:groups => ["wait"],
-		:list => [
+		:selectors => [
 			{ :tag_name => 'span', :class => /foo/ },
 			{ :tag_name => 'div', :id => 'bar' }
 		]
@@ -123,21 +123,21 @@ Then(/^within (\d+) seconds I should see "([^"]+?)" and "([^"]+?)"( disappear)?$
 end
 
 Then(/^within (\d+) seconds I should see added elements with matching$/) do |timeout|
-	elems = browser.wait_multiple(
+	elems = browser.multi_wait_all(
 		:timeout => timeout,
 		:condition => :until,
-		:operator => :all_of,
+		:mode => :match_all,
 		:groups => ["wait"],
-		:list => [
+		:selectors => [
 			{ :tag_name => 'span', :class => /foo/, :text => /foo/ },
 			{ :tag_name => 'div', :id => 'bar', :html => "bar" }
 		]
 	)
- 	assert 2 == elems.length
+ 	assert (2 == elems.length), "Expected two elements, found #{elems.length}"
 end
 
 Then(/^within 10 seconds I should see either added element/) do
-	browser.wait_multiple(
+	browser.multi_wait_all(
 			{ :tag_name => 'a', :class => /foo/ },
 			{ :tag_name => 'div', :id => 'bar' }
 	)
