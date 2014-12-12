@@ -183,7 +183,7 @@ module BrowserModule
       options = {
         :mode => :match_one
       }
-      options.merge! ERROR_OPTIONS
+      options = ERROR_OPTIONS.merge options
 
       # If we have a single hash argument, we'll treat it as options, and expect
       # the :selectors field.
@@ -213,8 +213,8 @@ module BrowserModule
     # selector, the expected fields exist.
     def parse_find_options(options, *args)
       # First, parse the arguments into an options hash
+      options = ERROR_OPTIONS.merge options
       options = parse_args(options, :selectors, *args)
-      options.merge! ERROR_OPTIONS
 
       # Verify/sanitize common options
       if options.has_key? :mode
@@ -377,7 +377,7 @@ module BrowserModule
       return options, lambda {
         elems = inner.call
         if not elems
-          return nil
+          return []
         end
         return elems.find_all { |elem|
           elem.send(filter_by)
@@ -440,6 +440,9 @@ module BrowserModule
           all = []
           lambdas.each do |func|
             res = func.call
+            if 0 == res.length
+              return []
+            end
             res.each do |e|
               all << e
             end
