@@ -113,13 +113,13 @@ module LapisLazuli
     ##
     # Return if the browser is open
     def is_open?
-      return (not @browser.nil?)
+      return !@browser.nil?
     end
 
     ##
     # Start the browser if it's not yet open.
     def start
-      if not @browser.nil?
+      if @browser.nil?
         @browser = self.init
       end
     end
@@ -205,16 +205,17 @@ module LapisLazuli
     # Example
     # ll.browser.goto "http://www.spritecloud.com"
     def respond_to?(meth)
-      return (!@browser.nil? and @browser.respond_to? meth)
+      if !@browser.nil? and @browser.respond_to? meth
+        return true
+      end
+      return super
     end
 
     def method_missing(meth, *args, &block)
-      if @browser.respond_to? meth
+      if !@browser.nil? and @browser.respond_to? meth
         return @browser.send(meth.to_s, *args, &block)
       end
-      @ll.error("Browser Method Missing: #{meth}")
+      return super
     end
-
-
   end
 end

@@ -23,6 +23,9 @@ module LapisLazuli
   ##
   # Pass just about everything on to the World class
   def respond_to?(meth)
+    if ["config_file", "config_file="].include? meth.to_s
+      return true
+    end
     return World.instance.respond_to? meth
   end
 
