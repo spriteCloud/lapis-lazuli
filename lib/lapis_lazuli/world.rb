@@ -127,7 +127,7 @@ module LapisLazuli
     ##
     # Checks if there is a browser started
     def has_browser?
-      return !@browser.nil?
+      return (not @browser.nil? and @browser.is_open?)
     end
 
     ##
@@ -140,18 +140,23 @@ module LapisLazuli
         @browser = Browser.new(*browser_args)
 
         # Register a finalizer, so we can clean up the browser again
-        ObjectSpace.define_finalizer(self, self.class.browser_destroy(@browser, @log))
+        ObjectSpace.define_finalizer(self, self.class.browser_destroy(self.env_or_config("close_browser_after"), @browser, @log))
       end
+
+      if not @browser.is_open?
+        @browser.start
+      end
+
       return @browser
     end
 
   private
 
-    def self.browser_destroy(browser, log)
+    def self.browser_destroy(close_browser_after, browser, log)
       proc {
-        if not browser.nil?
+        if "end" == close_browser_after and not browser.nil?
           begin
-            browser.close
+            browser.close "end"
           rescue
             log.debug("Failed to close the browser, probably chrome")
           end
