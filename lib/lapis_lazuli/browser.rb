@@ -111,20 +111,41 @@ module LapisLazuli
     end
 
     ##
+    # Return if the browser is open
+    def is_open?
+      return (not @browser.nil?)
+    end
+
+    ##
+    # Start the browser if it's not yet open.
+    def start
+      if not @browser.nil?
+        @browser = self.init
+      end
+    end
+
+    ##
     # Close and create a new browser
     def restart
       @ll.log.debug "Restarting browser"
       @browser.close
-      @browser = self.init
+      self.start
     end
 
     ##
     # Closes the browser and updates LL so that it will open a new one if needed
-    def close
-      @ll.log.debug "Closing browser"
-      @browser.close
-      # Update LL that we don't have a browser anymore...
-      @ll.browser = nil
+    def close(reason = nil)
+      if not @browser.nil?
+        if not reason.nil?
+          reason = " after #{reason}"
+        else
+          reason = ""
+        end
+
+        @ll.log.debug "Closing browser#{reason}: #{@browser}"
+        @browser.close
+        @browser = nil
+      end
     end
 
     ##
@@ -137,27 +158,27 @@ module LapisLazuli
     # Close after scenario will close the browser depending on the close_browser_after
     # configuration
     #
-    # Valid config options: feature, scenario, never
+    # Valid config options: feature, scenario, end, never
     # Default: feature
     def close_after_scenario(scenario)
       # Determine the config
-      close_browser_after = @ll.env_or_config("close_browser_after", "feature")
-
-      @ll.log.debug "Close after #{close_browser_after}"
+      close_browser_after = @ll.env_or_config("close_browser_after")
 
       case close_browser_after
       when "scenario"
         # We always close it
-        self.close
+        self.close close_browser_after
       when "never"
         # Do nothing: party time, excellent!
+      when "end"
+        # Also ignored here - this is handled  in World.browser_destroy
       else
         case scenario
         when Cucumber::Ast::Scenario
           # Is this scenario the last one of its feature?
           if scenario.feature.feature_elements.last == scenario
             # Close it
-            self.close
+            self.close close_browser_after
           end
         when Cucumber::Ast::OutlineTable::ExampleRow
           # Is this the last scenario in this feature?
@@ -169,7 +190,7 @@ module LapisLazuli
             end
             # Then close it
             if is_last_example
-              self.close
+              self.close close_browser_after
             end
           end
         end
