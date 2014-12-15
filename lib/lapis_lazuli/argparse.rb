@@ -89,5 +89,40 @@ module LapisLazuli
       return options
     end
 
+
+    ##
+    # Simple way for dealing with an argument that can be either a list, or a
+    # single item: we distinguish based on whether the argument responds to 'each'.
+    # If the optional 'flatten' parameter is given, nested lists will also be
+    # flattened.
+    def make_list_from_item(item, flatten = false)
+      res = []
+      if item.respond_to?('each')
+        item.each do |e|
+          if flatten
+            res << make_list_from_item(e)
+          else
+            res << e
+          end
+        end
+      else
+        res << item
+      end
+      return res
+    end
+
+
+    ##
+    # Using make_list_from_item, apply the logic to all of an array. It
+    # effectively flattens nested arrays, if necessary, and does so
+    # recursively if the flatten parameter is true.
+    def make_list_from_nested(list, flatten = false)
+      all = []
+      list.each do |item|
+        all.concat(make_list_from_item(item, flatten))
+      end
+      return all
+    end
+
   end # module ArgParse
 end # module LapisLazuli
