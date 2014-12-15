@@ -16,6 +16,7 @@ require "lapis_lazuli/browser/error"
 require 'lapis_lazuli/browser/find'
 require "lapis_lazuli/browser/wait"
 require "lapis_lazuli/browser/screenshots"
+require "lapis_lazuli/browser/interaction"
 require 'lapis_lazuli/generic/xpath'
 
 module LapisLazuli
@@ -28,6 +29,7 @@ module LapisLazuli
     include LapisLazuli::BrowserModule::Find
     include LapisLazuli::BrowserModule::Wait
     include LapisLazuli::BrowserModule::Screenshots
+    include LapisLazuli::BrowserModule::Interaction
     include LapisLazuli::GenericModule::XPath
 
     @ll
