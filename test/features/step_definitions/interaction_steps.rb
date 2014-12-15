@@ -97,3 +97,45 @@ end
 When(/^I go to "(.*?)"$/) do |url|
   browser.goto url
 end
+
+Then(/^I should be able to click the first button by event$/) do
+  elem = browser.button(:id => 'first')
+  browser.on_click(elem)
+  browser.wait(
+    :timeout => 1,
+    :text => 'first clicked',
+    :groups => ['wait'],
+  )
+end
+
+Then(/^I should be able to click the first button by using JavaScript$/) do
+  elem = browser.button(:id => 'first')
+  browser.js_click(elem)
+  browser.wait(
+    :timeout => 1,
+    :text => 'first clicked',
+    :groups => ['wait'],
+  )
+end
+
+Then(/^I should be able to click the first button by click type (.*?)$/) do |type|
+  elem = browser.button(:id => 'first')
+  browser.click_type(elem, type)
+  browser.wait(
+    :timeout => 1,
+    :text => 'first clicked',
+    :groups => ['wait'],
+  )
+end
+
+
+Then(/^I should be able to click the first button by force click$/) do
+  elem = browser.button(:id => 'first')
+  browser.force_click(elem)
+  browser.wait(
+    :timeout => 1,
+    :text => 'first clicked',
+    :groups => ['wait'],
+  )
+end
+
