@@ -11,10 +11,47 @@ module WorldModule
   ##
   # Module with configuration loading related functions
   #
-  # Defines and uses:
-  #   @config - internal configuration representation
-  #   @env    - loaded/detected config/test environment
+  # Defines and/or uses:
+  #   @config          - internal configuration representation
+  #   @env             - loaded/detected config/test environment
+  #   config_file      - Needs to be set before config can be accessed.
   module Config
+    ##
+    # Explicitly store the configuration file name. The syntax is very Ruby;
+    # the point is that class methods aren't automatically inherited when
+    # a module is included.
+    module ClassMethods
+      attr_accessor :config_file
+    end
+
+    extend ClassMethods
+
+    def self.included(other)
+      other.extend(ClassMethods)
+    end
+
+
+    ##
+    # The configuration is not a singleton, precisely, but it does not need to
+    # be created more than once. Note that explicitly calling load_config will
+    # still work to overwrite an existing configuration.
+    def init
+      # Guard against doing this more than once.
+      if not @config.nil?
+        return
+      end
+
+      if config_file.nil?
+        raise "No configuration file provided!"
+      end
+
+      load_config(config_file)
+
+      if @config.nil?
+        raise "Could not load configuration."
+      end
+    end
+
 
     ##
     # Loads a config based on a filename
@@ -134,6 +171,9 @@ module WorldModule
     #
     # Raises error if traversing the object is impossible
     def config(variable=false, default=nil)
+      # Make sure the configured configuration is loaded, if possible
+      init
+
       # No variable given? Return the entire object.
       result = @config
       if not variable
