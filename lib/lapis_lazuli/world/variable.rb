@@ -9,6 +9,7 @@
 require "securerandom"
 
 require "lapis_lazuli/scenario"
+require "lapis_lazuli/runtime"
 
 require "lapis_lazuli/world/config"
 
@@ -18,60 +19,56 @@ module WorldModule
   # Module for variable replacement
   #
   # Manages the following:
-  #   @scenario   - for per-scenario variables
-  #   @uuid       - for the entire test run
-  #   @time       - for the entire test run
-  #   @storage    - for the entire test run
+  #   scenario   - for per-scenario variables
+  #   uuid       - for the entire test run
+  #   time       - for the entire test run
+  #   storage    - for the entire test run
   module Variable
     include LapisLazuli::WorldModule::Config
 
     ##
     # Scenario "singleton"
     def scenario
-      if @scenario.nil?
-        @scenario = Scenario.new
+      return data(:scenario) do
+        Scenario.new
       end
-      return @scenario
     end
 
     ##
     # Time "singleton"
     def time
-      if @time.nil?
+      return data(:time) do
         time = Time.now
         @time = {
           :timestamp => time.strftime('%y%m%d_%H%M%S'),
           :epoch => time.to_i.to_s
         }
       end
-      return @time
     end
 
     ##
     # UUID "singleton"
     def uuid
-      if @uuid.nil?
-        @uuid = SecureRandom.hex
+      return data(:uuid) do
+        SecureRandom.hex
       end
-      return @uuid
     end
 
     ##
     # Storage "singleton"
     def has_storage?
-      return !@storage.nil?
+      b = Runtime.instance.get :variable_data
+      return !b[:storage].nil?
     end
 
     def storage
-      if @storage.nil?
-        @storage = Storage.new
-        @storage.set("time", time)
-        @storage.set("uuid", uuid)
+      return data(:storage) do
+        storage = Storage.new
+        storage.set("time", time)
+        storage.set("uuid", uuid)
 
-        # Register a finalizer, so we can clean up the proxy again
-        ObjectSpace.define_finalizer(self, Variable.destroy(self))
+        storage
       end
-      return @storage
     end
 
 
@@ -109,20 +106,36 @@ module WorldModule
       string.replace(variable(string))
     end
 
-
   private
 
+    def data(name, &block)
+      d = Runtime.instance.get :variable_data
+      if not d.nil?
+        if not d.is_a? Hash
+          raise "Expect a hash for variables managed by the Variable module"
+        end
+      else
+        d = {}
+      end
+
+      if not d.has_key? name
+        value = block.call()
+        d[name] = value
+
+        Runtime.instance.set(self, :variable_data, d, Variable.destroy(self))
+      end
+
+      return d[name]
+    end
+
+
     def self.destroy(world)
-      Proc.new do
-        # Destroy storage
+      Proc.new do |w|
         if world.has_storage?
           world.storage.destroy(world)
         end
       end
     end
-
-
-
   end # module Variable
 end # module WorldModule
 end # module LapisLazuli
