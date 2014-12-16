@@ -15,6 +15,7 @@ require "lapis_lazuli/world/error"
 require "lapis_lazuli/world/annotate"
 require "lapis_lazuli/world/logging"
 require "lapis_lazuli/world/browser"
+require "lapis_lazuli/world/api"
 require "lapis_lazuli/generic/xpath"
 
 
@@ -28,5 +29,6 @@ module LapisLazuli
   include LapisLazuli::WorldModule::Annotate
   include LapisLazuli::WorldModule::Logging
   include LapisLazuli::WorldModule::Browser
+  include LapisLazuli::WorldModule::API
   include LapisLazuli::GenericModule::XPath
 end # module LapisLazuli
