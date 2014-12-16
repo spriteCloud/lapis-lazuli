@@ -21,7 +21,6 @@ module LapisLazuli
       @storage = Storage.new
       @running = false
       @name = "start_of_test_run"
-      @error = nil
       self.update_timestamp
     end
     ##
@@ -32,8 +31,6 @@ module LapisLazuli
       @check_browser_errors = true
       # The original scenario from cucumber
       @data = scenario
-      # Reset the error
-      @error = nil
       # A name without special characters
       case scenario
       when Cucumber::Ast::Scenario
@@ -50,10 +47,6 @@ module LapisLazuli
       end
 
       self.update_timestamp
-    end
-
-    def update_error(err)
-      @error = err
     end
 
     def update_timestamp
