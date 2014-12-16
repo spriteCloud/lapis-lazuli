@@ -7,29 +7,25 @@
 #
 
 require "lapis_lazuli/version"
-require "lapis_lazuli/world"
+
+require "lapis_lazuli/world/config"
+require "lapis_lazuli/world/hooks"
+require "lapis_lazuli/world/variable"
+require "lapis_lazuli/world/error"
+require "lapis_lazuli/world/annotate"
+require "lapis_lazuli/world/logging"
+require "lapis_lazuli/world/browser"
+require "lapis_lazuli/generic/xpath"
+
 
 module LapisLazuli
   ##
-  # Explicitly store the configuration file name
-  def self.config_file=(name)
-    @config_filename = name
-  end
-
-  def self.config_file
-    @config_filename
-  end
-
-  ##
-  # Pass just about everything on to the World class
-  def respond_to?(meth)
-    if ["config_file", "config_file="].include? meth.to_s
-      return true
-    end
-    return World.instance.respond_to? meth
-  end
-
-  def method_missing(meth, *args, &block)
-    return World.instance.send(meth.to_s, *args, &block)
-  end
+  # Includes all the functionality from the following modules.
+  include LapisLazuli::WorldModule::Config
+  include LapisLazuli::WorldModule::Hooks
+  include LapisLazuli::WorldModule::Variable
+  include LapisLazuli::WorldModule::Logging
+  include LapisLazuli::WorldModule::Browser
+  include LapisLazuli::WorldModule::Error
+  include LapisLazuli::GenericModule::XPath
 end # module LapisLazuli
