@@ -30,37 +30,29 @@ module WorldModule
     ##
     # Get the current proxy
     def proxy
-      p = Runtime.instance.get :proxy
-      if not p.nil?
-        return p
-      end
+      return Runtime.instance.set_if(self, :proxy) do
+        # Check if we can start a proxy
+        begin
+          # Default proxy settings
+          proxy_ip = "localhost"
+          proxy_port = 10000
+          proxy_master = true
 
-      # Check if we can start a proxy
-      begin
-        # Default proxy settings
-        proxy_ip = "localhost"
-        proxy_port = 10000
-        proxy_master = true
+          # Do we have a config?
+          if has_env_or_config?("proxy.ip") and has_env_or_config?("proxy.port")
+            proxy_ip = env_or_config("proxy.ip")
+            proxy_port = env_or_config("proxy.port")
+            proxy_master = env_or_config("proxy.spritecloud", true)
+          end
 
-        # Do we have a config?
-        if has_env_or_config?("proxy.ip") and has_env_or_config?("proxy.port")
-          proxy_ip = env_or_config("proxy.ip")
-          proxy_port = env_or_config("proxy.port")
-          proxy_master = env_or_config("proxy.spritecloud", true)
+          # Try to start the proxy
+          p = LapisLazuli::Proxy.new(proxy_ip, proxy_port, proxy_master)
+
+          log.debug("Found proxy: #{proxy_ip}:#{proxy_port}, spritecloud: #{proxy_master}")
+        rescue StandardError => err
+          log.debug("No proxy available: #{err}")
         end
-
-        # Try to start the proxy
-        p = LapisLazuli::Proxy.new(proxy_ip, proxy_port, proxy_master)
-
-        # Make it a "singleton"
-        Runtime.instance.set(self, :proxy, p)
-
-        log.debug("Found proxy: #{proxy_ip}:#{proxy_port}, spritecloud: #{proxy_master}")
-      rescue StandardError => err
-        log.debug("No proxy available: #{err}")
       end
-
-      return p
     end
   end # module Proxy
 end # module WorldModule
