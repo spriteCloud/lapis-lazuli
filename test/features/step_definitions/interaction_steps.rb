@@ -139,3 +139,16 @@ Then(/^I should be able to click the first button by force click$/) do
   )
 end
 
+
+Given(/^I annotate a step with (.*?)$/) do |data|
+  annotate data
+end
+
+Then(/^the report should include (.*?) and (.*?) in the correct place$/) do |data1, data2|
+  # Our test completely ignores the "scope" part, because the scope is the
+  # scenario/example anyway. Instead we just check the stored values are
+  # as expected.
+  annotations.each do |scope, values|
+    assert ([[data1], [data2]] == values), "Stored values: #{values}, expected [[#{data1}], [#{data2}]]"
+  end
+end

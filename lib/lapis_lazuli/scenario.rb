@@ -23,6 +23,7 @@ module LapisLazuli
       @name = "start_of_test_run"
       self.update_timestamp
     end
+
     ##
     # Update the scenario with a new one
     def update(scenario)
@@ -63,6 +64,23 @@ module LapisLazuli
     def tags
       if !@data.nil?
         return @data.source_tag_names
+      end
+    end
+
+    def scope(cleaned = false)
+      scope = nil
+      if @data.respond_to? :backtrace_line
+        scope = @data.backtrace_line
+      elsif @data.respond_to? :file_colon_line
+        scope = @data.file_colon_line
+      end
+
+      if scope.nil?
+        return nil
+      elsif cleaned
+        return clean [scope]
+      else
+        return scope
       end
     end
 

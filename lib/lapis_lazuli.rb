@@ -24,8 +24,9 @@ module LapisLazuli
   include LapisLazuli::WorldModule::Config
   include LapisLazuli::WorldModule::Hooks
   include LapisLazuli::WorldModule::Variable
+  include LapisLazuli::WorldModule::Error
+  include LapisLazuli::WorldModule::Annotate
   include LapisLazuli::WorldModule::Logging
   include LapisLazuli::WorldModule::Browser
-  include LapisLazuli::WorldModule::Error
   include LapisLazuli::GenericModule::XPath
 end # module LapisLazuli
