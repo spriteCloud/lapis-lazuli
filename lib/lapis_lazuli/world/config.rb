@@ -6,29 +6,24 @@
 # All rights reserved.
 #
 
+require "lapis_lazuli/options"
+
 module LapisLazuli
 module WorldModule
   ##
   # Module with configuration loading related functions
   #
-  # Defines and/or uses:
+  # Manages the following:
   #   @config          - internal configuration representation
-  #   @env             - loaded/detected config/test environment
   #   config_file      - Needs to be set before config can be accessed.
+  #   @env             - loaded/detected config/test environment
   module Config
     ##
-    # Explicitly store the configuration file name. The syntax is very Ruby;
-    # the point is that class methods aren't automatically inherited when
-    # a module is included.
+    # Explicitly store the configuration file name.
     module ClassMethods
       attr_accessor :config_file
     end
-
     extend ClassMethods
-
-    def self.included(other)
-      other.extend(ClassMethods)
-    end
 
 
     ##
@@ -41,11 +36,11 @@ module WorldModule
         return
       end
 
-      if config_file.nil?
-        raise "No configuration file provided!"
+      if Config.config_file.nil?
+        raise "No configuration file provided, set LapisLazuli::WorldModule::Config.config_file"
       end
 
-      load_config(config_file)
+      load_config(Config.config_file)
 
       if @config.nil?
         raise "Could not load configuration."
@@ -80,6 +75,10 @@ module WorldModule
         "test",
         "local"
       ]
+
+      if ENV["TEST_ENV"]
+        @env = ENV["TEST_ENV"]
+      end
 
       # Do we have an environment
       if not @env.nil?
@@ -154,10 +153,13 @@ module WorldModule
     # Does the config have a variable?
     # Uses config and catches any errors it raises
     def has_config?(variable)
+      # Make sure the configured configuration is loaded, if possible
+      init
+
         begin
           value = self.config(variable)
           return (not value.nil?)
-        rescue
+        rescue RuntimeError => err
           return false
         end
     end
@@ -211,6 +213,9 @@ module WorldModule
     ##
     # Does the environment have a certain config variable
     def has_env?(variable)
+      # Make sure the configured configuration is loaded, if possible
+      init
+
       if @env.nil?
         return false
       end
@@ -221,6 +226,9 @@ module WorldModule
     # Get a environment variable from the config file
     # Alias for ll.config(ll.env + "." + variable)
     def env(variable=false, default=nil)
+      # Make sure the configured configuration is loaded, if possible
+      init
+
       if not variable
         return self.config(@env)
       end
@@ -240,6 +248,9 @@ module WorldModule
     ##
     # Checks if a variabl exist in the env or config
     def has_env_or_config?(variable)
+      # Make sure the configured configuration is loaded, if possible
+      init
+
       return self.has_env?(variable) || self.has_config?(variable)
     end
 
@@ -247,6 +258,9 @@ module WorldModule
     # Get a variable from the config
     # First checks the environment section, before it checks the global part
     def env_or_config(variable, default=nil)
+      # Make sure the configured configuration is loaded, if possible
+      init
+
       if self.has_env?(variable)
         return self.env(variable, default)
       elsif self.has_config?(variable)
