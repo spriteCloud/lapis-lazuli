@@ -50,7 +50,7 @@ module WorldModule
         proxy = LapisLazuli::Proxy.new(proxy_ip, proxy_port, proxy_master)
 
         # Register a finalizer, so we can clean up the proxy again
-        ObjectSpace.define_finalizer(self, self.class.destroy(self))
+        ObjectSpace.define_finalizer(self, Proxy.destroy(self))
 
         log.debug("Found proxy: #{proxy_ip}:#{proxy_port}, spritecloud: #{proxy_master}")
         @proxy = proxy
