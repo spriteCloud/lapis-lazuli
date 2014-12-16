@@ -58,11 +58,18 @@ module WorldModule
 
     ##
     # Storage "singleton"
+    def has_storage?
+      return !@storage.nil?
+    end
+
     def storage
       if @storage.nil?
         @storage = Storage.new
         @storage.set("time", time)
         @storage.set("uuid", uuid)
+
+        # Register a finalizer, so we can clean up the proxy again
+        ObjectSpace.define_finalizer(self, Variable.destroy(self))
       end
       return @storage
     end
@@ -101,6 +108,19 @@ module WorldModule
     def variable!(string)
       string.replace(variable(string))
     end
+
+
+  private
+
+    def self.destroy(world)
+      Proc.new do
+        # Destroy storage
+        if world.has_storage?
+          world.storage.destroy(world)
+        end
+      end
+    end
+
 
 
   end # module Variable
