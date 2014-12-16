@@ -34,14 +34,11 @@ module WorldModule
     ##
     # Get the current main browser
     def browser(*args)
-      b = Runtime.instance.get :browser
-      if b.nil?
+      b = Runtime.instance.set_if(self, :browser) do
         # Add LL to the arguments for the browser
         browser_args = args.unshift(self)
         # Create a new browser object
-        b = LapisLazuli::Browser.new(*browser_args)
-        # Make it a "singleton"
-        Runtime.instance.set(self, :browser, b)
+        LapisLazuli::Browser.new(*browser_args)
       end
 
       if not b.is_open?
