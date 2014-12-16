@@ -19,7 +19,3 @@ AfterStep('@pause') do |scenario|
   print "Press Return to continue"
   STDIN.getc
 end
-
-AfterConfiguration do |config|
-  config.options[:formats] << ["LapisLazuli::Formatter", STDERR]
-end
