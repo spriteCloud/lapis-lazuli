@@ -7,6 +7,7 @@
 #
 
 require "lapis_lazuli/browser"
+require "lapis_lazuli/runtime"
 
 require "lapis_lazuli/world/config"
 require "lapis_lazuli/world/logging"
@@ -26,42 +27,29 @@ module WorldModule
     ##
     # Checks if there is a browser started
     def has_browser?
-      pp "#{self}: #{@browser}"
-      pp "open? #{@browser.is_open?}"
-      return (not @browser.nil? and @browser.is_open?)
+      b = Runtime.instance.get :browser
+      return (not b.nil? and b.is_open?)
     end
 
     ##
     # Get the current main browser
     def browser(*args)
-      if @browser.nil?
+      b = Runtime.instance.get :browser
+      if b.nil?
         # Add LL to the arguments for the browser
         browser_args = args.unshift(self)
         # Create a new browser object
-        @browser = LapisLazuli::Browser.new(*browser_args)
-
-        # Register a finalizer, so we can clean up the proxy again
-        ObjectSpace.define_finalizer(self, Browser.destroy(self))
+        b = LapisLazuli::Browser.new(*browser_args)
+        # Make it a "singleton"
+        Runtime.instance.set(self, :browser, b)
       end
 
-      if not @browser.is_open?
-        @browser.start
+      if not b.is_open?
+        b.start
       end
 
-      return @browser
+      return b
     end
-
-  private
-
-    def self.destroy(world)
-      Proc.new do
-        # First close the browser
-        if world.has_browser?
-          world.browser.destroy(world)
-        end
-      end
-    end
-
 
   end # module Browser
 end # module WorldModule
