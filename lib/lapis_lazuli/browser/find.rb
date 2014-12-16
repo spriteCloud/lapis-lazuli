@@ -56,7 +56,7 @@ module BrowserModule
       rescue RuntimeError => err
         opts[:message] = "Error in find"
         opts[:exception] = err
-        @ll.error(opts)
+        @world.error(opts)
       end
     end
 
@@ -124,7 +124,7 @@ module BrowserModule
       rescue RuntimeError => err
         opts[:message] = "Error in multi_find"
         opts[:exception] = err
-        @ll.error(opts)
+        @world.error(opts)
       end
     end
 
@@ -167,7 +167,7 @@ module BrowserModule
         else
           options[:message] = "Invalid :pick value #{pick}."
           options[:groups] = ['find', 'pick']
-          @ll.error(options)
+          @world.error(options)
         end
       end
     end
@@ -277,7 +277,7 @@ module BrowserModule
         if not like_opts.has_key? :element
           selector[:message] = "Like selector are missing the :element key."
           selector[:groups] = ['find', 'selector']
-          @ll.error(selector)
+          @world.error(selector)
         end
       end
 
@@ -453,7 +453,7 @@ module BrowserModule
         return options, lambda {
           lambdas.each do |func|
             res = func.call
-            # @ll.log.debug("Got: #{res}")
+            # @world.log.debug("Got: #{res}")
             if res.length > 0
               return res
             end
@@ -463,7 +463,7 @@ module BrowserModule
       else
         options[:message] = "Invalid mode '#{options[:mode]}' provided to multi_find_all."
         options[:groups] = ['find', 'multi', 'mode']
-        @ll.error(options)
+        @world.error(options)
       end
     end
 

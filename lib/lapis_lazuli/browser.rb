@@ -22,6 +22,11 @@ require 'lapis_lazuli/generic/xpath'
 module LapisLazuli
   ##
   # Extension to the Watir browser
+  #
+  # This class handles initialization, for the most part. BrowserModules
+  # included here can rely on @world being set to the current cucumber world
+  # object, and for some WorldModules to exist in it (see assertions in
+  # constructor).
   class Browser
     include Test::Unit::Assertions
 
@@ -32,13 +37,21 @@ module LapisLazuli
     include LapisLazuli::BrowserModule::Interaction
     include LapisLazuli::GenericModule::XPath
 
-    @ll
+    @world
     @browser
     @cached_browser_wanted
     @cached_optional_data
 
-    def initialize(ll, *args)
-      @ll = ll
+    def initialize(world, *args)
+      # The class only works with some modules loaded; they're loaded by the
+      # Browser module, but we can't be sure that's been used.
+      assert world.respond_to?(:config), "Need to include LapisLazuli::WorldModule::Config in your cucumber world."
+      assert world.respond_to?(:log), "Need to include LapisLazuli::WorldModule::Logging in your cucumber world."
+      assert world.respond_to?(:has_error?), "Need to include LapisLazuli::WorldModule::Error in your cucumber world."
+      assert world.respond_to?(:has_proxy?), "Need to include LapisLazuli::WorldModule::Proxy in your cucumber world."
+
+      @world = world
+
       # Create a new browser with optional arguments
       @browser = self.init(*args)
     end
@@ -72,11 +85,9 @@ module LapisLazuli
     # Create a new browser depending on settings
     # Always cached the supplied arguments
     def create(browser_wanted=nil, optional_data=nil)
-      browser = nil
-
       # No browser? Does the config have a browser? Default to firefox
       if browser_wanted.nil?
-        browser_wanted = @ll.env_or_config('browser', 'firefox')
+        browser_wanted = @world.env_or_config('browser', 'firefox')
       end
 
       # Select the correct browser
@@ -91,13 +102,13 @@ module LapisLazuli
           if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
             browser = :ie
           else
-            @ll.error("You can't run IE tests on non-Windows machine")
+            @world.error("You can't run IE tests on non-Windows machine")
           end
         when 'ios'
           if RUBY_PLATFORM.downcase.include?("darwin")
             browser = :iphone
           else
-            @ll.error("You can't run IOS tests on non-mac machine")
+            @world.error("You can't run IOS tests on non-mac machine")
           end
         else
           browser = :firefox
@@ -105,17 +116,17 @@ module LapisLazuli
 
       args = [browser]
       if not optional_data.nil? and not optional_data.empty?
-        @ll.log.debug("Got optional data: #{optional_data}")
+        @world.log.debug("Got optional data: #{optional_data}")
         args.push(optional_data)
-      elsif @ll.has_proxy?
+      elsif @world.has_proxy?
         # Create a session if needed
-        if !@ll.proxy.has_session?
-          @ll.proxy.create()
+        if !@world.proxy.has_session?
+          @world.proxy.create()
         end
 
-        proxy_url = "#{@ll.proxy.ip}:#{@ll.proxy.port}"
+        proxy_url = "#{@world.proxy.ip}:#{@world.proxy.port}"
         if browser == :firefox
-          @ll.log.debug("Configuring Firefox proxy: #{proxy_url}")
+          @world.log.debug("Configuring Firefox proxy: #{proxy_url}")
           profile = Selenium::WebDriver::Firefox::Profile.new
           profile.proxy = Selenium::WebDriver::Proxy.new :http => proxy_url, :ssl => proxy_url
           args.push({:profile => profile})
@@ -143,7 +154,7 @@ module LapisLazuli
     ##
     # Close and create a new browser
     def restart
-      @ll.log.debug "Restarting browser"
+      @world.log.debug "Restarting browser"
       @browser.close
       self.start
     end
@@ -158,7 +169,7 @@ module LapisLazuli
           reason = ""
         end
 
-        @ll.log.debug "Closing browser#{reason}: #{@browser}"
+        @world.log.debug "Closing browser#{reason}: #{@browser}"
         @browser.close
         @browser = nil
       end
@@ -178,7 +189,7 @@ module LapisLazuli
     # Default: feature
     def close_after_scenario(scenario)
       # Determine the config
-      close_browser_after = @ll.env_or_config("close_browser_after")
+      close_browser_after = @world.env_or_config("close_browser_after")
 
       case close_browser_after
       when "scenario"
