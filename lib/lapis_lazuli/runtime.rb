@@ -16,8 +16,6 @@ module LapisLazuli
     include Singleton
 
     def initialize
-      require 'pp'
-      pp "Singleton creation"
       @objects = {}
     end
 
@@ -27,14 +25,25 @@ module LapisLazuli
 
     def set(world, name, object, destructor = nil)
       if @objects.has_key? name
-        pp "got an object already, need to destroy it."
-        @objects[name].destroy() # FIXME world
+        Runtime.destroy(world, name, destructor)
       end
 
       # Register a finalizer, so we can clean up the proxy again
       ObjectSpace.define_finalizer(self, Runtime.destroy(world, name, destructor))
 
       @objects[name] = object
+    end
+
+    def set_if(world, name, destructor = nil, &block)
+      if @objects.has_key? name
+        return @objects[name]
+      end
+
+      obj = block.call
+
+      set(world, name, obj, destructor)
+
+      return obj
     end
 
     def get(name)
@@ -45,11 +54,9 @@ module LapisLazuli
   private
     def self.destroy(world, name, destructor)
       Proc.new do
-        require 'pp'
-        pp "Trying destructors for #{name}..."
         # If a destructor is given, call that.
         if not destructor.nil?
-          return destructor(world)
+          return destructor.call(world)
         end
 
         # Next, try a has_foo?/foo.destroy combination
