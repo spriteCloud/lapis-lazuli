@@ -7,6 +7,7 @@
 #
 
 require "lapis_lazuli/proxy"
+require "lapis_lazuli/runtime"
 
 require "lapis_lazuli/world/config"
 require "lapis_lazuli/world/logging"
@@ -22,14 +23,16 @@ module WorldModule
     ##
     # Checks if there is a proxy started
     def has_proxy?
-      return !@proxy.nil?
+      p = Runtime.instance.get :proxy
+      return !p.nil?
     end
 
     ##
     # Get the current proxy
     def proxy
-      if not @proxy.nil?
-        return @proxy
+      p = Runtime.instance.get :proxy
+      if not p.nil?
+        return p
       end
 
       # Check if we can start a proxy
@@ -47,33 +50,18 @@ module WorldModule
         end
 
         # Try to start the proxy
-        proxy = LapisLazuli::Proxy.new(proxy_ip, proxy_port, proxy_master)
+        p = LapisLazuli::Proxy.new(proxy_ip, proxy_port, proxy_master)
 
-        # Register a finalizer, so we can clean up the proxy again
-        ObjectSpace.define_finalizer(self, Proxy.destroy(self))
+        # Make it a "singleton"
+        Runtime.instance.set(self, :proxy, p)
 
         log.debug("Found proxy: #{proxy_ip}:#{proxy_port}, spritecloud: #{proxy_master}")
-        @proxy = proxy
       rescue StandardError => err
         log.debug("No proxy available: #{err}")
       end
 
-      return @proxy
+      return p
     end
-
-
-  private
-
-    def self.destroy(world)
-      Proc.new do
-        # Then the proxy
-        if world.has_proxy?
-          world.proxy.destroy(world)
-        end
-      end
-    end
-
-
   end # module Proxy
 end # module WorldModule
 end # module LapisLazuli
