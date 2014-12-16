@@ -5,9 +5,6 @@
 # Copyright (c) 2013-2014 spriteCloud B.V. and other LapisLazuli contributors.
 # All rights reserved.
 #
-require "lapis_lazuli/hooks"
-
-include LapisLazuli::Hooks
 
 Before do |scenario|
   before_scenario_hook(scenario)
@@ -24,5 +21,5 @@ AfterStep('@pause') do |scenario|
 end
 
 AfterConfiguration do |config|
-  after_configuration_hook(config)
+  config.options[:formats] << ["LapisLazuli::Formatter", STDERR]
 end
