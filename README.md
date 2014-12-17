@@ -44,6 +44,9 @@ name component will be considered the project name, so e.g. a path of
 Change to that newly created project directory and read the README.md file there
 for further instructions.
 
+Be sure to read [the Wiki](https://github.com/spriteCloud/lapis-lazuli/wiki) for
+further documentation.
+
 ## Contributing
 
 1. Fork it
