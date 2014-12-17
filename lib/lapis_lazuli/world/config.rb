@@ -21,7 +21,13 @@ module WorldModule
     ##
     # Explicitly store the configuration file name.
     module ClassMethods
-      attr_accessor :config_file
+      def config_file=(name)
+        @config_file = name
+      end
+
+      def config_file
+        return @config_file || "config/config.yml"
+      end
     end
     extend ClassMethods
 
