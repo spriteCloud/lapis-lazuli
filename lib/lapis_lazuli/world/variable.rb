@@ -41,6 +41,8 @@ module WorldModule
         time = Time.now
         @time = {
           :timestamp => time.strftime('%y%m%d_%H%M%S'),
+          :iso_timestamp => now.utc.strftime("%FT%TZ"),
+          :iso_short => now.utc.strftime("%y%m%dT%H%M%SZ"),
           :epoch => time.to_i.to_s
         }
       end
@@ -83,13 +85,17 @@ module WorldModule
       end
       random_uuid = SecureRandom.hex
       string % {
-        :epoch => time[:epoch],
         :timestamp => time[:timestamp],
-        :uuid => uuid,
+        :iso_timestamp => time[:iso_timestamp],
+        :iso_short => time[:iso_short],
+        :epoch => time[:epoch],
         :email => "test_#{uuid}@#{email_domain}",
+        :uuid => uuid,
         :scenario_id => scenario.id,
-        :scenario_epoch => scenario.time[:epoch],
         :scenario_timestamp => scenario.time[:timestamp],
+        :scenario_iso_timestamp => scenario.time[:iso_timestamp],
+        :scenario_iso_short => scenario.time[:iso_short],
+        :scenario_epoch => scenario.time[:epoch],
         :scenario_email => "test_#{uuid}_scenario_#{scenario.uuid}@#{email_domain}",
         :scenario_uuid => scenario.uuid,
         :random => rand(9999),
