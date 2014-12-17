@@ -10,6 +10,7 @@ require "securerandom"
 
 require "lapis_lazuli/scenario"
 require "lapis_lazuli/runtime"
+require "lapis_lazuli/placeholders"
 
 require "lapis_lazuli/world/config"
 
@@ -41,8 +42,8 @@ module WorldModule
         time = Time.now
         @time = {
           :timestamp => time.strftime('%y%m%d_%H%M%S'),
-          :iso_timestamp => now.utc.strftime("%FT%TZ"),
-          :iso_short => now.utc.strftime("%y%m%dT%H%M%SZ"),
+          :iso_timestamp => time.utc.strftime("%FT%TZ"),
+          :iso_short => time.utc.strftime("%y%m%dT%H%M%SZ"),
           :epoch => time.to_i.to_s
         }
       end
@@ -84,26 +85,14 @@ module WorldModule
         email_domain = env_or_config("email_domain")
       end
       random_uuid = SecureRandom.hex
-      string % {
-        :timestamp => time[:timestamp],
-        :iso_timestamp => time[:iso_timestamp],
-        :iso_short => time[:iso_short],
-        :epoch => time[:epoch],
-        :email => "test_#{uuid}@#{email_domain}",
-        :uuid => uuid,
-        :scenario_id => scenario.id,
-        :scenario_timestamp => scenario.time[:timestamp],
-        :scenario_iso_timestamp => scenario.time[:iso_timestamp],
-        :scenario_iso_short => scenario.time[:iso_short],
-        :scenario_epoch => scenario.time[:epoch],
-        :scenario_email => "test_#{uuid}_scenario_#{scenario.uuid}@#{email_domain}",
-        :scenario_uuid => scenario.uuid,
-        :random => rand(9999),
-        :random_small => rand(99),
-        :random_lange => rand(999999),
-        :random_uuid => random_uuid,
-        :random_email => "test_#{uuid}_random_#{random_uuid}@#{email_domain}"
-      }
+
+      # Prepare current values.
+      values = {}
+      LapisLazuli::PLACEHOLDERS.each do |placeholder, value|
+        values[placeholder] = eval value[0]
+      end
+
+      return string % values
     end
 
     ##
