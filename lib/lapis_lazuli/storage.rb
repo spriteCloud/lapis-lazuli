@@ -29,6 +29,16 @@ module LapisLazuli
     ##
     # Write all stored data to file
     def writeToFile(filename)
+      # Make storage directory
+      dir = File.dirname(filename)
+      begin
+        Dir.mkdir dir
+      rescue SystemCallError => ex
+        # Swallow this error; it occurs (amongst other situations) when the
+        # directory exists. Checking for an existing directory beforehand is
+        # not concurrency safe.
+      end
+
       File.open(filename, 'w') { |file|
         # Write the JSON to the file
         file.write(@data.to_json)
