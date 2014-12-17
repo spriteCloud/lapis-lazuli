@@ -18,7 +18,13 @@ module BrowserModule
     include LapisLazuli::ArgParse
 
     ##
-    # FIXME
+    # Same arguments as for the find functions, but a few more options are valid:
+    #
+    # :timeout    - specifies the timeout to wait for, defaulting to 10 seconds
+    # :condition  - specifies the condition to wait for, either of :while or
+    #               :until. The default is :until.
+    # :screenshot - boolean flag determining whether a screenshot should be made
+    #               if the function produces an error. The default is false.
     def multi_wait_all(*args)
       return internal_wait(:multi_find_all, *args)
     end
