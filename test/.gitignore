@@ -1,6 +1,7 @@
 .*.sw*
 
 logs
+storage
 tmp
 version_tmp
 screenshots
