@@ -7,11 +7,15 @@
 #
 
 Before do |scenario|
-  before_scenario_hook(scenario)
+  if respond_to? :before_scenario_hook
+    before_scenario_hook(scenario)
+  end
 end
 
 After do |scenario|
-  after_scenario_hook(scenario)
+  if respond_to? :after_scenario_hook
+    after_scenario_hook(scenario)
+  end
 end
 
 # Can be used for debug purposes
