@@ -177,38 +177,6 @@ module BrowserModule
   private
 
     ##
-    # Parse extra options in multi_find options
-    def parse_multi_find_options(*args)
-      # Default options
-      options = {
-        :mode => :match_one
-      }
-      options = ERROR_OPTIONS.merge options
-
-      # If we have a single hash argument, we'll treat it as options, and expect
-      # the :selectors field.
-      if 1 == args.length and args[0].is_a? Hash
-        opts = args[0]
-        options.each do |k, v|
-          if not opts.has_key? k
-            opts[k] = v
-          end
-        end
-
-        assert opts.has_key?(:selectors) and opts[:selectors].is_a? Array, "Need to provide a list of element selectors."
-        options = opts
-      else
-        options[:selectors] = args
-      end
-
-      # Ensure correct types
-      options[:mode] = options[:mode].to_sym
-
-      return options
-    end
-
-
-    ##
     # Uses parse_args to parse find options. Then ensures that for each
     # selector, the expected fields exist.
     def parse_find_options(options, *args)
