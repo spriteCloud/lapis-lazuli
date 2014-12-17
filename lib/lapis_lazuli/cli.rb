@@ -9,6 +9,7 @@ require 'thor'
 
 require 'lapis_lazuli/generators/cucumber'
 require 'lapis_lazuli/options'
+require 'lapis_lazuli/placeholders'
 
 module LapisLazuli
   class CLI < Thor
@@ -89,7 +90,21 @@ INTRO
 
       end
     end
+
+
+
+    desc "placeholders", "Display placeholders managed by WorldModule::Variable."
+    def placeholders
+      STDOUT.write <<-INTRO
+The following are placeholders to use with WorldModule::Variable's functions
+as managed by this version of LapisLazuli.
+
+INTRO
+      STDOUT.flush
+
+      LapisLazuli::PLACEHOLDERS.each do |option, value|
+        printf "%22s - %s\n", option, value[1]
+      end
+    end
   end
-
-
 end
