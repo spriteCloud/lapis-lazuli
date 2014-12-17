@@ -278,3 +278,19 @@ Then(/^I should (not )?find "(.*?)" ([0-9]+ times )?using "(.*?)" as context$/) 
 		end
 	end
 end
+
+Given(/^I generate and store an email$/) do
+  x = variable("%{email}")
+  storage.set("test_email", x)
+end
+
+Then(/^I can retrieve the email$/) do
+  x = storage.get("test_email")
+  assert !x.nil?, "Could not retrieve email from storage."
+end
+
+Then(/^I expect the email to contain the domain name I specified\.$/) do
+  x = storage.get("test_email")
+  domain = env_or_config('email_domain')
+  assert x.include?(domain), "Generated email #{x} does not contain configured domain #{domain}!"
+end
