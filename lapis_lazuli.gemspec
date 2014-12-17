@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.description   = %q{Cucumber helper functions and scaffolding for easier test automation suite development.}
   spec.summary       = %q{Cucumber helper functions and scaffolding for easier test automation suite development.}
   spec.homepage      = "https://github.com/spriteCloud/lapis-lazuli"
-  spec.license       = "Proprietary"
+  spec.license       = "MITNFA"
 
   spec.files         = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
