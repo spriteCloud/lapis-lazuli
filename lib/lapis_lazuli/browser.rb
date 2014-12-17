@@ -47,7 +47,7 @@ module LapisLazuli
       # Browser module, but we can't be sure that's been used.
       assert world.respond_to?(:config), "Need to include LapisLazuli::WorldModule::Config in your cucumber world."
       assert world.respond_to?(:log), "Need to include LapisLazuli::WorldModule::Logging in your cucumber world."
-      assert world.respond_to?(:has_error?), "Need to include LapisLazuli::WorldModule::Error in your cucumber world."
+      assert world.respond_to?(:error), "Need to include LapisLazuli::WorldModule::Error in your cucumber world."
       assert world.respond_to?(:has_proxy?), "Need to include LapisLazuli::WorldModule::Proxy in your cucumber world."
 
       @world = world
