@@ -31,6 +31,6 @@ module LapisLazuli
     :random_lange => ['rand(999999)', 'A random integer <1,000,000.'],
     :random_uuid => ['random_uuid', 'A random UUID.'],
     :random_email => ['"test_#{uuid}_random_#{random_uuid}@#{email_domain}"', 'Same as email, but contains the test run and the random UUID.'],
-    :versions => ['JSON.generate(LapisLazuli.software_versions)', 'A JSON serialized string of software versions found in e.g. the AfterConfiguration hook.']
+    :versions => ['LapisLazuli.software_versions.nil? ? "" : JSON.generate(LapisLazuli.software_versions)', 'A JSON serialized string of software versions found in e.g. the AfterConfiguration hook.']
   }
 end # module LapisLazuli
