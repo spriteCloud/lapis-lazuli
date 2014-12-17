@@ -7,8 +7,10 @@
 #
 
 require "securerandom"
+require 'json'
 
 require "lapis_lazuli/scenario"
+require "lapis_lazuli/versions"
 require "lapis_lazuli/runtime"
 require "lapis_lazuli/placeholders"
 
@@ -24,6 +26,7 @@ module WorldModule
   #   uuid       - for the entire test run
   #   time       - for the entire test run
   #   storage    - for the entire test run
+  #   versions   - versions as gathered by e.g. fetch_versions
   module Variable
     include LapisLazuli::WorldModule::Config
 
