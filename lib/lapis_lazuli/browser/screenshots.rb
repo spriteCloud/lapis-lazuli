@@ -55,6 +55,11 @@ module BrowserModule
         # Save the screenshot
         @browser.screenshot.save fileloc
         @world.log.debug "Screenshot saved: #{fileloc}"
+
+        # Try to store the screenshot name
+        if @world.respond_to? :annotate
+          @world.annotate :screenshot => fileloc
+        end
       rescue RuntimeError => e
         @world.log.debug "Failed to save screenshot to '#{fileloc}'. Error message #{e.message}"
       end
