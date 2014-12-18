@@ -1,6 +1,6 @@
 # Lapis Lazuli
 
-Cucumber helper functions and scaffolding for spriteCloud TA engineers.
+Cucumber helper functions and scaffolding for easier test automation suite development.
 
 ## Installation
 
