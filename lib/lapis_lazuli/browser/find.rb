@@ -285,6 +285,13 @@ module BrowserModule
 
       # pp "find options: #{options}"
 
+      # Make {:html => x} a shortcut for {:html => {:text => x}}
+      if options.has_key? :html
+        if options[:html].is_a? String or options[:html].is_a? Regexp
+          options[:html] = { :text => options[:html] }
+        end
+      end
+
       # Do we have :like options? Create an appropriate lambda
       if options.has_key? :like
         return find_lambda_like(context, has_context, options)
