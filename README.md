@@ -49,30 +49,7 @@ further documentation.
 
 ## Contributing
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
-
-When you are contributing, it will make sense not to use a released version of
-Lapis Lazuli, but either a github branch or your local changes instead.
-
-### Use Github version of Lapiz Lazuli
-
-The `create` command knows a `--branch` parameter for specifying a github branch.
-If specified, the newly created or updated project will require this github
-branch instead of a release version of Lapis Lazuli.
-
-### Use local version of Lapis Lazuli
-
-You can force bundler to use your locally checked out Lapis Lazuli instead of
-a github or release version by running:
-
-    $ bundle config local.lapis_lazuli /path/to/local/lapis_lazuli
-    $ bundle install
-
-That will resolve the `lapis_lazuli` dependency to the local version.
+Please see [the Wiki page on contributing](https://github.com/spriteCloud/lapis-lazuli/wiki/Contributing)
 
 ## License
 Copyright (c) 2013-2014 spriteCloud B.V. and other node-apinator contributors. See [the LICENSE file](LICENSE) for details.
