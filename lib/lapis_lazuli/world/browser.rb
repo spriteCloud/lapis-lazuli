@@ -25,6 +25,20 @@ module WorldModule
     include LapisLazuli::WorldModule::Proxy
 
     ##
+    # Store extension modules for the browser
+    module ClassMethods
+      def browser_module(module_name)
+        @extensions ||= []
+        @extensions << module_name
+      end
+
+      def browser_modules
+        @extensions
+      end
+    end
+    extend ClassMethods
+
+    ##
     # Checks if there is a browser started
     def has_browser?
       b = Runtime.instance.get :browser
@@ -38,7 +52,13 @@ module WorldModule
         # Add LL to the arguments for the browser
         browser_args = args.unshift(self)
         # Create a new browser object
-        LapisLazuli::Browser.new(*browser_args)
+        inst = LapisLazuli::Browser.new(*browser_args)
+        # Extend the instance
+        Browser.browser_modules.each do |ext|
+          inst.extend(ext)
+        end
+        # Return the instance
+        inst
       end
 
       if not b.is_open?
