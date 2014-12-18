@@ -18,8 +18,8 @@ junit_report: -f pretty -f junit --out=results
 
 ################################################################################
 # Supported browsers (default = firefox)
-# TODO: Make it functional on Chrome and IE
 ff: BROWSER=firefox
+firefox: BROWSER=firefox
 chrome: BROWSER=chrome
 ie: BROWSER=ie
 safari: BROWSER=safari
@@ -29,9 +29,6 @@ safari: BROWSER=safari
 # Listed environments (default is set in config.yml)
 t: TEST_ENV=test -t @t,@test
 test: TEST_ENV=test -t @t,@test
-
-u: TEST_ENV=acceptatie -t @u,@uat
-uat: TEST_ENV=acceptatie -t @u,@uat
 
 p: TEST_ENV=production -t @p,@prod
 production: TEST_ENV=production -t @p,@prod
