@@ -54,8 +54,10 @@ module WorldModule
         # Create a new browser object
         inst = LapisLazuli::Browser.new(*browser_args)
         # Extend the instance
-        Browser.browser_modules.each do |ext|
-          inst.extend(ext)
+        if not Browser.browser_modules.nil?
+          Browser.browser_modules.each do |ext|
+            inst.extend(ext)
+          end
         end
         # Return the instance
         inst
