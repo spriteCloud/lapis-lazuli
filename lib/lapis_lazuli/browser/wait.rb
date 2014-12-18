@@ -53,21 +53,45 @@ module BrowserModule
       timeout = options[:timeout]
       options.delete(:timeout)
 
+      retries = options[:stale_retries] + 1 # Add first attempt!
+      options.delete(:stale_retries)
+
       condition = options[:condition]
-      options.delete(condition)
+      options.delete(:condition)
+
+      # pp "got options: #{options}"
 
       # The proc we're waiting for invokes the find_func
       results = []
       has_single = false
       find_proc = lambda { |dummy|
-        results = send(find_func.to_sym, options)
-        if results.respond_to? :length
-          results.length > 0
-        else
-          has_single = true
-          results = [results]
-          !!results[0]
+        res = false
+        err = nil
+        retries.times do
+          begin
+            opts = Marshal.load(Marshal.dump(options))
+            results = send(find_func.to_sym, opts)
+            if results.respond_to? :length
+              res = (results.length > 0)
+            else
+              has_single = true
+              results = [results]
+              res = !!results[0]
+            end
+            break # don't need to retry
+          rescue Selenium::WebDriver::Error::StaleElementReferenceError => e
+            err = e
+          end
+          # Retry
         end
+
+        # Raise the error if the retries didn't suffice
+        if not err.nil? and not res
+          raise err, "Tried #{retries} times, but got: #{err.message}", err.backtrace
+        end
+
+        # Return the results!
+        res
       }
 
       # Call the appropriate condition function.
@@ -99,6 +123,7 @@ module BrowserModule
     def parse_wait_options(*args)
       options = {
         :timeout => 10,
+        :stale_retries => 3,
         :condition => :until,
         :screenshot => false,
       }
