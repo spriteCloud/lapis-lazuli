@@ -298,23 +298,25 @@ module BrowserModule
         # Find the one the browser responds to
         # Example: text_fields or buttons
         function_name = "#{key.to_s}s"
-        if context.respond_to? function_name
-          # If the value is a hash use it as arguments for this function
-          if value.is_a? Hash
-            return options, lambda {
-              return context.send(function_name, value)
-            }
-          else
-            # Find it based on name, id or text
-            str = value.to_s
-            return options, lambda {
-              return context.send(
-                function_name,
-                :xpath,
-                "#{'.' if has_context}//*[@name='#{str}' or @id='#{str}' or text()='#{str}']"
-              )
-            }
-          end
+        if not context.respond_to? function_name
+          next
+        end
+
+        # If the value is a hash use it as arguments for this function
+        if value.is_a? Hash
+          return options, lambda {
+            context.send(function_name, value)
+          }
+        else
+          # Find it based on name, id or text
+          str = value.to_s
+          return options, lambda {
+            xpath = "#{'.' if has_context}//*[@name='#{str}' or @id='#{str}' or text()='#{str}']"
+            context.send(
+              function_name,
+              :xpath => xpath
+            )
+          }
         end
       end
 
@@ -322,7 +324,7 @@ module BrowserModule
       # the elements function as-is, in case there's a regular Watir selector
       # in it.
       return options, lambda {
-        return context.elements(options)
+        context.elements(options)
       }
     end
 
@@ -344,12 +346,12 @@ module BrowserModule
       # Wrap into filter function
       return options, lambda {
         elems = inner.call
-        if not elems
-          return []
+        if elems
+          elems.find_all { |elem|
+            elem.send(filter_by)
+          }
         end
-        return elems.find_all { |elem|
-          elem.send(filter_by)
-        }
+        elems
       }
     end
 
@@ -381,7 +383,7 @@ module BrowserModule
 
       # Create the XPath query
       return options, lambda {
-        return context.elements(
+        context.elements(
           :xpath,
           xpath
         )
@@ -409,24 +411,26 @@ module BrowserModule
           lambdas.each do |func|
             res = func.call
             if 0 == res.length
-              return []
+              all = []
+              break
             end
             res.each do |e|
               all << e
             end
           end
-          return all
+          all
         }
       when :match_one
         return options, lambda {
+          res = []
           lambdas.each do |func|
             res = func.call
             # @world.log.debug("Got: #{res}")
             if res.length > 0
-              return res
+              break
             end
           end
-          return []
+          res
         }
       else
         options[:message] = "Invalid mode '#{options[:mode]}' provided to multi_find_all."
