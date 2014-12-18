@@ -5,8 +5,17 @@
 require 'lapis_lazuli'
 require 'lapis_lazuli/cucumber'
 
+module TestModule
+  def test_func
+    # does nothing. being able to call it is important
+  end
+end
+
 LapisLazuli::WorldModule::Config.config_file = "config/config.yml"
-World(LapisLazuli)
+World(LapisLazuli, TestModule)
+
+LapisLazuli::WorldModule::Browser.browser_module(TestModule)
+
 
 # Transition function from old codebase to new
 load 'server/start.rb'

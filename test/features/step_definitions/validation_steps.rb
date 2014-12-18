@@ -290,7 +290,26 @@ Then(/^I can retrieve the email$/) do
 end
 
 Then(/^I expect the email to contain the domain name I specified\.$/) do
+  browser.bar
   x = storage.get("test_email")
   domain = env_or_config('email_domain')
   assert x.include?(domain), "Generated email #{x} does not contain configured domain #{domain}!"
+end
+
+
+Given(/^I include a (world|browser) module$/) do |type|
+  # Nothing to do - see features/support/env.rb
+  true
+end
+
+Then(/^I expect the (world|browser) module's functions to be available$/) do |type|
+  # We're essentially testing that NoMethodError is not being raised here.
+  case type
+  when "browser"
+    browser.test_func
+  when "world"
+    test_func
+  else
+    raise "No such module type: #{type}"
+  end
 end
