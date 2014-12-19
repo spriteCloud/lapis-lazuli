@@ -13,6 +13,7 @@ begin
   gem_root = "#{spec.gem_dir}#{File::SEPARATOR}"
   coverage_root = "#{gem_root}lib"
   output_dir = "#{Dir.getwd}#{File::SEPARATOR}coverage"
+  template_dir = "#{coverage_root}lib#{File::SEPARATOR}lapis_lazuli#{File::SEPARATOR}generators#{File::SEPARATOR}cucumber"
 
   if ENV['COVERAGE']
     puts "Enabling code coverage for files under '#{coverage_root}';"
@@ -20,6 +21,7 @@ begin
     SimpleCov.start do
       root(coverage_root)
       coverage_dir(output_dir)
+      add_filter(template_dir)
     end
   end
 rescue LoadError
