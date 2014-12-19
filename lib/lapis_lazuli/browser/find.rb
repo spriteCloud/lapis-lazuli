@@ -283,10 +283,11 @@ module BrowserModule
         has_context = true
       end
 
-      # pp "find options: #{options}"
+      # pp "find options: #{options}, has context: #{has_context}"
 
-      # Make {:html => x} a shortcut for {:html => {:text => x}}
-      if options.has_key? :html
+      # Make {:html => x} a shortcut for {:html => {:text => x}}, but only
+      # if it's the only option.
+      if options.has_key? :html and 1 == options.length
         if options[:html].is_a? String or options[:html].is_a? Regexp
           options[:html] = { :text => options[:html] }
         end
