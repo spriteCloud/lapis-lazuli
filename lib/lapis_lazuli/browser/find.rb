@@ -355,7 +355,7 @@ module BrowserModule
       return options, lambda {
         elems = inner.call
         if elems
-          elems.find_all { |elem|
+          elems = elems.find_all { |elem|
             elem.send(filter_by)
           }
         end
