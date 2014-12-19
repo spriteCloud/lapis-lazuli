@@ -6,7 +6,8 @@
 # All rights reserved.
 #
 
-require "lapis_lazuli/logger"
+require "teelogger"
+
 require "lapis_lazuli/runtime"
 
 require "lapis_lazuli/world/config"
@@ -41,7 +42,7 @@ module WorldModule
         if has_env_or_config?("log_file")
           log_file = env_or_config("log_file")
         end
-        l = TeeLogger.new(log_file)
+        l = TeeLogger::TeeLogger.new(STDOUT, log_file)
         l.level = env_or_config("log_level")
 
         l
