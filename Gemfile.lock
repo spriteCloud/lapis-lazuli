@@ -12,15 +12,22 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
+    docile (1.1.5)
     facets (2.9.3)
     faraday (0.9.0)
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.9.1)
       faraday (>= 0.7.4, < 0.10)
     json (1.8.1)
+    multi_json (1.10.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
     rake (10.4.2)
+    simplecov (0.9.1)
+      docile (~> 1.1.0)
+      multi_json (~> 1.0)
+      simplecov-html (~> 0.8.0)
+    simplecov-html (0.8.0)
     thor (0.19.1)
 
 PLATFORMS
@@ -30,3 +37,4 @@ DEPENDENCIES
   bundler (~> 1.6)
   lapis_lazuli!
   rake
+  simplecov

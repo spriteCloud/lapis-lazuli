@@ -6,6 +6,26 @@
 # All rights reserved.
 #
 
+begin
+  require "simplecov"
+  require "rubygems"
+  spec = Gem::Specification.find_by_name("lapis_lazuli")
+  gem_root = "#{spec.gem_dir}#{File::SEPARATOR}"
+  coverage_root = "#{gem_root}lib"
+  output_dir = "#{Dir.getwd}#{File::SEPARATOR}coverage"
+
+  if ENV['COVERAGE']
+    puts "Enabling code coverage for files under '#{coverage_root}';"
+    puts "coverage reports get written to '#{output_dir}'."
+    SimpleCov.start do
+      root(coverage_root)
+      coverage_dir(output_dir)
+    end
+  end
+rescue LoadError
+  # do nothing
+end
+
 require "lapis_lazuli/version"
 
 require "lapis_lazuli/world/config"
