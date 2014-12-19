@@ -24,6 +24,11 @@ module WorldModule
       # Default message
       message = nil
       groups = nil
+
+      # Default actions
+      screenshot = false
+      exception = nil
+
       # Do we have settings
       if not settings.nil?
         # Simple string input
@@ -59,18 +64,24 @@ module WorldModule
               groups = grouping
             end
           end
-        end
-      end
 
-      # Exception message shouldn't get lost
-      if settings.has_key? :exception and not settings[:exception].nil?
-        if message.nil?
-          message = settings[:exception].message
-        else
-          message = "#{message} - #{settings[:exception].message}"
+          # Exception message shouldn't get lost
+          if settings.has_key? :exception and not settings[:exception].nil?
+            exception = settings[:exception]
+            if message.nil?
+              message = settings[:exception].message
+            else
+              message = "#{message} - #{settings[:exception].message}"
+            end
+          elsif message.nil?
+            message = "An unknown error occurred."
+          end
+
+          # Check if we want to take a screenshot
+          if settings.has_key? :screenshot
+            screenshot = !!settings[:screenshot]
+          end
         end
-      elsif message.nil?
-        message = "An unknown error occurred."
       end
 
       # Include URL if we have a browser
@@ -89,7 +100,7 @@ module WorldModule
       end
 
       # Take screenshot, if necessary
-      if settings.has_key? :screenshot and settings[:screenshot]
+      if screenshot
         self.browser.take_screenshot(message)
       end
 
@@ -99,10 +110,9 @@ module WorldModule
       end
 
       # Raise the message
-      if settings.has_key? :exception and not settings[:exception].nil?
-        ex = settings[:exception]
+      if not exception.nil?
         # message already contains ex.message here - or it should
-        raise ex.class, message, ex.backtrace
+        raise exception.class, message, exception.backtrace
       else
         raise message
       end
