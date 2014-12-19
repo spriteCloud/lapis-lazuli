@@ -22,6 +22,13 @@ Author: "Onno Steenbergen" <onno@spritecloud.com>
 
     $ bundle exec cucumber
 
+# Code Coverage
+
+Code coverage can be enabled if the `simplecov` gem is installed, by specifying
+the `COVERAGE` environment variable when running the test suite:
+
+    $ COVERAGE=1 bundle exec cucumber
+
 # Contributing
 
 If you create new utility functions and want to contribute them to the Lapis
