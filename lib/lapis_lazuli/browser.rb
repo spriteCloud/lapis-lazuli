@@ -42,6 +42,9 @@ module LapisLazuli
     @cached_browser_wanted
     @cached_optional_data
 
+    @browser_name
+    attr_reader :browser_name
+
     def initialize(world, *args)
       # The class only works with some modules loaded; they're loaded by the
       # Browser module, but we can't be sure that's been used.
@@ -115,6 +118,7 @@ module LapisLazuli
       end
 
       args = [browser]
+      @browser_name = browser.to_s
       if not optional_data.nil? and not optional_data.empty?
         @world.log.debug("Got optional data: #{optional_data}")
         args.push(optional_data)
