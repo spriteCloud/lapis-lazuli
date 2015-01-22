@@ -70,3 +70,9 @@ Scenario Outline: FindAllPresent with context
   | deep3   | deep6          | 1      |
   | deep3   | count          | 4      |
   | deep3   | does_not_exist | 0      |
+
+@find_07 @find_errors @issue_6
+Scenario: Find in FireFox always returns an element, defaulting to the document root
+  Given I am in browser "firefox"
+  And I navigate to the find test page
+  Then I expect not to find "does_not_exist"

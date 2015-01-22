@@ -316,3 +316,9 @@ end
 Given(/^I am in browser "(.*?)"$/) do |b_name|
   assert b_name == browser.browser_name, "Cannot reproduce issue outside of #{b_name}."
 end
+
+
+Then(/^I expect not to find "(.*?)"$/) do |id|
+  element = browser.find(:id => id)
+  assert element.nil?, "Found the some element!"
+end

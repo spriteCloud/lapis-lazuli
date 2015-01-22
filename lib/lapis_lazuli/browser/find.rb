@@ -332,7 +332,14 @@ module BrowserModule
       # the elements function as-is, in case there's a regular Watir selector
       # in it.
       return options, lambda {
-        context.elements(options)
+        elems = context.elements(options)
+        # XXX Hack for firefox webdriver. When the given options return no
+        #     matches, elems.length would be 0, elems.each would not iterate
+        #     over anything, but elems[0] is the top-level HTML element, etc.
+        if elems.length <= 0
+          elems = []
+        end
+        elems
       }
     end
 
