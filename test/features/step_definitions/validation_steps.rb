@@ -322,3 +322,9 @@ Then(/^I expect not to find "(.*?)"$/) do |id|
   element = browser.find(:id => id)
   assert element.nil?, "Found the some element!"
 end
+
+Then(/^I expect to use tagname to hash options to find an element$/) do
+  element = browser.find(:div => {:id => 'deep3'})
+  assert element.exists?, "Could not find element with a tagname => hash selector"
+end
+
