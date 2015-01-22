@@ -312,3 +312,7 @@ Then(/^I expect the (world|browser) module's functions to be available$/) do |ty
     raise "No such module type: #{type}"
   end
 end
+
+Given(/^I am in browser "(.*?)"$/) do |b_name|
+  assert b_name == browser.browser_name, "Cannot reproduce issue outside of #{b_name}."
+end
