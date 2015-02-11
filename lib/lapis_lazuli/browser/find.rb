@@ -353,15 +353,17 @@ module BrowserModule
 
       options, inner = find_lambda(options)
 
-      # No filter? Then don't do anything special
-      if filter_by.nil?
-        return options, inner
-      end
-
       # Wrap into filter function
       return options, lambda {
         elems = inner.call
-        if elems
+
+        # XXX See similar comment in find_lambda()
+        if elems.length <= 0
+          elems = []
+        end
+
+        # If we have elements and want them filtered, deal with that now.
+        if elems and not filter_by.nil?
           elems = elems.find_all { |elem|
             elem.send(filter_by)
           }
