@@ -72,12 +72,16 @@ Scenario Outline: FindAllPresent with context
   | deep3   | does_not_exist | 0      |
 
 @find_07 @find_errors @issue_6
-Scenario: Find in FireFox always returns an element, defaulting to the document root
-  Given I am in browser "firefox"
-  And I navigate to the find test page
+Scenario: Find in always returns an element, defaulting to the document root
+  Given I navigate to the find test page
   Then I expect not to find "does_not_exist"
 
-@find_07 @find_errors @issue_6
-Scenario: Find with tagname to hash options seems broken
+@find_08 @find_errors @issue_6
+Scenario Outline: Find with tagname to hash options seems broken
   Given I navigate to the find test page
-  Then I expect to use tagname to hash options to find an element
+  Then I expect to use tagname to hash options to <mode> find element <element>
+
+  Examples:
+  | element        | mode |
+  | deep3          |      |
+  | does_not_exist | not  |

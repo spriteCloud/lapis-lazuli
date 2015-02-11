@@ -313,18 +313,17 @@ Then(/^I expect the (world|browser) module's functions to be available$/) do |ty
   end
 end
 
-Given(/^I am in browser "(.*?)"$/) do |b_name|
-  assert b_name == browser.browser_name, "Cannot reproduce issue outside of #{b_name}."
-end
-
-
 Then(/^I expect not to find "(.*?)"$/) do |id|
   element = browser.find(:id => id)
   assert element.nil?, "Found the some element!"
 end
 
-Then(/^I expect to use tagname to hash options to find an element$/) do
-  element = browser.find(:div => {:id => 'deep3'})
-  assert element.exists?, "Could not find element with a tagname => hash selector"
+Then(/^I expect to use tagname to hash options to (.*?) find element (.*?)$/) do |mode, elem_id|
+  element = browser.find(:div => {:id => elem_id})
+  if mode.length > 0 # "not "
+    assert element.nil?, "Could find element with a tagname => hash selector"
+  else
+    assert element.exists?, "Could not find element with a tagname => hash selector"
+  end
 end
 
