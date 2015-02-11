@@ -4,7 +4,6 @@ require "webrick"
 server = WEBrick::HTTPServer.new(
   :Port => 9090,
   :DocumentRoot => File.expand_path("../www", __FILE__),
-  Logger: WEBrick::Log.new("/dev/null"),
   AccessLog: [],
 );
 
