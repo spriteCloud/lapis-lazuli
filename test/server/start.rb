@@ -7,11 +7,6 @@ server = WEBrick::HTTPServer.new(
   AccessLog: [],
 );
 
-# On interupt shutdown the server
-trap('INT') {
-  server.shutdown
-};
-
 # Start a new thread with the server so cucumber can continue
 thread = Thread.new { server.start }
 
