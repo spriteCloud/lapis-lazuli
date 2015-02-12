@@ -85,3 +85,8 @@ Scenario Outline: Find with tagname to hash options seems broken
   | element        | mode |
   | deep3          |      |
   | does_not_exist | not  |
+
+@find_09 @issue_8
+Scenario: Find should throw, unless no :throw is specified
+  Given I navigate to the find test page
+  Then I expect not to find "does_not_exist" with no :throw option

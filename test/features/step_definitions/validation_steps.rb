@@ -313,9 +313,20 @@ Then(/^I expect the (world|browser) module's functions to be available$/) do |ty
   end
 end
 
-Then(/^I expect not to find "(.*?)"$/) do |id|
-  element = browser.find(:id => id)
-  assert element.nil?, "Found the some element!"
+Then(/^I expect not to find "(.*?)"(.*?)$/) do |id, extra|
+  require 'pp'
+  throw_opt = !(extra.length > 0)
+  if throw_opt
+    ex = nil
+    begin
+      element = browser.find(:id => id, :throw => throw_opt)
+    rescue LapisLazuli::FindError => e
+      ex = e
+    end
+    assert !ex.nil?, "No exception thrown when finding element that doesn't exist."
+  else
+    assert element.nil?, "Found the some element!"
+  end
 end
 
 Then(/^I expect to use tagname to hash options to (.*?) find element (.*?)$/) do |mode, elem_id|
