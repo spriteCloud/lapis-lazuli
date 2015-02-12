@@ -59,6 +59,10 @@ module BrowserModule
       condition = options[:condition]
       options.delete(:condition)
 
+      # The easiest way to deal with find's new :throw policy is to set it to
+      # false.
+      options[:throw] = false
+
       # pp "got options: #{options}"
 
       # The proc we're waiting for invokes the find_func
