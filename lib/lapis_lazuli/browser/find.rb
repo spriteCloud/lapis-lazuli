@@ -168,7 +168,7 @@ module BrowserModule
 
     NON_SELECTOR_OPTS = {
       :pick => :first,
-      :throw => false, #FIXME #8
+      :throw => true,
       :mode => :match_one,
     }
 

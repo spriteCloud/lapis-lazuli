@@ -256,21 +256,18 @@ Then(/^I expect to find an? (.*?) element or an? (.*?) element$/) do |element1, 
 	element = browser.multi_find(element1.to_sym, element2.to_sym)
 end
 
-Then(/^I should (not )?find "(.*?)" ([0-9]+ times )?using "(.*?)" as context$/) do |result, number, id, name|
+Then(/^I should (not )?find "(.*?)" ([0-9]+ times )?using "(.*?)" as context$/) do |result, id, number, name|
 	context = scenario.storage.get name
 	if context.nil?
 		error(:not_found => "Find context in storage")
 	end
 	begin
 		settings = {:element => id, :context => context}
-		if number == "a"
-			element = browser.find(settings)
-		else
-			settings[:filter_by] = :present?
-			elements = browser.find_all(settings)
-			if elements.length != number.to_i
-				error("Incorrect number of elements: #{elements.length}")
-			end
+		settings[:filter_by] = :present?
+		settings[:throw] = false
+		elements = browser.find_all(settings)
+		if not number.nil? and elements.length != number.to_i
+			error("Incorrect number of elements: #{elements.length}")
 		end
 	rescue
 		if result.nil?
@@ -329,7 +326,7 @@ Then(/^I expect not to find "(.*?)"(.*?)$/) do |id, extra|
 end
 
 Then(/^I expect to use tagname to hash options to (.*?) find element (.*?)$/) do |mode, elem_id|
-  element = browser.find(:div => {:id => elem_id})
+  element = browser.find(:div => {:id => elem_id}, :throw => false)
   if mode.length > 0 # "not "
     assert element.nil?, "Could find element with a tagname => hash selector"
   else
