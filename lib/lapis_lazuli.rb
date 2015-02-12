@@ -39,7 +39,6 @@ require "lapis_lazuli/world/logging"
 require "lapis_lazuli/world/browser"
 require "lapis_lazuli/world/api"
 require "lapis_lazuli/generic/xpath"
-require "lapis_lazuli/generic/error"
 
 
 module LapisLazuli
@@ -54,5 +53,4 @@ module LapisLazuli
   include LapisLazuli::WorldModule::Browser
   include LapisLazuli::WorldModule::API
   include LapisLazuli::GenericModule::XPath
-  include LapisLazuli::GenericModule::Error
 end # module LapisLazuli
