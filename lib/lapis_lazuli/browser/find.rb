@@ -2,12 +2,13 @@
 # LapisLazuli
 # https://github.com/spriteCloud/lapis-lazuli
 #
-# Copyright (c) 2013-2014 spriteCloud B.V. and other LapisLazuli contributors.
+# Copyright (c) 2013-2015 spriteCloud B.V. and other LapisLazuli contributors.
 # All rights reserved.
 #
 
 require 'test/unit/assertions'
 require 'lapis_lazuli/argparse'
+
 
 module LapisLazuli
 module BrowserModule
@@ -45,19 +46,17 @@ module BrowserModule
     # - :filter_by expects a symbol that the elements respond to; if calling
     #   the method returns true, the element is returned, otherwise it is
     #   ignored. Use e.g. { :filter_by => :present? }
+    # - :throw one of true, false. Default is true.
     def find_all(*args)
       # Parse args into options
       options = parse_find_options({}, *args)
+      throw_opt, options = do_throw?(options)
 
       # Find filtered.
       opts, func = find_lambda_filtered(options[:selectors][0])
-      begin
-        return func.call
-      rescue RuntimeError => err
-        opts[:message] = "Error in find"
-        opts[:exception] = err
-        @world.error(opts)
-      end
+
+      # Dispatch the call & handle errors
+      return dispatch_call(throw_opt, "Error in find", options, opts, func)
     end
 
 
@@ -78,10 +77,7 @@ module BrowserModule
         :pick => :first,
       }
       options = parse_find_options(options, *args)
-
-      # Extract the extra "pick" option
-      pick = options.fetch(:pick, "first")
-      options.delete(:pick)
+      pick, options = pick_which?(options)
 
       # Pick one of the find all results
       return pick_one(pick, find_all(options))
@@ -116,16 +112,13 @@ module BrowserModule
         :mode => :match_one,
       }
       options = parse_find_options(options, *args)
+      throw_opt, options = do_throw?(options)
 
       # Find all for the given selectors
       opts, func = multi_find_lambda(options)
-      begin
-        return func.call
-      rescue RuntimeError => err
-        opts[:message] = "Error in multi_find"
-        opts[:exception] = err
-        @world.error(opts)
-      end
+
+      # Dispatch the call & handle errors
+      return dispatch_call(throw_opt, "Error in multi_find", options, opts, func)
     end
 
 
@@ -138,10 +131,7 @@ module BrowserModule
         :pick => :first,
       }
       options = parse_find_options(options, *args)
-
-      # Extract the extra "pick" option
-      pick = options.fetch(:pick, "first")
-      options.delete(:pick)
+      pick, options = pick_which?(options)
 
       # Pick one of the find all results
       return pick_one(pick, multi_find_all(options))
@@ -176,12 +166,19 @@ module BrowserModule
 
   private
 
+    NON_SELECTOR_OPTS = {
+      :pick => :first,
+      :throw => false, #FIXME #8
+      :mode => :match_one,
+    }
+
     ##
     # Uses parse_args to parse find options. Then ensures that for each
     # selector, the expected fields exist.
     def parse_find_options(options, *args)
       # First, parse the arguments into an options hash
       options = ERROR_OPTIONS.merge options
+      options = NON_SELECTOR_OPTS.merge options
       options = parse_args(options, :selectors, *args)
 
       # Verify/sanitize common options
@@ -283,6 +280,7 @@ module BrowserModule
         has_context = true
       end
 
+      # require 'pp'
       # pp "find options: #{options}, has context: #{has_context}"
 
       # Make {:html => x} a shortcut for {:html => {:text => x}}, but only
@@ -348,6 +346,8 @@ module BrowserModule
     # Similar to find_lambda, but filters the returned elements by the given
     # :filter_by function (defaults to :present?).
     def find_lambda_filtered(options)
+      options = options.dup
+
       filter_by = options.fetch(:filter_by, nil)
       options.delete(:filter_by)
 
@@ -457,6 +457,35 @@ module BrowserModule
     end
 
 
+    def do_throw?(options)
+      ret = options.fetch(:throw, NON_SELECTOR_OPTS[:throw])
+      options.delete(:throw)
+      return ret, options
+    end
+
+
+    def pick_which?(options)
+      ret = options.fetch(:pick, NON_SELECTOR_OPTS[:pick])
+      options.delete(:pick)
+      return ret, options
+    end
+
+
+    def dispatch_call(throw_opt, message, selectors, opts, func)
+      begin
+        ret = func.call
+
+        if throw_opt and (ret.nil? or ret.length <= 0)
+          raise "Cannot find elements with selectors: #{selectors}"
+        end
+
+        return ret
+      rescue RuntimeError => err
+        opts[:message] = message
+        opts[:exception] = err
+        @world.error(opts)
+      end
+    end
   end # module Find
 end # module BrowserModule
 end # module LapisLazuli
