@@ -41,4 +41,7 @@ Feature: Timing
     Given I navigate to the timing test page
     Then within 3 seconds I should see added elements with matching
 
-
+  @timing_08 @timing_errors @issue_9
+  Scenario: timing_08 - Expect wait to throw
+    Given I navigate to the timing test page
+    Then within 3 seconds I should not see nonexistent elements

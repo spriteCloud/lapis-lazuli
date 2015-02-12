@@ -167,6 +167,20 @@ Then(/^within (\d+) seconds I get an error waiting for "(.*?)"( disappear)?$/) d
 	end
 end
 
+
+Then(/^within (\d+) seconds I should not see nonexistent elements$/) do |timeout|
+
+  ex = nil
+  begin
+    browser.wait_all(:timeout => timeout, :id => "does_not_exist")
+  rescue StandardError => e
+    ex = e
+  end
+
+  assert !ex.nil?, "We need a timeout error to occur here!"
+end
+
+
 Then(/^a screenshot should have been created$/) do
 	# Check if there is a screenshot with the correct name
 	name = browser.screenshot_name
