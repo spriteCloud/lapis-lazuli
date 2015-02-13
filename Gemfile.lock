@@ -7,7 +7,7 @@ PATH
       faraday_middleware (~> 0.9.1)
       json (~> 1.8.1)
       multi_xml (~> 0.5.5)
-      teelogger (~> 0.1.0)
+      teelogger (~> 0.3.0)
       thor (~> 0.19)
 
 GEM
@@ -15,11 +15,11 @@ GEM
   specs:
     docile (1.1.5)
     facets (2.9.3)
-    faraday (0.9.0)
+    faraday (0.9.1)
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.9.1)
       faraday (>= 0.7.4, < 0.10)
-    json (1.8.1)
+    json (1.8.2)
     multi_json (1.10.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
@@ -29,7 +29,7 @@ GEM
       multi_json (~> 1.0)
       simplecov-html (~> 0.8.0)
     simplecov-html (0.8.0)
-    teelogger (0.1.0)
+    teelogger (0.3.0)
     thor (0.19.1)
 
 PLATFORMS
