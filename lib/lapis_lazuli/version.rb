@@ -2,9 +2,9 @@
 # LapisLazuli
 # https://github.com/spriteCloud/lapis-lazuli
 #
-# Copyright (c) 2013-2014 spriteCloud B.V. and other LapisLazuli contributors.
+# Copyright (c) 2013-2015 spriteCloud B.V. and other LapisLazuli contributors.
 # All rights reserved.
 #
 module LapisLazuli
-  VERSION = "0.5.0"
+  VERSION = "0.6.0"
 end
