@@ -6,15 +6,21 @@ Cucumber helper functions and scaffolding for easier test automation suite devel
 
 Add this line to your application's Gemfile:
 
-    gem 'lapis_lazuli'
+```ruby
+gem 'lapis_lazuli'
+```
 
 And then execute:
 
-    $ bundle
+```bash
+$ bundle
+```
 
 Or install it yourself as:
 
-    $ gem install lapis_lazuli
+```bash
+$ gem install lapis_lazuli
+```
 
 ## Usage
 
@@ -27,14 +33,18 @@ The Lapis Lazuli project has two main purposes:
 The first goal is fulfilled by the Lapis Lazuli module itself, which can be
 imported in any cucumber project like this:
 
-    require 'lapis_lazuli'
-    World(LapisLazuli)
+```ruby
+require 'lapis_lazuli'
+World(LapisLazuli)
+```
 
 All of Lapis Lazuli's helper functions will be available in your step definitions
 then. However, you won't need to do this if you create a new Lapis Lazuli project.
 Simple run:
 
-    $ lapis_lazuli create <projectpath>
+```bash
+$ lapis_lazuli create <projectpath>
+```
 
 And a cucumber project will be set up for you in the given path. The last path
 name component will be considered the project name, so e.g. a path of
