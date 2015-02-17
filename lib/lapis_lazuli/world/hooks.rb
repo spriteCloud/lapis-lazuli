@@ -99,9 +99,7 @@ module WorldModule
       end
 
       @@hooks[queue].each do |hook|
-        self.instance_eval {
-          hook.call(cuke_scenario)
-        }
+        self.instance_exec(cuke_scenario, &hook)
       end
     end
   end # module Hooks
