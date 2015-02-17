@@ -231,6 +231,8 @@ module WorldModule
     ##
     # Returns current environment
     def current_env
+      init
+      
       return @env
     end
 
