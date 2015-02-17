@@ -52,4 +52,4 @@ further documentation.
 Please see [the Wiki page on contributing](https://github.com/spriteCloud/lapis-lazuli/wiki/Contributing)
 
 ## License
-Copyright (c) 2013-2014 spriteCloud B.V. and other node-apinator contributors. See [the LICENSE file](LICENSE) for details.
+Copyright (c) 2013-2015 spriteCloud B.V. and other node-apinator contributors. See [the LICENSE file](LICENSE) for details.
