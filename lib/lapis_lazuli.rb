@@ -53,4 +53,23 @@ module LapisLazuli
   include LapisLazuli::WorldModule::Browser
   include LapisLazuli::WorldModule::API
   include LapisLazuli::GenericModule::XPath
+
+  ##
+  # Export equivalents to cucumber's Before/After functions
+  def self.Before(&block)
+    LapisLazuli::WorldModule::Hooks.add_hook(:before, block)
+  end
+
+  def self.After(&block)
+    LapisLazuli::WorldModule::Hooks.add_hook(:after, block)
+  end
+
+  def self.Start(&block)
+    LapisLazuli::WorldModule::Hooks.add_hook(:start, block)
+  end
+
+# FIXME hard to implement; leaving it for now. See issue #13
+#  def self.End(&block)
+#    LapisLazuli::WorldModule::Hooks.add_hook(:end, block)
+#  end
 end # module LapisLazuli

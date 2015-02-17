@@ -15,6 +15,24 @@ module WorldModule
   # always tests whether World responds to a function before calling it.
   module Hooks
     ##
+    # Add hooks to one of the four queues :before, :after, :start or :end.
+    HOOK_QUEUES = [
+      :before,
+      :after,
+      :start,
+      # :end # FIXME hard to implement. See issue #13
+    ]
+    def self.add_hook(queue, hook)
+      if not HOOK_QUEUES.include?(queue)
+        raise "Invalid hook queue #{queue}"
+      end
+
+      @@hooks ||= {}
+      @@hooks[queue] ||= []
+      @@hooks[queue] << hook
+    end
+
+    ##
     # Hook invoked in BeforeScenario
     def before_scenario_hook(cuke_scenario)
       # Update the scenario informaton
@@ -27,11 +45,27 @@ module WorldModule
       if respond_to? :log
         log.info("Starting Scenario: #{scenario.id}")
       end
+
+      # Run 'start' queue once.
+      @@started ||= false
+      if not @@started
+        @@started = true
+        run_queue(:start)
+      end
+
+      # Run 'before' queue
+      run_queue(:before)
     end
 
     ##
     # Hook invoked in AfterScenario
     def after_scenario_hook(cuke_scenario)
+      # Run 'after' queue
+      run_queue(:after)
+
+      # Run 'end' queue
+      # FIXME hard to implement; see issue #13
+
       # The current scenario has finished
       if respond_to? :scenario
         scenario.running = false
@@ -55,6 +89,17 @@ module WorldModule
       # Close browser if needed
       if respond_to? :browser
         browser.close_after_scenario(cuke_scenario)
+      end
+    end
+
+  private
+    def run_queue(queue)
+      if @@hooks[queue].nil?
+        return
+      end
+
+      @@hooks[queue].each do |hook|
+        self.instance_eval(&hook)
       end
     end
   end # module Hooks
