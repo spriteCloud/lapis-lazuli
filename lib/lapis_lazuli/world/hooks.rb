@@ -50,18 +50,18 @@ module WorldModule
       @@started ||= false
       if not @@started
         @@started = true
-        run_queue(:start)
+        run_queue(:start, cuke_scenario)
       end
 
       # Run 'before' queue
-      run_queue(:before)
+      run_queue(:before, cuke_scenario)
     end
 
     ##
     # Hook invoked in AfterScenario
     def after_scenario_hook(cuke_scenario)
       # Run 'after' queue
-      run_queue(:after)
+      run_queue(:after, cuke_scenario)
 
       # Run 'end' queue
       # FIXME hard to implement; see issue #13
@@ -93,13 +93,15 @@ module WorldModule
     end
 
   private
-    def run_queue(queue)
+    def run_queue(queue, cuke_scenario)
       if @@hooks[queue].nil?
         return
       end
 
       @@hooks[queue].each do |hook|
-        self.instance_eval(&hook)
+        self.instance_eval {
+          hook.call(cuke_scenario)
+        }
       end
     end
   end # module Hooks
