@@ -229,6 +229,14 @@ module WorldModule
     end
 
     ##
+    # Returns current environment
+    def current_env
+      init
+      
+      return @env
+    end
+
+    ##
     # Get a environment variable from the config file
     # Alias for ll.config(ll.env + "." + variable)
     def env(variable=false, default=nil)
