@@ -155,7 +155,7 @@ module BrowserModule
         if pick.is_a? Numeric
           return elems[pick.to_i]
         else
-          options[:message] = "Invalid :pick value #{pick}."
+          options[:message] = optional_message("Invalid :pick value #{pick}.", options)
           options[:groups] = ['find', 'pick']
           @world.error(options)
         end
@@ -170,6 +170,7 @@ module BrowserModule
       :pick => :first,
       :throw => true,
       :mode => :match_one,
+      :error => nil,
     }
 
     ##
@@ -240,7 +241,7 @@ module BrowserModule
 
         selector[:like] = like_opts
         if not like_opts.has_key? :element
-          selector[:message] = "Like selector are missing the :element key."
+          selector[:message] = optional_message("Like selector are missing the :element key.", selector)
           selector[:groups] = ['find', 'selector']
           @world.error(selector)
         end
@@ -450,7 +451,7 @@ module BrowserModule
           res
         }
       else
-        options[:message] = "Invalid mode '#{options[:mode]}' provided to multi_find_all."
+        options[:message] = optional_message("Invalid mode '#{options[:mode]}' provided to multi_find_all.", options)
         options[:groups] = ['find', 'multi', 'mode']
         @world.error(options)
       end
@@ -471,6 +472,14 @@ module BrowserModule
     end
 
 
+    def optional_message(message, opts)
+      if opts.has_key? :message
+        return opts[:message]
+      end
+      return message
+    end
+
+
     def dispatch_call(throw_opt, message, selectors, opts, func)
       begin
         ret = func.call
@@ -481,7 +490,7 @@ module BrowserModule
 
         return ret
       rescue RuntimeError => err
-        opts[:message] = message
+        opts[:message] = optional_message(message, selectors)
         opts[:exception] = err
         @world.error(opts)
       end
