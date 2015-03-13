@@ -94,6 +94,8 @@ module WorldModule
 
   private
     def run_queue(queue, cuke_scenario)
+      @@hooks ||= {}
+
       if @@hooks[queue].nil?
         return
       end
