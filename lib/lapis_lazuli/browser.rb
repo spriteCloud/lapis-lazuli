@@ -11,6 +11,8 @@ require 'watir-webdriver'
 require "watir-webdriver/extensions/alerts"
 require 'test/unit/assertions'
 
+require "lapis_lazuli/ast"
+
 # Modules
 require "lapis_lazuli/browser/error"
 require 'lapis_lazuli/browser/find'
@@ -29,6 +31,8 @@ module LapisLazuli
   # constructor).
   class Browser
     include Test::Unit::Assertions
+
+    include LapisLazuli::Ast
 
     include LapisLazuli::BrowserModule::Error
     include LapisLazuli::BrowserModule::Find
@@ -204,14 +208,13 @@ module LapisLazuli
       when "end"
         # Also ignored here - this is handled  in World.browser_destroy
       else
-        case scenario
-        when Cucumber::Ast::Scenario
+        if is_scenario?(scenario)
           # Is this scenario the last one of its feature?
           if scenario.feature.feature_elements.last == scenario
             # Close it
             self.close close_browser_after
           end
-        when Cucumber::Ast::OutlineTable::ExampleRow
+        elsif is_table_row?(scenario)
           # Is this the last scenario in this feature?
           if scenario.scenario_outline.feature.feature_elements.last == scenario.scenario_outline
             # And is this the last example in the table?

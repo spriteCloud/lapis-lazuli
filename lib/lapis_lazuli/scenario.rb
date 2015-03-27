@@ -7,12 +7,15 @@
 #
 require "securerandom"
 require "lapis_lazuli/storage"
+require "lapis_lazuli/ast"
 
 module LapisLazuli
   ##
   # Stores the Cucumber scenario
   # Includes timing, running state and a name
   class Scenario
+    include LapisLazuli::Ast
+
     attr_reader :id, :time, :uuid, :data, :storage, :error
     attr_accessor :running, :check_browser_errors
 
@@ -32,21 +35,8 @@ module LapisLazuli
       @check_browser_errors = true
       # The original scenario from cucumber
       @data = scenario
-      # A name without special characters
-      case scenario
-      when Cucumber::Ast::Scenario
-        @id = clean [
-          scenario.feature.file,
-          scenario.name
-        ]
-      when Cucumber::Ast::OutlineTable::ExampleRow
-        @id = clean [
-          scenario.scenario_outline.feature.file,
-          scenario.scenario_outline.name,
-          scenario.name
-        ]
-      end
-
+      # A name without special characters.
+      @id = clean(scenario_id(scenario))
       self.update_timestamp
     end
 
@@ -92,7 +82,7 @@ module LapisLazuli
         clean_string = string.gsub(/[^\w\.\-]/, ' ').strip.squeeze(' ').gsub(" ","_")
         result.push(clean_string)
       end
-      return result.join("-")
+      return result.join("-").squeeze("-")
     end
   end
 end
