@@ -14,6 +14,8 @@ module WorldModule
   # The module is special in that it does not include other modules. Instead it
   # always tests whether World responds to a function before calling it.
   module Hooks
+    @@hooks = {}
+
     ##
     # Add hooks to one of the four queues :before, :after, :start or :end.
     HOOK_QUEUES = [
@@ -94,7 +96,7 @@ module WorldModule
 
   private
     def run_queue(queue, cuke_scenario)
-      if @@hooks[queue].nil?
+      if @@hooks.nil? or @@hooks[queue].nil?
         return
       end
 
