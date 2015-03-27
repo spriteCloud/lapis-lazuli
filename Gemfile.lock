@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    lapis_lazuli (0.5.0)
+    lapis_lazuli (0.6.1)
       facets (~> 2.9)
       faraday (~> 0.9.0)
       faraday_middleware (~> 0.9.1)
@@ -20,15 +20,15 @@ GEM
     faraday_middleware (0.9.1)
       faraday (>= 0.7.4, < 0.10)
     json (1.8.2)
-    multi_json (1.10.1)
+    multi_json (1.11.0)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
     rake (10.4.2)
-    simplecov (0.9.1)
+    simplecov (0.9.2)
       docile (~> 1.1.0)
       multi_json (~> 1.0)
-      simplecov-html (~> 0.8.0)
-    simplecov-html (0.8.0)
+      simplecov-html (~> 0.9.0)
+    simplecov-html (0.9.0)
     teelogger (0.3.0)
     thor (0.19.1)
 

@@ -107,8 +107,10 @@ module BrowserModule
         err = e
       end
 
+      # Filter out any nil results
+      filter_results = results.select {|i| not i.nil?}
       # Error handling
-      if not err.nil? and results.empty?
+      if not err.nil? and filter_results.empty?
         options[:exception] = err
         @world.error(options)
       end

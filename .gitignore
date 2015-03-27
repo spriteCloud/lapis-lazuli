@@ -14,5 +14,5 @@ rdoc
 spec/reports
 tmp
 .ruby-version
-
+test/storage
 .*.sw*
