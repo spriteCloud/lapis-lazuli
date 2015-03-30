@@ -34,7 +34,9 @@ module WorldModule
       for_scope << stuff[scope]
       @annotations[scope] = for_scope
 
-      embed(JSON.generate(stuff), 'application/json')
+      if self.respond_to? "embed"
+        embed(JSON.generate(stuff), 'application/json')
+      end
     end
 
     def annotations
