@@ -208,25 +208,9 @@ module LapisLazuli
       when "end"
         # Also ignored here - this is handled  in World.browser_destroy
       else
-        if is_scenario?(scenario)
-          # Is this scenario the last one of its feature?
-          if scenario.feature.feature_elements.last == scenario
-            # Close it
-            self.close close_browser_after
-          end
-        elsif is_table_row?(scenario)
-          # Is this the last scenario in this feature?
-          if scenario.scenario_outline.feature.feature_elements.last == scenario.scenario_outline
-            # And is this the last example in the table?
-            is_last_example = false
-            scenario.scenario_outline.each_example_row do |row|
-              is_last_example = row == scenario
-            end
-            # Then close it
-            if is_last_example
-              self.close close_browser_after
-            end
-          end
+        if is_last_scenario?(scenario)
+          # Close it
+          self.close close_browser_after
         end
       end
     end
