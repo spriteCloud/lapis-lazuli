@@ -2,12 +2,11 @@
 # LapisLazuli
 # https://github.com/spriteCloud/lapis-lazuli
 #
-# Copyright (c) 2013-2014 spriteCloud B.V. and other LapisLazuli contributors.
+# Copyright (c) 2013-2015 spriteCloud B.V. and other LapisLazuli contributors.
 # All rights reserved.
 #
 
-require 'test/unit/assertions'
-
+require 'lapis_lazuli/assertions'
 require 'lapis_lazuli/argparse'
 
 module LapisLazuli
@@ -16,7 +15,7 @@ module BrowserModule
   ##
   # Module with helper functions to do with DOM element interaction
   module Interaction
-    include Test::Unit::Assertions
+    include LapisLazuli::Assertions
     include LapisLazuli::ArgParse
 
     ##

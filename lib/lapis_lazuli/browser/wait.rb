@@ -6,7 +6,7 @@
 # All rights reserved.
 #
 
-require 'test/unit/assertions'
+require 'lapis_lazuli/assertions'
 require 'lapis_lazuli/argparse'
 
 module LapisLazuli

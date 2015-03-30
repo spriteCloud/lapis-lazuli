@@ -9,8 +9,8 @@
 require 'selenium-webdriver'
 require 'watir-webdriver'
 require "watir-webdriver/extensions/alerts"
-require 'minitest/assertions'
 
+require 'lapis_lazuli/assertions'
 require "lapis_lazuli/ast"
 
 # Modules
@@ -30,7 +30,7 @@ module LapisLazuli
   # object, and for some WorldModules to exist in it (see assertions in
   # constructor).
   class Browser
-    include Test::Unit::Assertions
+    include LapisLazuli::Assertions
 
     include LapisLazuli::Ast
 
