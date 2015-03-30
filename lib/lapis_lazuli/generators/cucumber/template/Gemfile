@@ -1,5 +1,4 @@
 source 'http://rubygems.org'
-source 'https://3RFCCaafQBDr4qAA2qzQ@gem.fury.io/spritecloud/'
 
 
 # Add following two lines to your ~/.gemrc or /etc/gemrc:
@@ -34,6 +33,5 @@ gem 'watir-webdriver-performance'
 gem 'watir-scroll'
 gem 'cucumber'
 
-# spriteCloud specific
-gem 'regressinator'
+# LapisLazul itself
 gem 'lapis_lazuli', <%= config[:lapis_lazuli][:dependency] %>
