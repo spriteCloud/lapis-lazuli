@@ -1,11 +1,9 @@
 install:
-  - "bundle install"
   - "cd test"
   - "export BUNDLE_GEMFILE=$PWD/Gemfile"
-  - "echo ${BUNDLE_GEMFILE}"
   - "bundle install"
 script:
-  - "echo ${PWD} ${BUNDLE_GEMFILE} && COVERAGE=1 bundle exec cucumber"
+  - "COVERAGE=1 bundle exec cucumber -t ~@needsproxy"
 os:
   - linux
   - osx
