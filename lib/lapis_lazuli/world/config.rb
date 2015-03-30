@@ -49,7 +49,7 @@ module WorldModule
       load_config(Config.config_file)
 
       if @config.nil?
-        raise "Could not load configuration."
+        warn "Could not load configuration from: #{Config.config_file}"
       end
     end
 
@@ -202,7 +202,12 @@ module WorldModule
           raise "Unknown configuration variable '#{variable}' and no default given!"
         end
         break if result.nil?
-        result = result[part]
+        begin
+          result = result[part]
+        rescue TypeError, NoMethodError => ex
+          warn "Could not read configuration variable #{variable}: #{ex}"
+          break
+        end
       end
 
       if default.nil? and result.nil?
