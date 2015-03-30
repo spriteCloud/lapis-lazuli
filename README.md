@@ -1,6 +1,15 @@
 # Lapis Lazuli
 
-Cucumber helper functions and scaffolding for easier test automation suite development.
+LapisLazuli provides cucumber helper functions and scaffolding for easier (web)
+test automation suite development.
+
+A lot of functionality is aimed at dealing better with [Watir](http://watir.com/),
+such as:
+
+- Easier/more reliable find and wait functionality for detecting web page elements.
+- Easier browser handling
+- Better error handling
+- etc.
 
 ## Installation
 
@@ -26,7 +35,7 @@ $ gem install lapis_lazuli
 
 The Lapis Lazuli project has two main purposes:
 
-- Provide a repository of common test functions for spriteCloud TA engineers.
+- Provide a repository of common test functions for test automation engineers.
 - Make it easy to get started on a test automation project with these test
   functions.
 
