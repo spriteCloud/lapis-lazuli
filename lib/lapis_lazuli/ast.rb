@@ -6,6 +6,18 @@
 # All rights reserved.
 #
 
+# Hack for cucumber 2.0.x
+module Cucumber
+  module Core
+    module Ast
+      class ExamplesTable
+        public :example_rows
+      end # ExamplesTable
+    end # Ast
+  end # Core
+end # Cucumber
+
+
 module LapisLazuli
   ##
   # Convenience module for dealing with aspects of the cucumber AST. From
@@ -67,8 +79,7 @@ module LapisLazuli
         return obj == Cucumber::Ast::Scenario
       rescue
         # 2.0.x - everything is a Cucumber::Core::Test::Case
-        # Source contains a Feature and a Scenario object
-        return obj.source.length == 2
+        return (not obj.outline?)
       end
     end
 
@@ -81,10 +92,65 @@ module LapisLazuli
         return obj == Cucumber::Ast::OutlineTable::ExampleRow
       rescue
         # 2.0.x - everything is a Cucumber::Core::Test::Case
-        # Source contains a Feature and a Scenario object, as well as an example
-        # and row object
-        return obj.source.length > 2
+        return obj.outline?
       end
+    end
+
+
+    ##
+    # Tests whether this scenario is the last scenario of a feature
+    def is_last_scenario?(scenario)
+      if is_scenario?(scenario)
+        begin
+          # 2.0.x
+          return (scenario.feature.feature_elements.last.location == scenario.location)
+        rescue
+          # 1.3.x
+          return (scenario.feature.feature_elements.last == scenario)
+        end
+
+      elsif is_table_row?(scenario)
+        begin
+          # 2.0.x
+
+          # We can bail early if this scenario's line is < the last feature
+          # element's line
+          outline = scenario.feature.feature_elements.last
+          if scenario.source.last.location.line < outline.location.line
+            return false
+          end
+
+          # Now the last feature element needs to be an outline - this is a
+          # sanity check that makes later stuff easier
+          if not outline.respond_to? :examples_tables
+            return false
+          end
+
+          # The last row of the last examples tables is what we care about
+          last_row = outline.examples_tables.last.example_rows.last
+
+          # If the current scenario has the same location as the last example,
+          # then we're the last scenario.
+          return scenario.source.last.location.line == last_row.location.line
+
+        rescue
+          # 1.3.x
+          if scenario.scenario_outline.feature.feature_elements.last == scenario.scenario_outline
+            # And is this the last example in the table?
+            is_last_example = false
+            scenario.scenario_outline.each_example_row do |row|
+              if row == scenario
+                is_last_example = true
+              else
+                # Overwrite this again with 'false'
+                is_last_example = false
+              end
+            end
+            return is_last_example
+          end
+        end
+      end
+      raise "If you see this error it might indicate you're running an unsupported version of cucumber"
     end
   end # module Ast
 end # module LapisLazuli
