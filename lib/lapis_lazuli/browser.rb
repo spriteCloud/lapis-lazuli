@@ -9,7 +9,7 @@
 require 'selenium-webdriver'
 require 'watir-webdriver'
 require "watir-webdriver/extensions/alerts"
-require 'test/unit/assertions'
+require 'minitest/assertions'
 
 require "lapis_lazuli/ast"
 
