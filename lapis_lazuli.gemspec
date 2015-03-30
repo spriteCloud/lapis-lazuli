@@ -8,7 +8,18 @@ Gem::Specification.new do |spec|
   spec.version       = LapisLazuli::VERSION
   spec.authors       = ["Onno Steenbergen", "Gijs Paulides", "Mark Barzilay", "Jens Finkhaeuser"]
   spec.email         = ["foss@spritecloud.com"]
-  spec.description   = %q{Cucumber helper functions and scaffolding for easier test automation suite development.}
+  spec.description   = %q{
+    LapisLazuli provides cucumber helper functions and scaffolding for easier (web)
+    test automation suite development.
+
+    A lot of functionality is aimed at dealing better with [Watir](http://watir.com/),
+    such as:
+
+    - Easier/more reliable find and wait functionality for detecting web page elements.
+    - Easier browser handling
+    - Better error handling
+    - etc.
+  }
   spec.summary       = %q{Cucumber helper functions and scaffolding for easier test automation suite development.}
   spec.homepage      = "https://github.com/spriteCloud/lapis-lazuli"
   spec.license       = "MITNFA"
