@@ -1,7 +1,7 @@
 install:
-  - "echo ${PWD} && ls -l && cd ${TEST_DIR} && bundle install"
+  - "echo ${PWD} && ls -l && cd ${TEST_DIR} && echo ${PWD} && bundle install"
 script:
-  - "cd ${TEST_DIR} && COVERAGE=1 bundle exec cucumber"
+  - "echo ${PWD} && ls -l && cd ${TEST_DIR} && echo ${PWD} && COVERAGE=1 bundle exec cucumber"
 os:
   - linux
   - osx
