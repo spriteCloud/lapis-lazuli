@@ -3,6 +3,9 @@
 LapisLazuli provides cucumber helper functions and scaffolding for easier (web)
 test automation suite development.
 
+[![Gem Version](https://badge.fury.io/rb/lapis-lazuli.svg)](http://badge.fury.io/rb/lapis-lazuli)
+[![Build Status](https://travis-ci.org/spriteCloud/lapis-lazuli.svg?branch=master)](https://travis-ci.org/spriteCloud/lapis-lazuli)
+
 A lot of functionality is aimed at dealing better with [Watir](http://watir.com/),
 such as:
 
