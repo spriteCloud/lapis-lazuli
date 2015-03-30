@@ -1,7 +1,11 @@
 install:
-  - "echo ${PWD} && ls -l && cd ${TEST_DIR} && echo ${PWD} && bundle install"
+  - "bundle install"
+  - "cd test"
+  - "export BUNDLE_GEMFILE=$PWD/Gemfile"
+  - "echo ${BUNDLE_GEMFILE}"
+  - "bundle install"
 script:
-  - "echo ${PWD} && ls -l && cd ${TEST_DIR} && echo ${PWD} && COVERAGE=1 bundle exec cucumber"
+  - "echo ${PWD} ${BUNDLE_GEMFILE} && COVERAGE=1 bundle exec cucumber"
 os:
   - linux
   - osx
