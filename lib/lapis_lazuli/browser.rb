@@ -10,7 +10,6 @@ require 'selenium-webdriver'
 require 'watir-webdriver'
 require "watir-webdriver/extensions/alerts"
 
-require 'lapis_lazuli/assertions'
 require "lapis_lazuli/ast"
 
 # Modules
@@ -20,6 +19,7 @@ require "lapis_lazuli/browser/wait"
 require "lapis_lazuli/browser/screenshots"
 require "lapis_lazuli/browser/interaction"
 require 'lapis_lazuli/generic/xpath'
+require 'lapis_lazuli/generic/assertions'
 
 module LapisLazuli
   ##
@@ -30,8 +30,6 @@ module LapisLazuli
   # object, and for some WorldModules to exist in it (see assertions in
   # constructor).
   class Browser
-    include LapisLazuli::Assertions
-
     include LapisLazuli::Ast
 
     include LapisLazuli::BrowserModule::Error
@@ -40,6 +38,7 @@ module LapisLazuli
     include LapisLazuli::BrowserModule::Screenshots
     include LapisLazuli::BrowserModule::Interaction
     include LapisLazuli::GenericModule::XPath
+    include LapisLazuli::GenericModule::Assertions
 
     @world
     @browser

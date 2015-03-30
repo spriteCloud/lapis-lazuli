@@ -6,6 +6,7 @@
 # All rights reserved.
 #
 
+require 'minitest'
 require 'minitest/assertions'
 
 module LapisLazuli
