@@ -50,6 +50,7 @@ module WorldModule
 
       if @config.nil?
         warn "Could not load configuration from: #{Config.config_file}"
+        @config = {}
       end
     end
 
