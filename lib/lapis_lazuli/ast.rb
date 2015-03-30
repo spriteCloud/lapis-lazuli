@@ -7,15 +7,19 @@
 #
 
 # Hack for cucumber 2.0.x
-module Cucumber
-  module Core
-    module Ast
-      class ExamplesTable
-        public :example_rows
-      end # ExamplesTable
-    end # Ast
-  end # Core
-end # Cucumber
+begin
+  module Cucumber
+    module Core
+      module Ast
+        class ExamplesTable
+          public :example_rows
+        end # ExamplesTable
+      end # Ast
+    end # Core
+  end # Cucumber
+rescue NameError
+  # Not cucumber 2.0.x
+end
 
 
 module LapisLazuli
@@ -25,14 +29,14 @@ module LapisLazuli
   module Ast
     ##
     # Return a unique and human parsable ID for scenarios
-    def scenario_id(obj)
+    def scenario_id(scenario)
       # For 2.0.x, the best scenario ID is one prefixed by the file name + line
       # number, followed by the feature name, scenario name, and table data (if
       # applicable).
-      if is_cucumber_2?(obj)
-        id = [obj.location.to_s]
-        for i in 0 .. obj.source.length - 1 do
-          part = obj.source[i]
+      if is_cucumber_2?(scenario)
+        id = [scenario.location.to_s]
+        for i in 0 .. scenario.source.length - 1 do
+          part = scenario.source[i]
           if part.respond_to?(:name)
             id << part.name
           elsif part.is_a?(Cucumber::Core::Ast::ExamplesTable::Row)
@@ -60,11 +64,11 @@ module LapisLazuli
 
     ##
     # Tests whether the given scenario object indicates we're using cucumber 2.x
-    def is_cucumber_2?(obj)
+    def is_cucumber_2?(scenario)
       begin
         # The assumption - FIXME perhaps wrong - is that cucumber 1.3.x does not
         # have this source array.
-        return (obj.respond_to?(:source) and obj.source.is_a?(Array))
+        return (scenario.respond_to?(:source) and scenario.source.is_a?(Array))
       rescue
         return false
       end
@@ -73,26 +77,26 @@ module LapisLazuli
 
     ##
     # Tests whether the scenario object is a single scenario
-    def is_scenario?(obj)
+    def is_scenario?(scenario)
       begin
         # 1.3.x
-        return obj == Cucumber::Ast::Scenario
+        return scenario.class == Cucumber::Ast::Scenario
       rescue
         # 2.0.x - everything is a Cucumber::Core::Test::Case
-        return (not obj.outline?)
+        return (not scenario.outline?)
       end
     end
 
 
     ##
     # Tests whether the scenario object is a table row
-    def is_table_row?(obj)
+    def is_table_row?(scenario)
       begin
         # 1.3.x
-        return obj == Cucumber::Ast::OutlineTable::ExampleRow
+        return scenario.class == Cucumber::Ast::OutlineTable::ExampleRow
       rescue
         # 2.0.x - everything is a Cucumber::Core::Test::Case
-        return obj.outline?
+        return scenario.outline?
       end
     end
 
