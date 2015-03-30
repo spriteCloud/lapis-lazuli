@@ -32,7 +32,9 @@ end
 gem 'watir-webdriver'
 gem 'watir-webdriver-performance'
 gem 'watir-scroll'
-gem 'cucumber'
+# For testing old versions of cucumber, swap the two lines below
+gem 'cucumber', '>1.3.19'
+# gem 'cucumber', '=1.3.19'
 
 # Testing related
 gem 'simplecov'
