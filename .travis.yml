@@ -1,9 +1,7 @@
 install:
-  - "cd test"
-  - "bundle install"
+  - "cd ${TEST_DIR} && bundle install"
 script:
-  - "cd test"
-  - "COVERAGE=1 bundle exec cucumber"
+  - "cd ${TEST_DIR} && COVERAGE=1 bundle exec cucumber"
 os:
   - linux
   - osx
@@ -15,3 +13,5 @@ notifications:
   email:
     recipients:
       - foss@spritecloud.com
+env:
+  - TEST_DIR=test
