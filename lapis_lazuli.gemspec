@@ -39,6 +39,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "faraday", "~> 0.9.0"
   spec.add_dependency "faraday_middleware", "~> 0.9.1"
   spec.add_dependency "multi_xml", "~> 0.5.5"
-  spec.add_dependency "teelogger", "~> 0.3.0"
+  spec.add_dependency "teelogger", "~> 0.4.0"
   spec.add_dependency "minitest", "~> 5.5.1"
 end
