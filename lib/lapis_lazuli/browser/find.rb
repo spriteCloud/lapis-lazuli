@@ -196,7 +196,7 @@ module BrowserModule
       end
 
       if options.has_key? :filter_by
-        options[:filter_by] = options.to_sym
+        options[:filter_by] = options[:filter_by].to_sym
       end
 
       # Next, expand all selectors.
