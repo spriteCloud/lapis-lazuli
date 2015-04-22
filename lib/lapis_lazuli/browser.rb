@@ -60,6 +60,13 @@ module LapisLazuli
 
       # Create a new browser with optional arguments
       @browser = self.init(*args)
+
+      # Add registered world modules.
+      if not LapisLazuli::WorldModule::Browser.browser_modules.nil?
+        LapisLazuli::WorldModule::Browser.browser_modules.each do |ext|
+          self.extend(ext)
+        end
+      end
     end
 
     ##
@@ -84,13 +91,19 @@ module LapisLazuli
       end
 
       # Create the browser
-      self.create(browser_wanted, optional_data)
+      self.create_internal(browser_wanted, optional_data)
+    end
+
+    ##
+    # Creates a new browser instance.
+    def create(*args)
+      return Browser.new(@world, *args)
     end
 
     ##
     # Create a new browser depending on settings
     # Always cached the supplied arguments
-    def create(browser_wanted=nil, optional_data=nil)
+    def create_internal(browser_wanted=nil, optional_data=nil)
       # No browser? Does the config have a browser? Default to firefox
       if browser_wanted.nil?
         browser_wanted = @world.env_or_config('browser', 'firefox')
