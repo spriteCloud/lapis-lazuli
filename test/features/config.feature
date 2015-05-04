@@ -6,9 +6,9 @@ Feature: config
 
   @config_01
   Scenario: config_01 - Environment Hash
-    Given I set environment variable "remote_user" to "username"
-    And I set environment variable "remote_pass" to "password"
-    Then the environment variable "remote" has "user" set to "username"
-    And the environment variable "remote.user" is set to "username"
-    And the environment variable "remote" has "pass" set to "password"
+    Given I set environment variable "configtest__user" to "username"
+    And I set environment variable "configtest__pass" to "password"
+    Then the environment variable "configtest" has "user" set to "username"
+    And the environment variable "configtest.user" is set to "username"
+    And the environment variable "configtest" has "pass" set to "password"
     And the environment variable "close_browser_after" is set to "feature"

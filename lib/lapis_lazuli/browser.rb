@@ -18,6 +18,7 @@ require 'lapis_lazuli/browser/find'
 require "lapis_lazuli/browser/wait"
 require "lapis_lazuli/browser/screenshots"
 require "lapis_lazuli/browser/interaction"
+require "lapis_lazuli/browser/remote"
 require 'lapis_lazuli/generic/xpath'
 require 'lapis_lazuli/generic/assertions'
 
@@ -37,6 +38,7 @@ module LapisLazuli
     include LapisLazuli::BrowserModule::Wait
     include LapisLazuli::BrowserModule::Screenshots
     include LapisLazuli::BrowserModule::Interaction
+    include LapisLazuli::BrowserModule::Remote
     include LapisLazuli::GenericModule::XPath
     include LapisLazuli::GenericModule::Assertions
 
@@ -129,13 +131,19 @@ module LapisLazuli
           else
             @world.error("You can't run IOS tests on non-mac machine")
           end
+        when 'remote'
+          browser = :remote
         else
           browser = :firefox
       end
 
       args = [browser]
       @browser_name = browser.to_s
-      if not optional_data.nil? and not optional_data.empty?
+      if browser == :remote
+        remote_settings = @world.env_or_config("remote", {})
+        @world.log.debug("Using remote browser: #{remote_settings}")
+        args.push(remote_browser_config(remote_settings))
+      elsif not optional_data.nil? and not optional_data.empty?
         @world.log.debug("Got optional data: #{optional_data}")
         args.push(optional_data)
       elsif @world.has_proxy?
@@ -152,8 +160,15 @@ module LapisLazuli
           args.push({:profile => profile})
         end
       end
+      p args
 
-      browser_instance = Watir::Browser.new(*args)
+      begin
+        browser_instance = Watir::Browser.new(*args)
+      rescue Selenium::WebDriver::Error::UnknownError => err
+        p err
+        p err.backtrace
+        raise err
+      end
       return browser_instance
     end
 

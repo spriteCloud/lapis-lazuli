@@ -310,7 +310,7 @@ module WorldModule
           not default.is_a? Hash
 
         # Env variables cannot contain a . replace them by _
-        key_wanted = var.gsub(".","_")
+        key_wanted = var.gsub(".","__")
 
         # Do a case insensitive compare
         ENV.keys.each do |key|
@@ -321,9 +321,9 @@ module WorldModule
         end
 
       # Environment:
-      #   REMOTE_USER=test
-      #   REMOTE_PASS=test
-      #   REMOTE_PROXY_HTTP=http://test.com
+      #   REMOTE__USER=test
+      #   REMOTE__PASS=test
+      #   REMOTE__PROXY__HTTP=http://test.com
       #
       # Call:
       #   var_from_env("remote",{})
@@ -344,7 +344,7 @@ module WorldModule
           if (key =~ rgx) == 0
             tmp = result
             # Remove start and split into parts
-            parts = key.sub(rgx, "").split("_")
+            parts = key.sub(rgx, "").split("__")
             # Remove empty start if needed
             if parts[0].to_s.empty?
               parts.shift
