@@ -160,13 +160,10 @@ module LapisLazuli
           args.push({:profile => profile})
         end
       end
-      p args
 
       begin
         browser_instance = Watir::Browser.new(*args)
       rescue Selenium::WebDriver::Error::UnknownError => err
-        p err
-        p err.backtrace
         raise err
       end
       return browser_instance
