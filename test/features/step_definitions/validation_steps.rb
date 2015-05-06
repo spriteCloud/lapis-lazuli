@@ -230,8 +230,14 @@ end
 Then(/^the firefox browser named "(.*?)" has a profile$/) do |name|
 	if scenario.storage.has? name
 		browser = scenario.storage.get name
-		if browser.driver.capabilities.firefox_profile.nil?
-			raise "Profile is not set"
+		if browser.browser_name == "remote"
+			if browser.driver.capabilities.firefox_profile.nil?
+				raise "Remote Firefox Profile is not set"
+			end
+		else
+			if browser.optional_data.has_key? "profile" or browser.optional_data.has_key? :profile
+				raise "No profile found in the optional data"
+			end
 		end
 	else
 		error("No item in the storage named #{name}")

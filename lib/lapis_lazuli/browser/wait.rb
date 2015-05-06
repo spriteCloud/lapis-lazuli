@@ -103,7 +103,7 @@ module BrowserModule
       begin
         res = Watir::Wait.send(condition, timeout, &find_proc)
       rescue Watir::Wait::TimeoutError => e
-        @world.log.debug("Caught timeout: #{e}")
+        world.log.debug("Caught timeout: #{e}")
         err = e
       end
 
@@ -112,7 +112,7 @@ module BrowserModule
       # Error handling
       if not err.nil? and filter_results.empty?
         options[:exception] = err
-        @world.error(options)
+        world.error(options)
       end
 
       # Set if the underlying find function returns single results

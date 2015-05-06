@@ -15,24 +15,24 @@ module BrowserModule
     ##
     # Returns the name of the screenshot, if take_screenshot is called now.
     def screenshot_name(suffix="")
-      dir = @world.env_or_config("screenshot_dir")
+      dir = world.env_or_config("screenshot_dir")
 
       # Generate the file name according to the new or old scheme.
       name = 'screenshot'
-      case @world.env_or_config("screenshot_scheme")
+      case world.env_or_config("screenshot_scheme")
       when "new"
-        # For non-cucumber cases: we don't have @world.scenario.data
-        if not @world.scenario.data.nil?
-          name = @world.scenario.id
+        # For non-cucumber cases: we don't have world.scenario.data
+        if not world.scenario.data.nil?
+          name = world.scenario.id
         end
         # FIXME random makes this non-repeatable, sadly
-        name = "#{@world.scenario.time[:iso_short]}-#{name}-#{Random.rand(10000).to_s}.png"
+        name = "#{world.scenario.time[:iso_short]}-#{name}-#{Random.rand(10000).to_s}.png"
       else # 'old' and default
-        # For non-cucumber cases: we don't have @world.scenario.data
-        if not @world.scenario.data.nil?
-          name = @world.scenario.data.name.gsub(/^.*(\\|\/)/, '').gsub(/[^\w\.\-]/, '_').squeeze('_')
+        # For non-cucumber cases: we don't have world.scenario.data
+        if not world.scenario.data.nil?
+          name = world.scenario.data.name.gsub(/^.*(\\|\/)/, '').gsub(/[^\w\.\-]/, '_').squeeze('_')
         end
-        name = @world.time[:timestamp] + "_" + name + '.png'
+        name = world.time[:timestamp] + "_" + name + '.png'
       end
 
       # Full file location
@@ -46,7 +46,7 @@ module BrowserModule
     # Using the name as defined at the start of every scenario
     def take_screenshot(suffix="")
       # If the target directory does not exist, create it.
-      dir = @world.env_or_config("screenshot_dir")
+      dir = world.env_or_config("screenshot_dir")
       begin
         Dir.mkdir dir
       rescue SystemCallError => ex
@@ -61,14 +61,14 @@ module BrowserModule
       begin
         # Save the screenshot
         @browser.screenshot.save fileloc
-        @world.log.debug "Screenshot saved: #{fileloc}"
+        world.log.debug "Screenshot saved: #{fileloc}"
 
         # Try to store the screenshot name
-        if @world.respond_to? :annotate
-          @world.annotate :screenshot => fileloc
+        if world.respond_to? :annotate
+          world.annotate :screenshot => fileloc
         end
       rescue RuntimeError => e
-        @world.log.debug "Failed to save screenshot to '#{fileloc}'. Error message #{e.message}"
+        world.log.debug "Failed to save screenshot to '#{fileloc}'. Error message #{e.message}"
       end
       return fileloc
     end
