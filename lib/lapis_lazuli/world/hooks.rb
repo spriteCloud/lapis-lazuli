@@ -81,7 +81,14 @@ module WorldModule
         if has_browser? and (cuke_scenario.failed? or (scenario.check_browser_errors and browser.has_error?))
           # Take a screenshot if needed
           if has_env_or_config?('screenshot_on_failure')
-            fileloc = browser.take_screenshot()
+            if env_or_config("screenshot_scheme") == "new"
+              # Take screenshots on all active browsers
+              LapisLazuli::Browser.browsers.each do |b|
+                fileloc = b.take_screenshot()
+              end
+            else
+              browser.take_screenshot()
+            end
           end
         end
       end

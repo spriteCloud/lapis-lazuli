@@ -47,7 +47,10 @@ module LapisLazuli
     class << self
       include LapisLazuli::GenericModule::Assertions
 
-      attr_accessor :browsers
+      def browsers
+        return @@browsers
+      end
+      
       def add_browser(b)
         # Add destructor for all browsers
         Runtime.instance.set_if(self, :browsers, LapisLazuli::Browser.method(:close_all))

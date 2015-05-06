@@ -18,7 +18,6 @@ module BrowserModule
       dir = world.env_or_config("screenshot_dir")
 
       # Generate the file name according to the new or old scheme.
-      name = 'screenshot'
       case world.env_or_config("screenshot_scheme")
       when "new"
         # For non-cucumber cases: we don't have world.scenario.data
@@ -26,7 +25,7 @@ module BrowserModule
           name = world.scenario.id
         end
         # FIXME random makes this non-repeatable, sadly
-        name = "#{world.scenario.time[:iso_short]}-#{name}-#{Random.rand(10000).to_s}.png"
+        name = "#{world.scenario.time[:iso_short]}-#{@browser.object_id}-#{name}-#{Random.rand(10000).to_s}.png"
       else # 'old' and default
         # For non-cucumber cases: we don't have world.scenario.data
         if not world.scenario.data.nil?
