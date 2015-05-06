@@ -68,6 +68,7 @@ module LapisLazuli
 
       # Create a new browser with optional arguments
       @browser = self.init(*args)
+      # Add this browser to the list of all browsers
       @@browsers.push @browser
 
       # Add registered world modules.
@@ -237,7 +238,7 @@ module LapisLazuli
 
         @world.log.debug "Closing browser#{reason}: #{@browser}"
         @browser.close
-        @@running_browsers.delete(browser)
+        @@browsers.delete(browser)
         @browser = nil
       end
     end
