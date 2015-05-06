@@ -85,7 +85,7 @@ module LapisLazuli
       @optional_data = @optional_data.dup
       @browser = create_driver(@browser_wanted, @optional_data)
       # Add this browser to the list of all browsers
-      @@browsers.push @browser
+      @@browsers.push self
     end
 
     ##
