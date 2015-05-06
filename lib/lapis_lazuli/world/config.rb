@@ -334,7 +334,7 @@ module WorldModule
       #    "proxy" => {"HTTP" => "http://test.con"}}
       elsif default.is_a? Hash
         # Env variables cannot contain a . replace them by _
-        key_wanted = var.gsub(".","_")
+        key_wanted = var.gsub(".","__")
         # Use a regular expression starting with the wanted key
         rgx = Regexp.new("^#{key_wanted}","i")
 
