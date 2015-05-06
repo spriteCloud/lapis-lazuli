@@ -291,7 +291,7 @@ module WorldModule
       elsif self.has_config?(variable)
         return self.config(variable, default)
       else
-        return nil
+        return default
       end
     end
 

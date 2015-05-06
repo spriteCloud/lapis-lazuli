@@ -42,13 +42,19 @@ module LapisLazuli
     include LapisLazuli::GenericModule::XPath
     include LapisLazuli::GenericModule::Assertions
 
+    @@cached_browser_options={}
+    @@browsers=[]
+    class << self
+      attr_accessor :browsers
+    end
+
     @world
     @browser
-    @cached_browser_wanted
-    @cached_optional_data
-
     @browser_name
-    attr_reader :browser_name
+    @browser_wanted
+    @optional_data
+
+    attr_reader :browser_name, :browser_wanted, :optional_data
 
     def initialize(world, *args)
       # The class only works with some modules loaded; they're loaded by the
@@ -62,6 +68,7 @@ module LapisLazuli
 
       # Create a new browser with optional arguments
       @browser = self.init(*args)
+      @@browsers.push @browser
 
       # Add registered world modules.
       if not LapisLazuli::WorldModule::Browser.browser_modules.nil?
@@ -71,29 +78,40 @@ module LapisLazuli
       end
     end
 
+    # Support browser.dup to create a duplicate
+    def initialize_copy(source)
+      @browser = self.create_internal([@browser_wanted, @optional_data])
+      # Add this browser to the list of all browsers
+      @@browsers.push @browser
+    end
+
     ##
     # The main browser window for testing
     def init(browser_wanted=(no_browser_wanted=true;nil), optional_data=(no_optional_data=true;nil))
       # Store the optional data so on restart of the browser it still has the
       # correct configuration
-      if no_optional_data and optional_data.nil? and @cached_optional_data
-        optional_data = @cached_optional_data
+      if no_optional_data and optional_data.nil? and
+        (browser_wanted.nil? or browser_wanted == @@cached_browser_options[:browser]) and
+        @@cached_browser_options[:optional_data]
+          optional_data = @@cached_browser_options[:optional_data]
       elsif optional_data.nil?
         optional_data = {}
-      else
+      elsif not @@cached_browser_options.has_key? :optional_data
         # Duplicate the data as Webdriver modifies it
-        @cached_optional_data = optional_data.dup
+        @@cached_browser_options[:optional_data] = optional_data.dup
       end
 
       # Do the same caching stuff for the browser
-      if no_browser_wanted and browser_wanted.nil? and @cached_browser_wanted
-        browser_wanted = @cached_browser_wanted
-      else
-        @cached_browser_wanted = browser_wanted
+      if no_browser_wanted and browser_wanted.nil? and @@cached_browser_options[:browser]
+        browser_wanted = @@cached_browser_options[:browser]
+      elsif not @@cached_browser_options.has_key? :browser
+        @@cached_browser_options[:browser] = browser_wanted
       end
 
+      @browser_wanted = browser_wanted
+      @optional_data = optional_data
       # Create the browser
-      self.create_internal(browser_wanted, optional_data)
+      self.create_internal(@browser_wanted, @optional_data)
     end
 
     ##
@@ -140,8 +158,24 @@ module LapisLazuli
       args = [browser]
       @browser_name = browser.to_s
       if browser == :remote
-        remote_settings = @world.env_or_config("remote", {})
-        @world.log.debug("Using remote browser: #{remote_settings}")
+        # Get the config
+        remote_config = @world.env_or_config("remote", {})
+
+        # The settings we are going to use to create the browser
+        remote_settings = {}
+
+        # Add the config to the settings using downcase string keys
+        remote_config.each{|k,v| remote_settings[k.to_s.downcase] = v}
+
+        if optional_data.is_a? Hash
+          # Convert the optional data to downcase string keys
+          string_hash = Hash.new
+          optional_data.each{|k,v| string_hash[k.to_s.downcase] = v}
+
+          # Merge them with the settings
+          remote_settings.merge! string_hash
+        end
+
         args.push(remote_browser_config(remote_settings))
       elsif not optional_data.nil? and not optional_data.empty?
         @world.log.debug("Got optional data: #{optional_data}")
@@ -203,6 +237,7 @@ module LapisLazuli
 
         @world.log.debug "Closing browser#{reason}: #{@browser}"
         @browser.close
+        @@running_browsers.delete(browser)
         @browser = nil
       end
     end
@@ -258,13 +293,27 @@ module LapisLazuli
     end
 
     def destroy(world)
-      if "end" == world.env_or_config("close_browser_after")
-        begin
-          self.close "end"
-        rescue
-          world.log.debug("Failed to close the browser, probably chrome")
+      # Primary browser should also close other browsers
+      LapisLazuli::Browser.close_all()
+    end
+
+    def self.close_all()
+      # A running browser should exist and we are allowed to close it
+      if @@browsers.length != 0 and @world.env_or_config("close_browser_after") != "never"
+        # Notify user
+        @world.log.debug("Closing all browsers")
+
+        # Close each browser
+        @@browsers.each do |browser|
+          begin
+            browser.close
+          rescue Exception => err
+            # Provide some details
+            @world.log.debug("Failed to close the browser, probably chrome: #{err.to_s}")
+          end
         end
       end
     end
   end
+
 end

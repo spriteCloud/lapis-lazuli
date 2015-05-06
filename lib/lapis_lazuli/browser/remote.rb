@@ -43,7 +43,7 @@ module BrowserModule
       if !settings.is_a? Hash
         @world.error("Missing Remote Browser Settings")
       end
-      
+
       # Fetch the URl
       url = hash_get_case_insensitive(settings,"url")
 
@@ -99,6 +99,8 @@ module BrowserModule
           end
         end
       end
+
+      @world.log.debug("Using remote browser: #{url} (#{uri.user}) #{caps.to_json}")
 
       return {
         :url => uri.to_s,
