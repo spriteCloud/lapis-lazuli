@@ -50,9 +50,10 @@ module WorldModule
     def browser(*args)
       b = Runtime.instance.set_if(self, :browser) do
         # Add LL to the arguments for the browser
-        browser_args = args.unshift(self)
+        LapisLazuli::Browser.set_world(self)
+        
         # Create & return a new browser object
-        LapisLazuli::Browser.new(*browser_args)
+        LapisLazuli::Browser.new(*args)
       end
 
       if not b.is_open?

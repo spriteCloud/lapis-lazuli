@@ -77,8 +77,8 @@ module WorldModule
       end
 
       # Did we fail?
-      if respond_to? :scenario and respond_to? :browser and respond_to? :config
-        if (cuke_scenario.failed? or (scenario.check_browser_errors and browser.has_error?))
+      if respond_to? :scenario and respond_to? :has_browser? and respond_to? :browser and respond_to? :config
+        if has_browser? and (cuke_scenario.failed? or (scenario.check_browser_errors and browser.has_error?))
           # Take a screenshot if needed
           if has_env_or_config?('screenshot_on_failure')
             fileloc = browser.take_screenshot()
@@ -87,8 +87,10 @@ module WorldModule
       end
 
       # Close browser if needed
-      if respond_to? :browser
-        browser.close_after_scenario(cuke_scenario)
+      if respond_to? :has_browser? and respond_to? :browser
+        if has_browser?
+          browser.close_after_scenario(cuke_scenario)
+        end
       end
     end
 

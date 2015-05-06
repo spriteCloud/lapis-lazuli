@@ -40,13 +40,34 @@ module LapisLazuli
     include LapisLazuli::BrowserModule::Interaction
     include LapisLazuli::BrowserModule::Remote
     include LapisLazuli::GenericModule::XPath
-    include LapisLazuli::GenericModule::Assertions
 
     @@world=nil
     @@cached_browser_options={}
     @@browsers=[]
     class << self
+      include LapisLazuli::GenericModule::Assertions
+
       attr_accessor :browsers
+      def add_browser(b)
+        # Add destructor for all browsers
+        Runtime.instance.set_if(self, :browsers, LapisLazuli::Browser.method(:close_all))
+        @@browsers.push(b)
+      end
+
+      def remove_browser(b)
+        @@browsers.delete(b)
+      end
+
+      def set_world(w)
+        @@world = w
+      end
+
+      def check_world?
+        assert @@world.respond_to?(:config), "Need to include LapisLazuli::WorldModule::Config in your cucumber world."
+        assert @@world.respond_to?(:log), "Need to include LapisLazuli::WorldModule::Logging in your cucumber world."
+        assert @@world.respond_to?(:error), "Need to include LapisLazuli::WorldModule::Error in your cucumber world."
+        assert @@world.respond_to?(:has_proxy?), "Need to include LapisLazuli::WorldModule::Proxy in your cucumber world."
+      end
     end
 
     @browser
@@ -56,20 +77,12 @@ module LapisLazuli
 
     attr_reader :browser_name, :browser_wanted, :optional_data
 
-    def initialize(world, *args)
+    def initialize(*args)
       # The class only works with some modules loaded; they're loaded by the
       # Browser module, but we can't be sure that's been used.
-      assert world.respond_to?(:config), "Need to include LapisLazuli::WorldModule::Config in your cucumber world."
-      assert world.respond_to?(:log), "Need to include LapisLazuli::WorldModule::Logging in your cucumber world."
-      assert world.respond_to?(:error), "Need to include LapisLazuli::WorldModule::Error in your cucumber world."
-      assert world.respond_to?(:has_proxy?), "Need to include LapisLazuli::WorldModule::Proxy in your cucumber world."
+      LapisLazuli::Browser.check_world?
 
-      @@world = world
-
-      # Create a new browser with optional arguments
-      @browser = init(*args)
-      # Add this browser to the list of all browsers
-      @@browsers.push self
+      self.start(*args)
 
       # Add registered world modules.
       if not LapisLazuli::WorldModule::Browser.browser_modules.nil?
@@ -85,13 +98,13 @@ module LapisLazuli
       @optional_data = @optional_data.dup
       @browser = create_driver(@browser_wanted, @optional_data)
       # Add this browser to the list of all browsers
-      @@browsers.push self
+      LapisLazuli::Browser.add_browser(self)
     end
 
     ##
     # Creates a new browser instance.
     def create(*args)
-      return Browser.new(world, *args)
+      return Browser.new(*args)
     end
 
     def world
@@ -106,9 +119,11 @@ module LapisLazuli
 
     ##
     # Start the browser if it's not yet open.
-    def start
+    def start(*args)
       if @browser.nil?
-        @browser = init
+        @browser = init(*args)
+        # Add this browser to the list of all browsers
+        LapisLazuli::Browser.add_browser(self)
       end
     end
 
@@ -133,7 +148,7 @@ module LapisLazuli
         world.log.debug "Closing browser#{reason}: #{@browser}"
         @browser.close
         if remove_from_list
-          @@browsers.delete(browser)
+          LapisLazuli::Browser.remove_browser(self)
         end
         @browser = nil
       end
@@ -221,22 +236,22 @@ module LapisLazuli
       def init(browser_wanted=(no_browser_wanted=true;nil), optional_data=(no_optional_data=true;nil))
         # Store the optional data so on restart of the browser it still has the
         # correct configuration
-        if no_optional_data and optional_data.nil? and
-          (browser_wanted.nil? or browser_wanted == @@cached_browser_options[:browser]) and
-          @@cached_browser_options[:optional_data]
-            optional_data = @@cached_browser_options[:optional_data]
+        if no_optional_data and optional_data.nil? and @@cached_browser_options.has_key?(:optional_data) and (browser_wanted.nil? or browser_wanted == @@cached_browser_options[:browser])
+          optional_data = @@cached_browser_options[:optional_data]
         elsif optional_data.nil?
           optional_data = {}
-        elsif not @@cached_browser_options.has_key? :optional_data
-          # Duplicate the data as Webdriver modifies it
-          @@cached_browser_options[:optional_data] = optional_data.dup
         end
 
         # Do the same caching stuff for the browser
-        if no_browser_wanted and browser_wanted.nil? and @@cached_browser_options[:browser]
+        if no_browser_wanted and browser_wanted.nil? and @@cached_browser_options.has_key?(:browser)
           browser_wanted = @@cached_browser_options[:browser]
-        elsif not @@cached_browser_options.has_key? :browser
+        end
+
+
+        if !@@cached_browser_options.has_key? :browser
           @@cached_browser_options[:browser] = browser_wanted
+          # Duplicate the data as Webdriver modifies it
+          @@cached_browser_options[:optional_data] = optional_data.dup
         end
 
         @browser_wanted = browser_wanted
@@ -258,31 +273,31 @@ module LapisLazuli
         case browser_wanted.to_s.downcase
           when 'chrome'
             # Check Platform running script
-            browser = :chrome
+            b = :chrome
           when 'safari'
-            browser = :safari
+            b = :safari
           when 'ie'
             require 'rbconfig'
             if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
-              browser = :ie
+              b = :ie
             else
               world.error("You can't run IE tests on non-Windows machine")
             end
           when 'ios'
             if RUBY_PLATFORM.downcase.include?("darwin")
-              browser = :iphone
+              b = :iphone
             else
               world.error("You can't run IOS tests on non-mac machine")
             end
           when 'remote'
-            browser = :remote
+            b = :remote
           else
-            browser = :firefox
+            b = :firefox
         end
 
-        args = [browser]
-        @browser_name = browser.to_s
-        if browser == :remote
+        args = [b]
+        @browser_name = b.to_s
+        if b == :remote
           # Get the config
           remote_config = world.env_or_config("remote", {})
 
@@ -312,7 +327,7 @@ module LapisLazuli
           end
 
           proxy_url = "#{world.proxy.ip}:#{world.proxy.port}"
-          if browser == :firefox
+          if b == :firefox
             world.log.debug("Configuring Firefox proxy: #{proxy_url}")
             profile = Selenium::WebDriver::Firefox::Profile.new
             profile.proxy = Selenium::WebDriver::Proxy.new :http => proxy_url, :ssl => proxy_url

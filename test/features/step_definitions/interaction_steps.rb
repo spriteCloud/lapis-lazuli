@@ -49,13 +49,13 @@ Given(/^I create a firefox browser named "(.*?)"( with proxy to "(.*?)")$/) do |
   else
     b = browser.create :firefox
   end
-  scenario.storage.set(name, browser)
+  scenario.storage.set(name, b)
 end
 
 Given(/^I close the browser named "(.*?)"$/) do |name|
   if scenario.storage.has? name
-    browser = scenario.storage.get name
-    browser.close
+    b = scenario.storage.get name
+    b.close
   else
     error("No item in the storage named #{name}")
   end

@@ -39,7 +39,10 @@ module LapisLazuli
         return @objects[name]
       end
 
-      obj = block.call
+      obj = nil
+      if !block.nil?
+        obj = block.call
+      end
 
       set(world, name, obj, destructor)
 
@@ -71,6 +74,17 @@ module LapisLazuli
         # call that.
         if world.respond_to? name
           return world.send(name).destroy(world)
+        end
+
+        # Try to run destroy on the object itself
+        obj = Runtime.get(name)
+        if obj.respond_to? :destroy
+          return obj.send(:destroy)
+        end
+
+        # If the object has stream/socket functions close ends the connection
+        if obj.respond_to? :close
+          return obj.send(:close)
         end
 
         # If all else fails, we have to log an error. We can't rely
