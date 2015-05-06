@@ -85,7 +85,7 @@ module LapisLazuli
       @optional_data = @optional_data.dup
       @browser = create_driver(@browser_wanted, @optional_data)
       # Add this browser to the list of all browsers
-      @@browsers.push @browser
+      @@browsers.push self
     end
 
     ##
@@ -122,7 +122,7 @@ module LapisLazuli
 
     ##
     # Closes the browser and updates LL so that it will open a new one if needed
-    def close(reason = nil)
+    def close(reason = nil, remove_from_list=true)
       if not @browser.nil?
         if not reason.nil?
           reason = " after #{reason}"
@@ -132,7 +132,9 @@ module LapisLazuli
 
         world.log.debug "Closing browser#{reason}: #{@browser}"
         @browser.close
-        @@browsers.delete(browser)
+        if remove_from_list
+          @@browsers.delete(browser)
+        end
         @browser = nil
       end
     end
@@ -199,14 +201,17 @@ module LapisLazuli
         @@world.log.debug("Closing all browsers")
 
         # Close each browser
-        @@browsers.each do |browser|
+        @@browsers.each do |b|
           begin
-            browser.close reason
+            b.close reason, false
           rescue Exception => err
             # Provide some details
             @@world.log.debug("Failed to close the browser, probably chrome: #{err.to_s}")
           end
         end
+
+        # Make sure the array is cleared
+        @@browsers = []
       end
     end
 
