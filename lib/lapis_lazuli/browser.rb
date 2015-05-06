@@ -81,7 +81,7 @@ module LapisLazuli
 
     # Support browser.dup to create a duplicate
     def initialize_copy(source)
-      @browser = self.create_internal([@browser_wanted, @optional_data])
+      @browser = self.create_internal(@browser_wanted, @optional_data)
       # Add this browser to the list of all browsers
       @@browsers.push @browser
     end
