@@ -25,9 +25,9 @@ module BrowserModule
       if errors.length > 0 or self.get_http_status.to_i > 299
         errors.each do |error|
           if error.is_a? Hash
-            @world.log.debug("#{error["message"]} #{error["url"]} #{error["line"]} #{error["column"]}\n#{error["stack"]}")
+            world.log.debug("#{error["message"]} #{error["url"]} #{error["line"]} #{error["column"]}\n#{error["stack"]}")
           else
-            @world.log.debug("#{error}")
+            world.log.debug("#{error}")
           end
         end
         return true
@@ -42,12 +42,12 @@ module BrowserModule
     def get_html_errors
       result = []
       # Need some error strings
-      if @world.has_env_or_config?("error_strings")
+      if world.has_env_or_config?("error_strings")
         begin
           # Get the HTML of the page
           page_text = @browser.html
           # Try to find all errors
-          @world.env_or_config("error_strings").each {|error|
+          world.env_or_config("error_strings").each {|error|
             if page_text.include? error
               # Add to the result list
               result.push error
@@ -55,7 +55,7 @@ module BrowserModule
           }
         rescue RuntimeError => err
           # An error?
-          @world.log.debug "Cannot read the html for page #{@browser.url}: #{err}"
+          world.log.debug "Cannot read the html for page #{@browser.url}: #{err}"
         end
       end
       # By default we don't have errors

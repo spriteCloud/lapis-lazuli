@@ -41,7 +41,7 @@ module BrowserModule
       require "selenium-webdriver"
 
       if !settings.is_a? Hash
-        @world.error("Missing Remote Browser Settings")
+        world.error("Missing Remote Browser Settings")
       end
 
       # Fetch the URl
@@ -100,7 +100,7 @@ module BrowserModule
         end
       end
 
-      @world.log.debug("Using remote browser: #{url} (#{uri.user}) #{caps.to_json}")
+      world.log.debug("Using remote browser: #{url} (#{uri.user}) #{caps.to_json}")
 
       return {
         :url => uri.to_s,

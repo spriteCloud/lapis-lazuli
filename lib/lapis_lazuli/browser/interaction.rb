@@ -69,7 +69,7 @@ module BrowserModule
       end
 
       if errors.length > 0
-        raise "Could not click #{elem} given any of these click types: #{types}: #{errors}"
+        world.error("Could not click #{elem} given any of these click types: #{types}: #{errors}")
       end
     end
 
