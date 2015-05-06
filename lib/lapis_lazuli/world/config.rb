@@ -238,7 +238,7 @@ module WorldModule
     # Returns current environment
     def current_env
       init
-      
+
       return @env
     end
 
@@ -255,11 +255,9 @@ module WorldModule
 
       # Environment variables for known options override environment specific
       # options, too
-      if CONFIG_OPTIONS.has_key? variable
-        var = variable.upcase
-        if ENV.has_key? var
-          return ENV[var]
-        end
+      env_var = var_from_env(variable, default)
+      if env_var != default
+        return env_var
       end
 
       return self.config("#{@env}.#{variable}",default)
@@ -281,6 +279,13 @@ module WorldModule
       # Make sure the configured configuration is loaded, if possible
       init
 
+      # Environment variables for known options override environment specific
+      # options, too
+      env_var = var_from_env(variable, default)
+      if env_var != default
+        return env_var
+      end
+
       if self.has_env?(variable)
         return self.env(variable, default)
       elsif self.has_config?(variable)
@@ -290,8 +295,88 @@ module WorldModule
       end
     end
 
+    def var_from_env(var, default=nil)
+      # Simple solution for single depth variables like "browser"
+      if ENV.has_key? var
+        return ENV[var]
+      end
 
+      value = default
 
+      # Variables like:
+      #  var_from_env("remote.url","http://test.test")
+      if var.is_a? String and
+          var.include? "." and
+          not default.is_a? Hash
+
+        # Env variables cannot contain a . replace them by _
+        key_wanted = var.gsub(".","__")
+
+        # Do a case insensitive compare
+        ENV.keys.each do |key|
+          if key.casecmp(key_wanted) == 0
+            value = ENV[key]
+            break
+          end
+        end
+
+      # Environment:
+      #   REMOTE__USER=test
+      #   REMOTE__PASS=test
+      #   REMOTE__PROXY__HTTP=http://test.com
+      #
+      # Call:
+      #   var_from_env("remote",{})
+      #
+      # Result:
+      #   {"USER" => "test",
+      #    "PASS" => "test",
+      #    "proxy" => {"HTTP" => "http://test.con"}}
+      elsif default.is_a? Hash
+        # Env variables cannot contain a . replace them by _
+        key_wanted = var.gsub(".","__")
+        # Use a regular expression starting with the wanted key
+        rgx = Regexp.new("^#{key_wanted}","i")
+
+        result = {}
+        # For each key check if it matched the regexp
+        ENV.keys.each do |key|
+          if (key =~ rgx) == 0
+            tmp = result
+            # Remove start and split into parts
+            parts = key.sub(rgx, "").split("__")
+            # Remove empty start if needed
+            if parts[0].to_s.empty?
+              parts.shift
+            end
+
+            # For each part
+            parts.each_with_index do |part, index|
+              # Final part should store the value in the hash
+              if index == parts.length - 1
+                tmp[part] = ENV[key]
+              else
+                # Otherwise, downcase the partname
+                part.downcase!
+                # Set it to an object if needed
+                if !tmp.has_key? part
+                  tmp[part] = {}
+                end
+                # Assign tmp to the new hash
+                tmp = tmp[part]
+              end
+            end
+          end
+        end
+
+        # If we have set keys in the result return it
+        if result.keys.length > 0
+          return result
+        end
+      end
+
+      return value
+    end
 
   end # module Config
 end # module WorldModule

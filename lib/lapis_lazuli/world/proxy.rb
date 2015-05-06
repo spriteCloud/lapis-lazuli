@@ -23,8 +23,8 @@ module WorldModule
     ##
     # Checks if there is a proxy started
     def has_proxy?
-      p = Runtime.instance.get :proxy
-      return !p.nil?
+      proxy = Runtime.instance.get :proxy
+      return !proxy.nil?
     end
 
     ##
@@ -46,7 +46,7 @@ module WorldModule
           end
 
           # Try to start the proxy
-          p = LapisLazuli::Proxy.new(proxy_ip, proxy_port, proxy_master)
+          proxy = LapisLazuli::Proxy.new(proxy_ip, proxy_port, proxy_master)
 
           log.debug("Found proxy: #{proxy_ip}:#{proxy_port}, spritecloud: #{proxy_master}")
         rescue StandardError => err

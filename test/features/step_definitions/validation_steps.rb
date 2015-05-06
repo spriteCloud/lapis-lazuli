@@ -348,3 +348,14 @@ Then(/^I expect to use tagname to hash options to (.*?) find element (.*?)$/) do
   end
 end
 
+Then(/^the environment variable "(.*?)" is set to "(.*?)"$/) do |var,val|
+	value = env(var)
+	assert_equal val, value, "Incorrect value"
+end
+
+Then(/^the environment variable "(.*?)" has "(.*?)" set to "(.*?)"$/) do |var, key, val|
+	hash = env(var,{})
+	assert hash.is_a?(Hash), "Config element is not a Hash: #{hash}"
+	assert hash.has_key?(key), "Config is missing #{key}"
+	assert_equal hash[key], val, "Config has incorrect value"
+end

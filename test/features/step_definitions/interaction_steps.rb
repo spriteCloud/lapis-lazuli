@@ -139,6 +139,9 @@ Then(/^I should be able to click the first button by force click$/) do
   )
 end
 
+Given(/^I set environment variable "(.*?)" to "(.*?)"$/) do |var, val|
+  ENV[var]=val
+end
 
 Given(/^I annotate a step with (.*?)$/) do |data|
   annotate data
