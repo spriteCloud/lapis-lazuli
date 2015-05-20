@@ -86,7 +86,7 @@ module WorldModule
 
       # Include URL if we have a browser
       if self.has_browser?
-        message += " (#{self.browser.url})"
+        message += " [ #{self.browser.url} ]"
       end
 
       # Add the groups to the message
