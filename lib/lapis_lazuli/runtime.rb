@@ -19,6 +19,12 @@ module LapisLazuli
       @objects = {}
     end
 
+    ##
+    # Number of objects stored in the Runtime
+    def length
+      return @objects.keys.length
+    end
+
     def has?(name)
       return @objects.has_key? name
     end
@@ -49,6 +55,12 @@ module LapisLazuli
       return obj
     end
 
+    ##
+    # Remove an object from the Runtime
+    def unset(name)
+      @objects.delete(name)
+    end
+
     def get(name)
       return @objects[name]
     end
@@ -57,6 +69,22 @@ module LapisLazuli
   private
     def self.destroy(world, name, destructor)
       Proc.new do
+        # Try to run destroy on the object itself
+        obj = Runtime.instance.get(name)
+
+        #world.log.debug("Destroying #{name}")
+
+        # Do not destroy the logger until everything else has been stopped
+        if name == :logger and Runtime.instance.length > 1
+          #world.log.debug("This is the logger, wait until everything is closed")
+          break
+        end
+        Runtime.instance.unset(name)
+
+        if obj.respond_to?(:destroy)
+          obj.send(:destroy, world)
+          break
+        end
         # If a destructor is given, call that.
         if not destructor.nil?
           return destructor.call(world)
@@ -74,12 +102,6 @@ module LapisLazuli
         # call that.
         if world.respond_to? name
           return world.send(name).destroy(world)
-        end
-
-        # Try to run destroy on the object itself
-        obj = Runtime.get(name)
-        if obj.respond_to? :destroy
-          return obj.send(:destroy)
         end
 
         # If the object has stream/socket functions close ends the connection

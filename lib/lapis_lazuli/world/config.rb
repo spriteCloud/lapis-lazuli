@@ -7,6 +7,8 @@
 #
 
 require "lapis_lazuli/options"
+require "lapis_lazuli/storage"
+require "lapis_lazuli/runtime"
 
 module LapisLazuli
 module WorldModule
@@ -52,6 +54,18 @@ module WorldModule
         warn "Could not load configuration from: #{Config.config_file}"
         @config = {}
       end
+
+      @metadata = Runtime.instance.set_if(self, :metadata) do
+        log.debug "Creating metadata storage"
+        Storage.new("metadata")
+      end
+    end
+
+    def metadata
+      if @metadata.nil?
+        raise "No metadata available"
+      end
+      return @metadata
     end
 
 
@@ -179,7 +193,7 @@ module WorldModule
     # ll.config("test.google.url") => "www.google.com"
     #
     # Raises error if traversing the object is impossible
-    def config(variable=false, default=nil)
+    def config(variable=false, default=(no_default_set=true;nil))
       # Make sure the configured configuration is loaded, if possible
       init
 
@@ -199,7 +213,7 @@ module WorldModule
 
       # Otherwise try to find it in the configuration object
       variable.split(".").each do |part|
-        if default.nil? and result.nil?
+        if no_default_set == true && result.nil?
           raise "Unknown configuration variable '#{variable}' and no default given!"
         end
         break if result.nil?
@@ -214,7 +228,7 @@ module WorldModule
       if default.nil? and result.nil?
         if CONFIG_OPTIONS.has_key? variable
           return CONFIG_OPTIONS[variable][0]
-        else
+        elsif no_default_set == true
           raise "Unknown configuration variable '#{variable}' and no default given!"
         end
       else
@@ -306,7 +320,6 @@ module WorldModule
       # Variables like:
       #  var_from_env("remote.url","http://test.test")
       if var.is_a? String and
-          var.include? "." and
           not default.is_a? Hash
 
         # Env variables cannot contain a . replace them by _
@@ -377,7 +390,6 @@ module WorldModule
 
       return value
     end
-
   end # module Config
 end # module WorldModule
 end # module LapisLazuli

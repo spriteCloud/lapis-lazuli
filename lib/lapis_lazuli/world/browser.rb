@@ -51,9 +51,29 @@ module WorldModule
       b = Runtime.instance.set_if(self, :browser) do
         # Add LL to the arguments for the browser
         LapisLazuli::Browser.set_world(self)
-        
+
         # Create & return a new browser object
-        LapisLazuli::Browser.new(*args)
+        brow = LapisLazuli::Browser.new(*args)
+
+        metadata = Runtime.instance.get(:metadata)
+        if metadata
+          metadata.set(
+            "browser",
+            {
+              "name" => brow.driver.capabilities[:browser_name],
+              "version" => brow.driver.capabilities[:version],
+              "platform" => brow.driver.capabilities[:platform],
+            }
+          )
+        end
+
+        sessionid = brow.driver.capabilities["webdriver.remote.sessionid"]
+
+        if !sessionid.nil?
+          metadata.set("sessionid", sessionid)
+        end
+
+        brow
       end
 
       if not b.is_open?
