@@ -79,7 +79,7 @@ module LapisLazuli
       # Otherwise, generate a name
       if filename.nil?
         # Folder to store in
-        filename += world.config("storage_dir", ".#{File::SEPARATOR}storage") + File::SEPARATOR
+        filename = world.config("storage_dir", ".#{File::SEPARATOR}storage") + File::SEPARATOR
 
         # Filename
         if @name.nil?
