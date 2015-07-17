@@ -143,7 +143,7 @@ Then(/^within 10 seconds I should see either added element/) do
 	)
 end
 
-Then(/^within (\d+) seconds I get an error waiting for "(.*?)"( disappear)?$/) do |timeout, text, condition|
+Then(/^within (\d+) seconds I get an error waiting for "(.*?)"( to disappear)?$/) do |timeout, text, condition|
 	if condition
 		condition = :while
 	else
@@ -163,7 +163,7 @@ Then(/^within (\d+) seconds I get an error waiting for "(.*?)"( disappear)?$/) d
 			:screenshot => true,
 			:groups => ["wait"]
 		)
-	rescue StandardError => err
+	rescue Watir::Wait::TimeoutError => err
 	end
 end
 

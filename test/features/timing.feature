@@ -20,10 +20,10 @@ Feature: Timing
     Then within 2 seconds I get an error waiting for "content"
     And a screenshot should have been created
 
-  @timing_04
+  @timing_04 @timing_errors @issue_24
   Scenario: timing_04 - Wait While Error
     Given I navigate to the timing test page
-    Then within 2 seconds I get an error waiting for "waiting" disappear
+    Then within 2 seconds I get an error waiting for "waiting" to disappear
     And a screenshot should have been created
 
   @timing_05
