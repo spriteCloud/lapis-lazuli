@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    lapis_lazuli (0.8.1)
+    lapis_lazuli (0.8.2)
       facets (~> 2.9)
       faraday (~> 0.9)
       faraday_json (~> 0.1)
@@ -9,7 +9,7 @@ PATH
       json (~> 1.8)
       minitest (~> 5.5)
       multi_xml (~> 0.5)
-      teelogger (~> 0.4)
+      teelogger (~> 0.5)
       thor (~> 0.19)
 
 GEM
