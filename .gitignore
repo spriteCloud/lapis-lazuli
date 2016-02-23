@@ -16,3 +16,4 @@ tmp
 .ruby-version
 test/storage
 .*.sw*
+.idea

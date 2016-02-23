@@ -2,7 +2,7 @@
 
 This cucumber project contains a web server with simple test cases to validate Lapis Lazuli behavior.
 
-Author: "Onno Steenbergen" <onno@spritecloud.com>
+Author: "Onno Steenbergen" <info@spritecloud.com>
 
 # Setup
 

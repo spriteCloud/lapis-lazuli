@@ -29,7 +29,6 @@ end
 
 # Install all the webdriver gems and cucumber
 gem 'watir-webdriver'
-gem 'watir-webdriver-performance'
 gem 'watir-scroll'
 gem 'cucumber'
 
