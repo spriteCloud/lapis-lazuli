@@ -6,10 +6,6 @@
 # All rights reserved.
 #
 
-require 'selenium-webdriver'
-require 'watir-webdriver'
-require "watir-webdriver/extensions/alerts"
-
 require "lapis_lazuli/ast"
 
 # Modules
@@ -50,7 +46,7 @@ module LapisLazuli
       def browsers
         return @@browsers
       end
-      
+
       def add_browser(b)
         # Add destructor for all browsers
         Runtime.instance.set_if(self, :browsers, LapisLazuli::Browser.method(:close_all))
@@ -267,6 +263,15 @@ module LapisLazuli
       # Create a new browser depending on settings
       # Always cached the supplied arguments
       def create_driver(browser_wanted=nil, optional_data=nil)
+        # Run-time dependency.
+        begin
+          require 'selenium-webdriver'
+          require 'watir-webdriver'
+          require "watir-webdriver/extensions/alerts"
+        rescue LoadError => err
+          raise LoadError, "#{err}: you need to add 'watir-webdriver', 'watir-webdriver-performance' and 'watir-scroll' to your Gemfile before using the browser."
+        end
+
         # No browser? Does the config have a browser? Default to firefox
         if browser_wanted.nil?
           browser_wanted = world.env_or_config('browser', 'firefox')
