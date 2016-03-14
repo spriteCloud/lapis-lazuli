@@ -50,11 +50,6 @@ module WorldModule
 
       load_config(Config.config_file)
 
-      if @config.nil?
-        warn "Could not load configuration from: #{Config.config_file}"
-        @config = {}
-      end
-
       @metadata = Runtime.instance.set_if(self, :metadata) do
         log.debug "Creating metadata storage"
         Storage.new("metadata")
@@ -150,6 +145,12 @@ module WorldModule
       rescue RuntimeError => err
         # Can't help you
         raise "Error loading file: #{filename} #{err}"
+      end
+
+      # Fix up empty files
+      if @config.nil? or @config == false
+        warn "Could not load configuration from '#{Config.config_file}'; it might be empty or malformed."
+        @config = {}
       end
 
       # If we have an environment this config should have it
