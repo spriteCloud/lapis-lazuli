@@ -7,14 +7,14 @@ Given(/^I navigate to (.*) in (.*)$/) do |site,language|
   config_name = "#{site.downcase}.#{language.downcase}"
   if has_env?(config_name)
     url = env(config_name)
-    browser.goto url
+    driver.goto url
   else
     error(:env => config_name)
   end
 end
 
 Given(/^I search for "(.*?)"$/) do |query|
-  searchbox = browser.find(:text_field => {:name => "q"})
+  searchbox = driver.find(:text_field => {:name => "q"})
   searchbox.clear rescue log.debug "Could not clear searchbox"
   searchbox.send_keys(query)
 end

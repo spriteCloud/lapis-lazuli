@@ -17,7 +17,7 @@ module LapisLazuli
     include LapisLazuli::Ast
 
     attr_reader :id, :time, :uuid, :data, :storage, :error
-    attr_accessor :running, :check_browser_errors
+    attr_accessor :running, :check_driver_errors
 
     def initialize
       @uuid = SecureRandom.hex
@@ -32,7 +32,7 @@ module LapisLazuli
     def update(scenario)
       @uuid = SecureRandom.hex
       # Reset the fail attribute
-      @check_browser_errors = true
+      @check_driver_errors = true
       # The original scenario from cucumber
       @data = scenario
       # A name without special characters.

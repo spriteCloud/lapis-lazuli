@@ -9,13 +9,13 @@ Then(/I see "([^"]*)" on the page/) do |string|
   #       includes the regex, all its parent elements also will, so you have
   #       tons of matches to process.
   #
-  # browser.wait(:text => /#{string}/i)
+  # driver.wait(:text => /#{string}/i)
 
   #       Instead, you will want to search only the root element for some
   #       text, e.g.
   #
-  # browser.wait(:html => {:text => /#{string}/i})
+  # driver.wait(:html => {:text => /#{string}/i})
 
   #       There's a shortcut for that in find/wait:
-  browser.wait(:html => /#{string}/i)
+  driver.wait(:html => /#{string}/i)
 end

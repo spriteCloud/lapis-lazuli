@@ -10,7 +10,7 @@ require 'lapis_lazuli/assertions'
 require 'lapis_lazuli/argparse'
 
 module LapisLazuli
-module BrowserModule
+module DriverModule
 
   ##
   # Module with helper functions to do with DOM element interaction
@@ -86,5 +86,5 @@ module BrowserModule
 
 
   end # module Interaction
-end # module BrowserModule
+end # module DriverModule
 end # module LapisLazuli

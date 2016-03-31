@@ -7,10 +7,10 @@
 #
 
 module LapisLazuli
-module BrowserModule
+module DriverModule
 
   ##
-  # Screenshot functionality for browser
+  # Screenshot functionality for driver
   module Screenshots
     ##
     # Returns the name of the screenshot, if take_screenshot is called now.
@@ -25,7 +25,7 @@ module BrowserModule
           name = world.scenario.id
         end
         # FIXME random makes this non-repeatable, sadly
-        name = "#{world.scenario.time[:iso_short]}-#{@browser.object_id}-#{name}-#{Random.rand(10000).to_s}.png"
+        name = "#{world.scenario.time[:iso_short]}-#{@driver.object_id}-#{name}-#{Random.rand(10000).to_s}.png"
       else # 'old' and default
         # For non-cucumber cases: we don't have world.scenario.data
         if not world.scenario.data.nil?
@@ -59,7 +59,7 @@ module BrowserModule
       # Write screenshot
       begin
         # Save the screenshot
-        @browser.screenshot.save fileloc
+        @driver.screenshot.save fileloc
         world.log.debug "Screenshot saved: #{fileloc}"
 
         # Try to store the screenshot name
@@ -72,5 +72,5 @@ module BrowserModule
       return fileloc
     end
   end # module Screenshots
-end # module BrowserModule
+end # module DriverModule
 end # module LapisLazuli

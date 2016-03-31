@@ -6,7 +6,7 @@
 # All rights reserved.
 #
 
-require "lapis_lazuli/browser"
+require "lapis_lazuli/driver"
 require "lapis_lazuli/runtime"
 
 require "lapis_lazuli/world/config"
@@ -17,50 +17,50 @@ require "lapis_lazuli/world/proxy"
 module LapisLazuli
 module WorldModule
   ##
-  # Module managing a browser instance
-  module Browser
+  # Module managing a driver instance
+  module Driver
     include LapisLazuli::WorldModule::Config
     include LapisLazuli::WorldModule::Logging
     include LapisLazuli::WorldModule::Error
     include LapisLazuli::WorldModule::Proxy
 
     ##
-    # Store extension modules for the browser
+    # Store extension modules for the driver
     module ClassMethods
-      def browser_module(module_name)
+      def driver_module(module_name)
         @extensions ||= []
         @extensions << module_name
       end
 
-      def browser_modules
+      def driver_modules
         @extensions
       end
     end
     extend ClassMethods
 
     ##
-    # Checks if there is a browser started
-    def has_browser?
-      b = Runtime.instance.get :browser
+    # Checks if there is a driver started
+    def has_driver?
+      b = Runtime.instance.get :driver
       return (not b.nil? and b.is_open?)
     end
 
     ##
-    # Get the current main browser
-    def browser(*args)
-      b = Runtime.instance.set_if(self, :browser) do
-        # Add LL to the arguments for the browser
-        LapisLazuli::Browser.set_world(self)
+    # Get the current main driver
+    def driver(*args)
+      b = Runtime.instance.set_if(self, :driver) do
+        # Add LL to the arguments for the driver
+        LapisLazuli::Driver.set_world(self)
 
-        # Create & return a new browser object
-        brow = LapisLazuli::Browser.new(*args)
+        # Create & return a new driver object
+        brow = LapisLazuli::Driver.new(*args)
 
         metadata = Runtime.instance.get(:metadata)
         if metadata
           metadata.set(
-            "browser",
+            "driver",
             {
-              "name" => brow.driver.capabilities[:browser_name],
+              "name" => brow.driver.capabilities[:driver_name],
               "version" => brow.driver.capabilities[:version],
               "platform" => brow.driver.capabilities[:platform],
             }
@@ -83,6 +83,6 @@ module WorldModule
       return b
     end
 
-  end # module Browser
+  end # module Driver
 end # module WorldModule
 end # module LapisLazuli

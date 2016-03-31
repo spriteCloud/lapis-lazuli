@@ -11,17 +11,17 @@ require 'lapis_lazuli/argparse'
 
 
 module LapisLazuli
-module BrowserModule
+module DriverModule
 
   ##
-  # Find functionality for LapisLazuli::Browser. Don't use outside of that
+  # Find functionality for LapisLazuli::Driver. Don't use outside of that
   # class.
   module Find
     include LapisLazuli::ArgParse
 
     ##
     # Finds all elements corresponding to some specification; the supported
-    # specifications include the ones accepted by Watir::Browser.elements.
+    # specifications include the ones accepted by Watir::Driver.elements.
     #
     # Possible specifications are:
     # - Watir specifications, e.g. { :tag_name => 'a', ... }
@@ -271,9 +271,9 @@ module BrowserModule
     def find_lambda(options)
       # A context is starting position for the search
       # Example:
-      #  parent = ll.browser.find(:div => "some_parent")
-      #  ll.browser.find(:a => "some_link", :context => parent)
-      context = @browser
+      #  parent = ll.driver.find(:div => "some_parent")
+      #  ll.driver.find(:a => "some_link", :context => parent)
+      context = @driver
       has_context = false
       if options.has_key? :context
         context = options[:context]
@@ -302,7 +302,7 @@ module BrowserModule
       # a hash; if it's anything else, it's assumed to be a tag name, id or text
       # contents we'll find with XPath.
       options.each do |key, value|
-        # Find the one the browser responds to
+        # Find the one the driver responds to
         # Example: text_fields or buttons
         function_name = "#{key.to_s}s"
         if not context.respond_to? function_name
@@ -496,5 +496,5 @@ module BrowserModule
       end
     end
   end # module Find
-end # module BrowserModule
+end # module DriverModule
 end # module LapisLazuli

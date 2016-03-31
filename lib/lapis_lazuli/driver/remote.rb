@@ -7,7 +7,7 @@
 #
 
 module LapisLazuli
-module BrowserModule
+module DriverModule
   module Remote
     # Convert settings to a valid remote driver argument
     #
@@ -18,7 +18,7 @@ module BrowserModule
     #  - Hashes can have a String or a Symbol as key
     #
     # Example:
-    #  args = remote_browser_config(
+    #  args = remote_driver_config(
     #   {
     #     "url"=>"http://test.com",
     #     "user"=>"user21",
@@ -36,12 +36,12 @@ module BrowserModule
     #     }
     #   })
     #  Watir::Browser.new :remote, args
-    def remote_browser_config(settings)
+    def remote_driver_config(settings)
       require "uri"
       require "selenium-webdriver"
 
       if !settings.is_a? Hash
-        world.error("Missing Remote Browser Settings")
+        world.error("Missing remote driver settings")
       end
 
       # Fetch the URl
@@ -100,7 +100,7 @@ module BrowserModule
         end
       end
 
-      world.log.debug("Using remote browser: #{url} (#{uri.user}) #{caps.to_json}")
+      world.log.debug("Using remote driver: #{url} (#{uri.user}) #{caps.to_json}")
 
       return {
         :url => uri.to_s,
@@ -136,5 +136,5 @@ module BrowserModule
       end
 
   end # module Remote
-end # module BrowserModule
+end # module DriverModule
 end # module LapisLazuli

@@ -84,9 +84,9 @@ module WorldModule
         end
       end
 
-      # Include URL if we have a browser
-      if self.has_browser?
-        message += " [ #{self.browser.url} ]"
+      # Include URL if we have a driver
+      if self.has_driver?
+        message += " [ #{self.driver.url} ]"
       end
 
       # Add the groups to the message
@@ -101,7 +101,7 @@ module WorldModule
 
       # Take screenshot, if necessary
       if screenshot
-        self.browser.take_screenshot(message)
+        self.driver.take_screenshot(message)
       end
 
       # Start debugger, if necessary
