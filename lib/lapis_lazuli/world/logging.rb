@@ -2,7 +2,7 @@
 # LapisLazuli
 # https://github.com/spriteCloud/lapis-lazuli
 #
-# Copyright (c) 2013-2014 spriteCloud B.V. and other LapisLazuli contributors.
+# Copyright (c) 2013-2016 spriteCloud B.V. and other LapisLazuli contributors.
 # All rights reserved.
 #
 
@@ -42,7 +42,7 @@ module WorldModule
         if has_env_or_config?("log_file")
           log_file = env_or_config("log_file")
         end
-        l = TeeLogger::TeeLogger.new(STDOUT, log_file)
+        l = TeeLogger::TeeLogger.new(log_file)
         l.level = env_or_config("log_level")
 
         l

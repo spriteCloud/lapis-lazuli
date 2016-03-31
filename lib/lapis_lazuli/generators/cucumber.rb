@@ -2,7 +2,7 @@
 # LapisLazuli
 # https://github.com/spriteCloud/lapis-lazuli
 #
-# Copyright (c) 2013-2014 spriteCloud B.V. and other LapisLazuli contributors.
+# Copyright (c) 2013-2016 spriteCloud B.V. and other LapisLazuli contributors.
 # All rights reserved.
 #
 
@@ -18,7 +18,7 @@ module LapisLazuli
       'features',
       File.join('features', 'step_definitions'),
       File.join('features', 'support'),
-      'log',
+      'logs',
       'results',
       'screenshots',
     ]

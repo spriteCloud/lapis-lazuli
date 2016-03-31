@@ -2,7 +2,7 @@
 # LapisLazuli
 # https://github.com/spriteCloud/lapis-lazuli
 #
-# Copyright (c) 2013-2014 spriteCloud B.V. and other LapisLazuli contributors.
+# Copyright (c) 2013-2016 spriteCloud B.V. and other LapisLazuli contributors.
 # All rights reserved.
 #
 
@@ -49,11 +49,6 @@ module WorldModule
       end
 
       load_config(Config.config_file)
-
-      if @config.nil?
-        warn "Could not load configuration from: #{Config.config_file}"
-        @config = {}
-      end
 
       @metadata = Runtime.instance.set_if(self, :metadata) do
         log.debug "Creating metadata storage"
@@ -150,6 +145,12 @@ module WorldModule
       rescue RuntimeError => err
         # Can't help you
         raise "Error loading file: #{filename} #{err}"
+      end
+
+      # Fix up empty files
+      if @config.nil? or @config == false
+        warn "Could not load configuration from '#{Config.config_file}'; it might be empty or malformed."
+        @config = {}
       end
 
       # If we have an environment this config should have it
