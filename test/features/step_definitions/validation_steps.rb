@@ -24,10 +24,10 @@ Then(/(first|last|random|[0-9]+[a-z]+) (.*) should (not )?be the (first|last|[0-
 	# Pick the correct one
 	options[:pick] = pick
 	# Execute the find
-	type_element = browser.find(options)
+	type_element = driver.find(options)
 
 	# All elements on the page
-	body_elements = browser.body.elements
+	body_elements = driver.body.elements
 	# Find the element we need
 	page_element = nil
 	if location_on_page == "first"
@@ -68,12 +68,12 @@ Then(/(first|last|random|[0-9]+[a-z]+) (.*) should (not )?be present$/) do |inde
 	# Pick the correct one
 	options[:pick] = pick
 	# Execute the find
-	type_element = browser.find(options)
+	type_element = driver.find(options)
 	# Find all
-	all_elements = browser.find_all(options)
+	all_elements = driver.find_all(options)
 
   options[:filter_by] = :present?
-	all_present = browser.find_all(options)
+	all_present = driver.find_all(options)
 
 	if hidden and type_element.present?
 		error("Hidden element is visible")
@@ -95,7 +95,7 @@ Then(/^within (\d+) seconds I should see "([^"]+?)"( disappear)?$/) do |timeout,
 		condition = :until
 	end
 
-	browser.wait(
+	driver.wait(
 		:timeout => timeout,
 		:text => text,
 		:condition => condition,
@@ -110,7 +110,7 @@ Then(/^within (\d+) seconds I should see "([^"]+?)" and "([^"]+?)"( disappear)?$
 		condition = :until
 	end
 
-	browser.multi_wait_all(
+	driver.multi_wait_all(
 		:timeout => timeout,
 		:condition => condition,
 		:mode => :match_all,
@@ -123,7 +123,7 @@ Then(/^within (\d+) seconds I should see "([^"]+?)" and "([^"]+?)"( disappear)?$
 end
 
 Then(/^within (\d+) seconds I should see added elements with matching$/) do |timeout|
-	elems = browser.multi_wait_all(
+	elems = driver.multi_wait_all(
 		:timeout => timeout,
 		:condition => :until,
 		:mode => :match_all,
@@ -137,7 +137,7 @@ Then(/^within (\d+) seconds I should see added elements with matching$/) do |tim
 end
 
 Then(/^within 10 seconds I should see either added element/) do
-	browser.multi_wait_all(
+	driver.multi_wait_all(
 			{ :tag_name => 'a', :class => /foo/ },
 			{ :tag_name => 'div', :id => 'bar' }
 	)
@@ -151,7 +151,7 @@ Then(/^within (\d+) seconds I get an error waiting for "(.*?)"( to disappear)?$/
 	end
 
 	begin
-		browser.wait(
+		driver.wait(
 			:timeout => timeout,
 			:text => text,
 			:condition => condition,
@@ -172,7 +172,7 @@ Then(/^within (\d+) seconds I should not see nonexistent elements$/) do |timeout
 
   ex = nil
   begin
-    browser.wait_all(:timeout => timeout, :id => "does_not_exist")
+    driver.wait_all(:timeout => timeout, :id => "does_not_exist")
   rescue StandardError => e
     ex = e
   end
@@ -183,7 +183,7 @@ end
 
 Then(/^a screenshot should have been created$/) do
 	# Check if there is a screenshot with the correct name
-	name = browser.screenshot_name
+	name = driver.screenshot_name
 	if Dir[name].empty?
 		error(
 			:message => "Didn't find a screenshot for this scenario: #{name}",
@@ -193,9 +193,9 @@ Then(/^a screenshot should have been created$/) do
 end
 
 Then(/^I expect javascript errors$/) do
-	errors = browser.get_js_errors
+	errors = driver.get_js_errors
 	if !errors.nil? and errors.length > 0
-		scenario.check_browser_errors = false
+		scenario.check_driver_errors = false
 	else
 		error(
 			:message => "No Javascript errors detected",
@@ -206,11 +206,11 @@ end
 
 Then(/^I expect a (\d+) status code$/) do |expected|
 	expected = expected.to_i
-	if browser.get_http_status == expected && expected > 299
-		scenario.check_browser_errors = false
-	elsif browser.get_http_status != expected
+	if driver.get_http_status == expected && expected > 299
+		scenario.check_driver_errors = false
+	elsif driver.get_http_status != expected
 		error(
-			:message => "Incorrect status code: #{browser.get_http_status}",
+			:message => "Incorrect status code: #{driver.get_http_status}",
 			:groups => ["error"]
 		)
 	end
@@ -218,10 +218,10 @@ end
 
 Then(/^I expect (no|\d+) HTML errors?$/) do |expected|
 	expected = expected.to_i
-	scenario.check_browser_errors = false
-	if browser.get_html_errors.length != expected
+	scenario.check_driver_errors = false
+	if driver.get_html_errors.length != expected
 		error(
-			:message => "Expected #{expected} errors: #{browser.get_html_errors}",
+			:message => "Expected #{expected} errors: #{driver.get_html_errors}",
 			:groups => ["error"]
 		)
 	end
@@ -230,12 +230,12 @@ end
 Then(/^the firefox browser named "(.*?)" has a profile$/) do |name|
 	if scenario.storage.has? name
 		browser = scenario.storage.get name
-		if browser.browser_name == "remote"
-			if browser.driver.capabilities.firefox_profile.nil?
+		if driver.browser_name == "remote"
+			if driver.driver.capabilities.firefox_profile.nil?
 				raise "Remote Firefox Profile is not set"
 			end
 		else
-			if browser.optional_data.has_key? "profile" or browser.optional_data.has_key? :profile
+			if driver.optional_data.has_key? "profile" or driver.optional_data.has_key? :profile
 				raise "No profile found in the optional data"
 			end
 		end
@@ -245,11 +245,11 @@ Then(/^the firefox browser named "(.*?)" has a profile$/) do |name|
 end
 
 Then(/^I expect the "(.*?)" to exist$/) do |name|
-	browser.find(name)
+	driver.find(name)
 end
 
 Then(/^I expect an? (.*?) element to exist$/) do |element|
-	browser.find(element.to_sym)
+	driver.find(element.to_sym)
 end
 
 Then(/^I expect to find an? (.*?) element with (.*?) "(.*?)" using (.*?) settings$/) do |element, attribute, text, setting_choice|
@@ -265,15 +265,15 @@ Then(/^I expect to find an? (.*?) element with (.*?) "(.*?)" using (.*?) setting
 	}
 	setting = settings[setting_choice]
 	# Find always throws an error if not found
-	elem_find = browser.find(setting)
-	elem_findall = browser.find_all(setting).first
+	elem_find = driver.find(setting)
+	elem_findall = driver.find_all(setting).first
 	if elem_find != elem_findall
 		error "Incorrect results"
 	end
 end
 
 Then(/^I expect to find an? (.*?) element or an? (.*?) element$/) do |element1, element2|
-	element = browser.multi_find(element1.to_sym, element2.to_sym)
+	element = driver.multi_find(element1.to_sym, element2.to_sym)
 end
 
 Then(/^I should (not )?find "(.*?)" ([0-9]+ times )?using "(.*?)" as context$/) do |result, id, number, name|
@@ -285,7 +285,7 @@ Then(/^I should (not )?find "(.*?)" ([0-9]+ times )?using "(.*?)" as context$/) 
 		settings = {:element => id, :context => context}
 		settings[:filter_by] = :present?
 		settings[:throw] = false
-		elements = browser.find_all(settings)
+		elements = driver.find_all(settings)
 		if not number.nil? and elements.length != number.to_i
 			error("Incorrect number of elements: #{elements.length}")
 		end
@@ -322,7 +322,7 @@ Then(/^I expect the (world|browser) module's functions to be available$/) do |ty
   # We're essentially testing that NoMethodError is not being raised here.
   case type
   when "browser"
-    browser.test_func
+    driver.test_func
   when "world"
     test_func
   else
@@ -335,7 +335,7 @@ Then(/^I expect not to find "(.*?)"(.*?)$/) do |id, extra|
   if throw_opt
     ex = nil
     begin
-      element = browser.find(:id => id, :throw => throw_opt)
+      element = driver.find(:id => id, :throw => throw_opt)
     rescue RuntimeError => e
       ex = e
     end
@@ -346,7 +346,7 @@ Then(/^I expect not to find "(.*?)"(.*?)$/) do |id, extra|
 end
 
 Then(/^I expect to use tagname to hash options to (.*?) find element (.*?)$/) do |mode, elem_id|
-  element = browser.find(:div => {:id => elem_id}, :throw => false)
+  element = driver.find(:div => {:id => elem_id}, :throw => false)
   if mode.length > 0 # "not "
     assert element.nil?, "Could find element with a tagname => hash selector"
   else
