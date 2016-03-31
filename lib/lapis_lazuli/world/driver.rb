@@ -53,27 +53,27 @@ module WorldModule
         LapisLazuli::Driver.set_world(self)
 
         # Create & return a new driver object
-        brow = LapisLazuli::Driver.new(*args)
+        drv = LapisLazuli::Driver.new(*args)
 
         metadata = Runtime.instance.get(:metadata)
         if metadata
           metadata.set(
             "driver",
             {
-              "name" => brow.driver.capabilities[:driver_name],
-              "version" => brow.driver.capabilities[:version],
-              "platform" => brow.driver.capabilities[:platform],
+              "name" => drv.driver.capabilities[:driver_name],
+              "version" => drv.driver.capabilities[:version],
+              "platform" => drv.driver.capabilities[:platform],
             }
           )
         end
 
-        sessionid = brow.driver.capabilities["webdriver.remote.sessionid"]
+        sessionid = drv.driver.capabilities["webdriver.remote.sessionid"]
 
         if !sessionid.nil?
           metadata.set("sessionid", sessionid)
         end
 
-        brow
+        drv
       end
 
       if not b.is_open?
