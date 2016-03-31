@@ -9,14 +9,14 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Onno Steenbergen", "Gijs Paulides", "Mark Barzilay", "Jens Finkhaeuser"]
   spec.email         = ["foss@spritecloud.com"]
   spec.description   = %q{
-    LapisLazuli provides cucumber helper functions and scaffolding for easier (web)
-    test automation suite development.
+    LapisLazuli provides cucumber helper functions and scaffolding for easier test
+    automation suite development.
 
     A lot of functionality is aimed at dealing better with [Watir](http://watir.com/),
-    such as:
+    or [appium](https://github.com/appium/appium), such as:
 
-    - Easier/more reliable find and wait functionality for detecting web page elements.
-    - Easier browser handling
+    - Easier/more reliable find and wait functionality for detecting UI elements.
+    - Easier browser/device handling
     - Better error handling
     - etc.
   }
