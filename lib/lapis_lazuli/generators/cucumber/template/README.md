@@ -16,10 +16,9 @@ Author: "<%= config[:user] %>" <<%= config[:email] %>>
 
     $ bundle install
 
-- Run cucumber or regressinator through bundler:
+- Run cucumber through bundler:
 
     $ bundle exec cucumber
-    $ bundle exec regressinator legacy cucumber
 
 # Contributing
 
