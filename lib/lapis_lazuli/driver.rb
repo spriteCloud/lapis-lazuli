@@ -14,7 +14,6 @@ require 'lapis_lazuli/driver/find'
 require "lapis_lazuli/driver/wait"
 require "lapis_lazuli/driver/screenshots"
 require "lapis_lazuli/driver/interaction"
-require "lapis_lazuli/driver/remote"
 require 'lapis_lazuli/generic/xpath'
 require 'lapis_lazuli/generic/assertions'
 
@@ -34,12 +33,19 @@ module LapisLazuli
     include LapisLazuli::DriverModule::Wait
     include LapisLazuli::DriverModule::Screenshots
     include LapisLazuli::DriverModule::Interaction
-    include LapisLazuli::DriverModule::Remote
     include LapisLazuli::GenericModule::XPath
+
+    # Methods that drivers must implement
+    DRIVER_METHODS = [
+      :match,
+      :precondition_check,
+      :create
+    ].freeze
 
     @@world=nil
     @@cached_driver_options={}
     @@drivers=[]
+    @@driver_implementations = []
     class << self
       include LapisLazuli::GenericModule::Assertions
 
@@ -263,93 +269,52 @@ module LapisLazuli
       # Create a new driver depending on settings
       # Always cached the supplied arguments
       def create_driver(driver_wanted=nil, optional_data=nil)
-        # Run-time dependency.
-        begin
-          require 'selenium-webdriver'
-          require 'watir-webdriver'
-          require "watir-webdriver/extensions/alerts"
-        rescue LoadError => err
-          raise LoadError, "#{err}: you need to add 'watir-webdriver', 'watir-webdriver-performance' and 'watir-scroll' to your Gemfile before using the driver."
-        end
-
         # No driver? Does the config have a driver? Default to firefox
         if driver_wanted.nil?
           driver_wanted = world.env_or_config('driver', 'firefox')
         end
 
-        # Select the correct driver
-        case driver_wanted.to_s.downcase
-          when 'chrome'
-            # Check Platform running script
-            b = :chrome
-          when 'safari'
-            b = :safari
-          when 'ie'
-            require 'rbconfig'
-            if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
-              b = :ie
-            else
-              world.error("You can't run IE tests on non-Windows machine")
+        # TODO add load path for external drivers, or let them be specified via
+        #      the driver environment/config variables.
+        Dir.glob(File.join(File.dirname(__FILE__), 'drivers', '*.rb')).each do |fpath|
+          # Determine class name from file name
+          fname = File.basename(fpath, '.rb')
+          fname = fname.split('_').map { |word| word.capitalize }.join
+
+          begin
+            require fpath
+            klassname = 'LapisLazuli::Drivers::' + fname
+            klass = Object.const_get(klassname)
+            klass_methods = klass.methods - klass.instance_methods - Object.methods
+            assert DRIVER_METHODS - klass_methods == [],
+              "Driver #{klassname} is not implementing all of #{DRIVER_METHODS}, aborting!"
+
+            if not @@driver_implementations.include? klass
+              @@driver_implementations << klass
             end
-          when 'ios'
-            if RUBY_PLATFORM.downcase.include?("darwin")
-              b = :iphone
-            else
-              world.error("You can't run IOS tests on non-mac machine")
-            end
-          when 'remote'
-            b = :remote
-          else
-            b = :firefox
-        end
-
-        args = [b]
-        @driver_name = b.to_s
-        if b == :remote
-          # Get the config
-          remote_config = world.env_or_config("remote", {})
-
-          # The settings we are going to use to create the driver
-          remote_settings = {}
-
-          # Add the config to the settings using downcase string keys
-          remote_config.each{|k,v| remote_settings[k.to_s.downcase] = v}
-
-          if optional_data.is_a? Hash
-            # Convert the optional data to downcase string keys
-            string_hash = Hash.new
-            optional_data.each{|k,v| string_hash[k.to_s.downcase] = v}
-
-            # Merge them with the settings
-            remote_settings.merge! string_hash
-          end
-
-          args.push(remote_driver_config(remote_settings))
-        elsif not optional_data.nil? and not optional_data.empty?
-          world.log.debug("Got optional data: #{optional_data}")
-          args.push(optional_data)
-        elsif world.has_proxy?
-          # Create a session if needed
-          if !world.proxy.has_session?
-            world.proxy.create()
-          end
-
-          proxy_url = "#{world.proxy.ip}:#{world.proxy.port}"
-          if b == :firefox
-            world.log.debug("Configuring Firefox proxy: #{proxy_url}")
-            profile = Selenium::WebDriver::Firefox::Profile.new
-            profile.proxy = Selenium::WebDriver::Proxy.new :http => proxy_url, :ssl => proxy_url
-            args.push({:profile => profile})
+          rescue LoadError => err
+            world.error(:exception => err, :message => "Error loading '#{fpath}', aborting driver creation!")
+          rescue NameError => err
+            world.error(:exception => err, :message => "Could not find class '#{klassname}', aborting driver creation!")
           end
         end
 
-        begin
-          driver_instance = Watir::Browser.new(*args)
-        rescue Selenium::WebDriver::Error::UnknownError => err
-          raise err
+        # Search available driver implementations
+        dimpl = nil
+        @@driver_implementations.each do |impl|
+          if impl.match driver_wanted
+            dimpl = impl
+            break
+          end
         end
-        return driver_instance
+
+        # Check preconditions for the driver
+        dimpl.precondition_check(driver_wanted, optional_data)
+
+        # Create and return driver instance
+        @driver_name, @driver = dimpl.create(world, driver_wanted, optional_data)
+
+        return @driver
       end
-  end
-
-end
+  end # class Driver
+end # module LapisLazuli

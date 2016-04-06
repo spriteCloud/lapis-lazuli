@@ -42,10 +42,8 @@ end
 Given(/^I create a firefox browser named "(.*?)"( with proxy to "(.*?)")$/) do |name, proxy, proxy_url|
   b = nil
   if proxy
-    log.debug("Starting with profile")
-    profile = Selenium::WebDriver::Firefox::Profile.new
-    profile.proxy = Selenium::WebDriver::Proxy.new :http => proxy_url
-    b = driver.create :firefox, :profile => profile
+    log.debug("Starting with proxy")
+    b = driver.create :firefox, :proxy_url => proxy_url
   else
     b = driver.create :firefox
   end
