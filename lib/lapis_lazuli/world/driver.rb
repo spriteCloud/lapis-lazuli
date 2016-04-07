@@ -55,20 +55,25 @@ module WorldModule
         # Create & return a new driver object
         drv = LapisLazuli::Driver.new(*args)
 
-        metadata = Runtime.instance.get(:metadata)
-        if metadata
-          metadata.set(
-            "driver",
-            {
-              "name" => drv.driver.capabilities[:driver_name],
-              "version" => drv.driver.capabilities[:version],
-              "platform" => drv.driver.capabilities[:platform],
-            }
-          )
+        # Determine driver capabilities
+        caps = {}
+        if drv.respond_to? :capabilites
+          # Selenium first; the driver should just respond to "capabilities"
+          caps = JSON.parse(drv.capabilities.to_json)
+        elsif drv.respond_to? :driver and drv.driver.respond_to? :capabilities
+          caps = JSON.parse(drv.driver.capabilities.to_json)
+        else
+          log.warning("Could not determine driver capabilities.")
         end
 
-        sessionid = drv.driver.capabilities["webdriver.remote.sessionid"]
+        # Store capabilites in metadata
+        metadata = Runtime.instance.get(:metadata)
+        if metadata
+          metadata.set("driver", { capabilities: caps })
+        end
 
+        # Remote session ID
+        sessionid = caps["webdriver.remote.sessionid"]
         if !sessionid.nil?
           metadata.set("sessionid", sessionid)
         end
