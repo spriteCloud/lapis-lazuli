@@ -17,4 +17,5 @@ Given(/^I search for "(.*?)"$/) do |query|
   searchbox = browser.find(:text_field => {:name => "q"})
   searchbox.clear rescue log.debug "Could not clear searchbox"
   searchbox.send_keys(query)
+  searchbox.send_keys(:enter)
 end
