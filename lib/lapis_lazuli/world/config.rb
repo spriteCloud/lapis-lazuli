@@ -260,7 +260,7 @@ module WorldModule
     ##
     # Get a environment variable from the config file
     # Alias for ll.config(ll.env + "." + variable)
-    def env(variable=false, default=nil)
+    def env(variable=false, default=(no_default_set=true;nil))
       # Make sure the configured configuration is loaded, if possible
       init
 
@@ -275,7 +275,14 @@ module WorldModule
         return env_var
       end
 
-      return self.config("#{@env}.#{variable}",default)
+      result = self.config("#{@env}.#{variable}",default)
+
+      if no_default_set == true and result.nil?
+        raise "Unknown environment variable '#{@env}.#{variable}' and no default given"
+      end
+
+      return result
+
     end
 
     ##
