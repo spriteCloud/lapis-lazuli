@@ -281,29 +281,29 @@ module LapisLazuli
         case browser_wanted.to_s.downcase
           when 'chrome'
             # Check Platform running script
-            b = [:chrome]
+            b = :chrome
           when 'safari'
-            b = [:safari]
+            b = :safari
           when 'ie'
             require 'rbconfig'
             if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
-              b = [:ie]
+              b = :ie
             else
               world.error("You can't run IE tests on non-Windows machine")
             end
           when 'ios'
             if RUBY_PLATFORM.downcase.include?("darwin")
-              b = [:iphone]
+              b = :iphone
             else
               world.error("You can't run IOS tests on non-mac machine")
             end
           when 'remote'
-            b = [:remote]
+            b = :remote
           else
-            b = [:firefox, marionette: true]
+            b = :firefox
         end
 
-        args = b
+        args = [b]
         @browser_name = b.to_s
         if b == :remote
           # Get the config
