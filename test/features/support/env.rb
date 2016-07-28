@@ -14,7 +14,7 @@ end
 LapisLazuli::WorldModule::Config.config_file = "config/config.yml"
 World(LapisLazuli, TestModule)
 
-LapisLazuli::WorldModule::Browser.browser_module(TestModule)
+LapisLazuli::WorldModule::Driver.driver_module(TestModule)
 
 
 # Transition function from old codebase to new

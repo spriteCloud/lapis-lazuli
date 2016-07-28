@@ -7,7 +7,7 @@
 #
 
 module LapisLazuli
-module BrowserModule
+module DriverModule
 
   ##
   # Module with error handling related functionality (World)
@@ -45,7 +45,7 @@ module BrowserModule
       if world.has_env_or_config?("error_strings")
         begin
           # Get the HTML of the page
-          page_text = @browser.html
+          page_text = @driver.html
           # Try to find all errors
           world.env_or_config("error_strings").each {|error|
             if page_text.include? error
@@ -55,7 +55,7 @@ module BrowserModule
           }
         rescue RuntimeError => err
           # An error?
-          world.log.debug "Cannot read the html for page #{@browser.url}: #{err}"
+          world.log.debug "Cannot read the html for page #{@driver.url}: #{err}"
         end
       end
       # By default we don't have errors
@@ -66,7 +66,7 @@ module BrowserModule
     ##
     # If the proxy is supported, use it to retrieve JS errors.
     def get_js_errors
-      return self.browser.execute_script <<-JS
+      return self.driver.execute_script <<-JS
         try {
           return lapis_lazuli.errors;
         } catch(err){
@@ -79,7 +79,7 @@ module BrowserModule
     ##
     # If the proxy is supported, use it get the HTTP status code.
     def get_http_status
-      return self.browser.execute_script <<-JS
+      return self.driver.execute_script <<-JS
         try{
           return lapis_lazuli.http.statusCode;
         } catch(err){
@@ -89,5 +89,5 @@ module BrowserModule
     end
 
   end # module Error
-end # module BrowserModule
+end # module DriverModule
 end # module LapisLazuli

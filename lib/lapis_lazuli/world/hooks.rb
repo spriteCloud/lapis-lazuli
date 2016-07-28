@@ -77,26 +77,26 @@ module WorldModule
       end
 
       # Did we fail?
-      if respond_to? :scenario and respond_to? :has_browser? and respond_to? :browser and respond_to? :config
-        if has_browser? and (cuke_scenario.failed? or (scenario.check_browser_errors and browser.has_error?))
+      if respond_to? :scenario and respond_to? :has_driver? and respond_to? :driver and respond_to? :config
+        if has_driver? and (cuke_scenario.failed? or (scenario.check_driver_errors and driver.has_error?))
           # Take a screenshot if needed
           if has_env_or_config?('screenshot_on_failure')
             if env_or_config("screenshot_scheme") == "new"
-              # Take screenshots on all active browsers
-              LapisLazuli::Browser.browsers.each do |b|
+              # Take screenshots on all active drivers
+              LapisLazuli::Driver.drivers.each do |b|
                 fileloc = b.take_screenshot()
               end
             else
-              browser.take_screenshot()
+              driver.take_screenshot()
             end
           end
         end
       end
 
-      # Close browser if needed
-      if respond_to? :has_browser? and respond_to? :browser
-        if has_browser?
-          browser.close_after_scenario(cuke_scenario)
+      # Close driver if needed
+      if respond_to? :has_driver? and respond_to? :driver
+        if has_driver?
+          driver.close_after_scenario(cuke_scenario)
         end
       end
     end

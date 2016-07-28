@@ -10,10 +10,10 @@ require 'lapis_lazuli/assertions'
 require 'lapis_lazuli/argparse'
 
 module LapisLazuli
-module BrowserModule
+module DriverModule
 
   ##
-  # Wait functionality for Browser
+  # Wait functionality for Driver
   module Wait
     include LapisLazuli::ArgParse
 
@@ -154,5 +154,5 @@ module BrowserModule
       return options
     end
   end # module Wait
-end # module BrowserModule
+end # module DriverModule
 end # module LapisLazuli

@@ -36,7 +36,7 @@ require "lapis_lazuli/world/variable"
 require "lapis_lazuli/world/error"
 require "lapis_lazuli/world/annotate"
 require "lapis_lazuli/world/logging"
-require "lapis_lazuli/world/browser"
+require "lapis_lazuli/world/driver"
 require "lapis_lazuli/world/api"
 require "lapis_lazuli/generic/xpath"
 require "lapis_lazuli/generic/assertions"
@@ -51,7 +51,7 @@ module LapisLazuli
   include LapisLazuli::WorldModule::Error
   include LapisLazuli::WorldModule::Annotate
   include LapisLazuli::WorldModule::Logging
-  include LapisLazuli::WorldModule::Browser
+  include LapisLazuli::WorldModule::Driver
   include LapisLazuli::WorldModule::API
   include LapisLazuli::GenericModule::XPath
   include LapisLazuli::GenericModule::Assertions
