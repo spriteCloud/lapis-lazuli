@@ -43,13 +43,18 @@ module WorldModule
       if not @config.nil?
         return
       end
-
+      
       if Config.config_file.nil?
         raise "No configuration file provided, set LapisLazuli::WorldModule::Config.config_file"
       end
 
       load_config(Config.config_file)
-
+      # In case there was no config file found an empty @config needs to be set to prevent infinite looping.
+      if @config.nil?
+        warn 'Unable to find a configuration file, defaulting to empty config.yml.'
+        @config = {}
+      end
+      
       @metadata = Runtime.instance.set_if(self, :metadata) do
         log.debug "Creating metadata storage"
         Storage.new("metadata")
