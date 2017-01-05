@@ -266,10 +266,9 @@ module LapisLazuli
         # Run-time dependency.
         begin
           require 'selenium-webdriver'
-          require 'watir-webdriver'
-          require "watir-webdriver/extensions/alerts"
+          require 'watir'
         rescue LoadError => err
-          raise LoadError, "#{err}: you need to add 'watir-webdriver', 'watir-webdriver-performance' and 'watir-scroll' to your Gemfile before using the browser."
+          raise LoadError, "#{err}: you need to add 'watir' to your Gemfile before using the browser."
         end
 
         # No browser? Does the config have a browser? Default to firefox
