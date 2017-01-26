@@ -101,7 +101,7 @@ module BrowserModule
       # Call the appropriate condition function.
       err = nil
       begin
-        res = Watir::Wait.send(condition, timeout, &find_proc)
+        res = Watir::Wait.send(condition, timeout: timeout, &find_proc)
       rescue Watir::Wait::TimeoutError => e
         world.log.debug("Caught timeout: #{e}")
         err = e
