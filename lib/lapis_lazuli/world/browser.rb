@@ -61,8 +61,8 @@ module WorldModule
             "browser",
             {
               "name" => brow.driver.capabilities[:browser_name],
-              "version" => brow.driver.capabilities[:version],
-              "platform" => brow.driver.capabilities[:platform],
+              "version" => brow.driver.capabilities[:browser_version] || brow.driver.capabilities[:version],
+              "platform" => brow.driver.capabilities[:platform_name] || brow.driver.capabilities[:platform],
             }
           )
         end
