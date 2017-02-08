@@ -123,6 +123,8 @@ module LapisLazuli
         @browser = init(*args)
         # Add this browser to the list of all browsers
         LapisLazuli::Browser.add_browser(self)
+
+        at_exit { LapisLazuli::Browser::close_all 'exit event trigger' }
       end
     end
 
@@ -168,20 +170,19 @@ module LapisLazuli
     def close_after_scenario(scenario)
       # Determine the config
       close_browser_after = world.env_or_config("close_browser_after")
-
       case close_browser_after
-      when "scenario"
-        # We always close it
-        LapisLazuli::Browser.close_all close_browser_after
-      when "never"
-        # Do nothing: party time, excellent!
-      when "end"
-        # Also ignored here - this is handled  in World.browser_destroy
-      else
-        if is_last_scenario?(scenario)
-          # Close it
+        when "scenario"
+          # We always close it
           LapisLazuli::Browser.close_all close_browser_after
-        end
+        when "never"
+          # Do nothing: party time, excellent!
+        when "feature"
+          if is_last_scenario?(scenario)
+            # Close it
+            LapisLazuli::Browser.close_all close_browser_after
+          end
+        else # close after 'end' is now default
+          # Also ignored here - this is handled  in World.browser_destroy
       end
     end
 
@@ -230,125 +231,125 @@ module LapisLazuli
     end
 
     private
-      ##
-      # The main browser window for testing
-      def init(browser_wanted=(no_browser_wanted=true;nil), optional_data=(no_optional_data=true;nil))
-        # Store the optional data so on restart of the browser it still has the
-        # correct configuration
-        if no_optional_data and optional_data.nil? and @@cached_browser_options.has_key?(:optional_data) and (browser_wanted.nil? or browser_wanted == @@cached_browser_options[:browser])
-          optional_data = @@cached_browser_options[:optional_data]
-        elsif optional_data.nil?
-          optional_data = {}
-        end
-
-        # Do the same caching stuff for the browser
-        if no_browser_wanted and browser_wanted.nil? and @@cached_browser_options.has_key?(:browser)
-          browser_wanted = @@cached_browser_options[:browser]
-        end
-
-
-        if !@@cached_browser_options.has_key? :browser
-          @@cached_browser_options[:browser] = browser_wanted
-          # Duplicate the data as Webdriver modifies it
-          @@cached_browser_options[:optional_data] = optional_data.dup
-        end
-
-        @browser_wanted = browser_wanted
-        @optional_data = optional_data
-        # Create the browser
-        create_driver(@browser_wanted, @optional_data)
+    ##
+    # The main browser window for testing
+    def init(browser_wanted=(no_browser_wanted=true; nil), optional_data=(no_optional_data=true; nil))
+      # Store the optional data so on restart of the browser it still has the
+      # correct configuration
+      if no_optional_data and optional_data.nil? and @@cached_browser_options.has_key?(:optional_data) and (browser_wanted.nil? or browser_wanted == @@cached_browser_options[:browser])
+        optional_data = @@cached_browser_options[:optional_data]
+      elsif optional_data.nil?
+        optional_data = {}
       end
 
-      ##
-      # Create a new browser depending on settings
-      # Always cached the supplied arguments
-      def create_driver(browser_wanted=nil, optional_data=nil)
-        # Run-time dependency.
-        begin
-          require 'selenium-webdriver'
-          require 'watir'
-        rescue LoadError => err
-          raise LoadError, "#{err}: you need to add 'watir' to your Gemfile before using the browser."
-        end
+      # Do the same caching stuff for the browser
+      if no_browser_wanted and browser_wanted.nil? and @@cached_browser_options.has_key?(:browser)
+        browser_wanted = @@cached_browser_options[:browser]
+      end
 
-        # No browser? Does the config have a browser? Default to firefox
-        if browser_wanted.nil?
-          browser_wanted = world.env_or_config('browser', 'firefox')
-        end
 
-        # Select the correct browser
-        case browser_wanted.to_s.downcase
-          when 'chrome'
-            # Check Platform running script
-            b = :chrome
-          when 'safari'
-            b = :safari
-          when 'ie'
-            require 'rbconfig'
-            if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
-              b = :ie
-            else
-              world.error("You can't run IE tests on non-Windows machine")
-            end
-          when 'ios'
-            if RUBY_PLATFORM.downcase.include?("darwin")
-              b = :iphone
-            else
-              world.error("You can't run IOS tests on non-mac machine")
-            end
-          when 'remote'
-            b = :remote
+      if !@@cached_browser_options.has_key? :browser
+        @@cached_browser_options[:browser] = browser_wanted
+        # Duplicate the data as Webdriver modifies it
+        @@cached_browser_options[:optional_data] = optional_data.dup
+      end
+
+      @browser_wanted = browser_wanted
+      @optional_data = optional_data
+      # Create the browser
+      create_driver(@browser_wanted, @optional_data)
+    end
+
+    ##
+    # Create a new browser depending on settings
+    # Always cached the supplied arguments
+    def create_driver(browser_wanted=nil, optional_data=nil)
+      # Run-time dependency.
+      begin
+        require 'selenium-webdriver'
+        require 'watir'
+      rescue LoadError => err
+        raise LoadError, "#{err}: you need to add 'watir' to your Gemfile before using the browser."
+      end
+
+      # No browser? Does the config have a browser? Default to firefox
+      if browser_wanted.nil?
+        browser_wanted = world.env_or_config('browser', 'firefox')
+      end
+
+      # Select the correct browser
+      case browser_wanted.to_s.downcase
+        when 'chrome'
+          # Check Platform running script
+          b = :chrome
+        when 'safari'
+          b = :safari
+        when 'ie'
+          require 'rbconfig'
+          if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
+            b = :ie
           else
-            b = :firefox
-        end
-
-        args = [b]
-        @browser_name = b.to_s
-        if b == :remote
-          # Get the config
-          remote_config = world.env_or_config("remote", {})
-
-          # The settings we are going to use to create the browser
-          remote_settings = {}
-
-          # Add the config to the settings using downcase string keys
-          remote_config.each{|k,v| remote_settings[k.to_s.downcase] = v}
-
-          if optional_data.is_a? Hash
-            # Convert the optional data to downcase string keys
-            string_hash = Hash.new
-            optional_data.each{|k,v| string_hash[k.to_s.downcase] = v}
-
-            # Merge them with the settings
-            remote_settings.merge! string_hash
+            world.error("You can't run IE tests on non-Windows machine")
           end
-
-          args.push(remote_browser_config(remote_settings))
-        elsif not optional_data.nil? and not optional_data.empty?
-          world.log.debug("Got optional data: #{optional_data}")
-          args.push(optional_data)
-        elsif world.has_proxy?
-          # Create a session if needed
-          if !world.proxy.has_session?
-            world.proxy.create()
+        when 'ios'
+          if RUBY_PLATFORM.downcase.include?("darwin")
+            b = :iphone
+          else
+            world.error("You can't run IOS tests on non-mac machine")
           end
-
-          proxy_url = "#{world.proxy.ip}:#{world.proxy.port}"
-          if b == :firefox
-            world.log.debug("Configuring Firefox proxy: #{proxy_url}")
-            profile = Selenium::WebDriver::Firefox::Profile.new
-            profile.proxy = Selenium::WebDriver::Proxy.new :http => proxy_url, :ssl => proxy_url
-            args.push({:profile => profile})
-          end
-        end
-
-        begin
-          browser_instance = Watir::Browser.new(*args)
-        rescue Selenium::WebDriver::Error::UnknownError => err
-          raise err
-        end
-        return browser_instance
+        when 'remote'
+          b = :remote
+        else
+          b = :firefox
       end
+
+      args = [b]
+      @browser_name = b.to_s
+      if b == :remote
+        # Get the config
+        remote_config = world.env_or_config("remote", {})
+
+        # The settings we are going to use to create the browser
+        remote_settings = {}
+
+        # Add the config to the settings using downcase string keys
+        remote_config.each { |k, v| remote_settings[k.to_s.downcase] = v }
+
+        if optional_data.is_a? Hash
+          # Convert the optional data to downcase string keys
+          string_hash = Hash.new
+          optional_data.each { |k, v| string_hash[k.to_s.downcase] = v }
+
+          # Merge them with the settings
+          remote_settings.merge! string_hash
+        end
+
+        args.push(remote_browser_config(remote_settings))
+      elsif not optional_data.nil? and not optional_data.empty?
+        world.log.debug("Got optional data: #{optional_data}")
+        args.push(optional_data)
+      elsif world.has_proxy?
+        # Create a session if needed
+        if !world.proxy.has_session?
+          world.proxy.create()
+        end
+
+        proxy_url = "#{world.proxy.ip}:#{world.proxy.port}"
+        if b == :firefox
+          world.log.debug("Configuring Firefox proxy: #{proxy_url}")
+          profile = Selenium::WebDriver::Firefox::Profile.new
+          profile.proxy = Selenium::WebDriver::Proxy.new :http => proxy_url, :ssl => proxy_url
+          args.push({:profile => profile})
+        end
+      end
+
+      begin
+        browser_instance = Watir::Browser.new(*args)
+      rescue Selenium::WebDriver::Error::UnknownError => err
+        raise err
+      end
+      return browser_instance
+    end
   end
 
 end
