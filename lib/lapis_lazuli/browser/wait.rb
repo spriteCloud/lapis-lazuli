@@ -104,16 +104,18 @@ module BrowserModule
         res = Watir::Wait.send(condition, timeout: timeout, &find_proc)
       rescue Watir::Wait::TimeoutError => e
         world.log.debug("Caught timeout: #{e}")
-        err = e
+        begin
+          # Catch the default error and add the selectors to it.
+          raise "#{e.message} with selectors: #{options[:selectors]}"
+        rescue RuntimeError => err
+          options[:exception] = err
+          options[:message] = optional_message('Error in wait', options)
+          world.error(options)
+        end
       end
 
       # Filter out any nil results
       filter_results = results.select {|i| not i.nil?}
-      # Error handling
-      if not err.nil?
-        options[:exception] = err
-        world.error(options)
-      end
 
       # Set if the underlying find function returns single results
       if has_single
@@ -150,7 +152,6 @@ module BrowserModule
           sel[:filter_by] = :present?
         end
       end
-
       return options
     end
   end # module Wait
