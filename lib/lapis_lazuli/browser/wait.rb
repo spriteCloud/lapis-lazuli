@@ -59,11 +59,13 @@ module BrowserModule
       condition = options[:condition]
       options.delete(:condition)
 
+      # Removing context from the options to preven an error in Marshal.dump
+      context = options[:selectors][0][:context]
+      options[:selectors][0].delete(:context)
+
       # The easiest way to deal with find's new :throw policy is to set it to
       # false.
       options[:throw] = false
-
-      # pp "got options: #{options}"
 
       # The proc we're waiting for invokes the find_func
       results = []
@@ -74,7 +76,10 @@ module BrowserModule
         retries.times do
           begin
             opts = Marshal.load(Marshal.dump(options))
+            # Putting :context back in the selector if it was used
+            opts[:selectors][0][:context] = context unless context.nil?
             results = send(find_func.to_sym, opts)
+
             if results.respond_to? :length
               res = (results.length > 0)
             else
