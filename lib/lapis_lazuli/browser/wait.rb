@@ -63,8 +63,9 @@ module BrowserModule
       context = options[:selectors][0][:context]
       options[:selectors][0].delete(:context)
 
-      # The easiest way to deal with find's new :throw policy is to set it to
-      # false.
+      # The easiest way to deal with find's new :throw policy is to set it to false.
+      # We'll store the original value in a variable to catch it later.
+      throw = options[:throw]
       options[:throw] = false
 
       # The proc we're waiting for invokes the find_func
@@ -111,7 +112,10 @@ module BrowserModule
         world.log.debug("Caught timeout: #{e}")
         begin
           # Catch the default error and add the selectors to it.
-          raise "#{e.message} with selectors: #{options[:selectors]}"
+          unless throw === false
+            # Only raise an error if :throw is not false
+            raise "#{e.message} with selectors: #{options[:selectors]}"
+          end
         rescue RuntimeError => err
           options[:exception] = err
           options[:message] = optional_message('Error in wait', options)
@@ -139,6 +143,7 @@ module BrowserModule
         :stale_retries => 3,
         :condition => :until,
         :screenshot => false,
+        :throw => true
       }
       options = ERROR_OPTIONS.merge options
       options = parse_args(options, :selectors, *args)
