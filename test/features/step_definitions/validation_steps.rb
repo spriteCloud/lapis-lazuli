@@ -150,6 +150,7 @@ Then(/^within (\d+) seconds I get an error waiting for "(.*?)"( to disappear)?$/
     condition = :until
   end
 
+  error_thrown = false
   begin
     browser.wait(
       :timeout => timeout,
@@ -158,12 +159,16 @@ Then(/^within (\d+) seconds I get an error waiting for "(.*?)"( to disappear)?$/
       :screenshot => true,
       :groups => ["wait"]
     )
+  rescue RuntimeError => err
+    error_thrown = true
+  end
+  unless error_thrown
+    # Only show an error if there was no error thrown before.
     error(
       :message => "Didn't receive an error with this timeout",
       :screenshot => true,
       :groups => ["wait"]
     )
-  rescue Watir::Wait::TimeoutError => err
   end
 end
 
