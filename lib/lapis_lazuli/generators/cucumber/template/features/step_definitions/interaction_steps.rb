@@ -5,18 +5,21 @@
 
 # interactions_steps.rb is used to interact with elements on the page.
 
-Given(/^the user navigates to (.*?) in (.*?)$/) do |site, language|
-  # Combine the configuration depth with dots
-  config_name = "#{site.downcase}.#{language.downcase}"
+Given(/^the user navigates to (.*?)$/) do |page|
   # Get the value of the configuration (see /config/config.yml)
-  url         = env(config_name)
+
+  # First grab the root URL defined in the config
+  url = env('pages.root')
+  # Then add the page specific part to the URL
+  url += env("pages.#{page}")
+
   # Go to the URL
   browser.goto url
 end
 
 Given(/^the user searches for "(.*?)"$/) do |query|
   # Get the input element
-  searchbox = browser.find(:text_field => {:name => "q"})
+  searchbox = browser.find(:text_field => {:name => "s"})
   # Make sure the input field is empty
   searchbox.clear rescue log.debug "Could not clear searchbox"
   # Fill in the query
@@ -29,9 +32,78 @@ When(/^the user clicks on link "(.*?)"$/) do |url|
   # Search for the element that includes the expected text
   browser.wait(
     :like => {
-      :element   => :a,
+      :element => :a,
       :attribute => :href,
-      :include   => url
+      :include => url
     }
   ).click
+end
+
+When(/^the user clicks on the spritecloud logo$/) do
+  # Search for the logo
+  logo = browser.find(
+    :like => [:img, :id, 'logo'],
+    :message => 'Unable to find the logo on this page.'
+  )
+  # And click the logo
+  logo.click
+end
+
+
+When(/^"(.*?)" logs in$/) do |user_tag|
+  pending # Write code here that turns the phrase above into concrete actions
+
+  # Set the user data
+  set_user_data(user_tag)
+
+  # Fill in the user form
+  browser.find(
+    :like => [:input, :name, 'username']
+  ).set(get_user_data('username'))
+  browser.find(
+    :like => [:input, :name, 'password']
+  ).set(get_user_data('password'))
+
+  # Press the submit button
+  browser.find(
+    :like => [:input, :type, 'submit']
+  ).click
+end
+
+When(/^the user clicks on the logout button$/) do
+  pending # This step is an example and will fail
+
+  # First get the header to use as a context for the logout button
+  header = browser.wait(:like => [:div, :id, 'header'])
+
+  # Then click the logout button
+  browser.find(
+    :like => [:a, :href, '/logout'],
+    :context => header,
+    :message => 'Failed to find the logout button.'
+  )
+end
+
+When(/^(.*?) registers for a new account$/) do |user_tag|
+  pending # Write code here that turns the phrase above into concrete actions
+
+  # Set the user data
+  set_user_data(user_tag)
+
+  # Go to the registration page
+  step 'the user navigates to page "registration"'
+
+  # Fill in the form
+
+  # Get the form container and use it as a context to find the fields
+  from = browser.wait(:like => [:form, :id, 'register_form'])
+
+  # Fill in the details
+  browser.find(:element => {:name => 'firstname'}, :context => form).set get_user_data('firstname')
+  browser.find(:element => {:name => 'lastname'}, :context => form).set get_user_data('lastname')
+  browser.find(:element => {:name => 'username'}, :context => form).set get_user_data('username')
+  browser.find(:element => {:name => 'password'}, :context => form).set get_user_data('password')
+
+  # Press the submit button
+  browser.find(:input => {:type => 'submit'}).click
 end

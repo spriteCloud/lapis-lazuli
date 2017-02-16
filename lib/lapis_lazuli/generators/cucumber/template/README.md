@@ -6,8 +6,10 @@ Author: "<%= config[:user] %>" <<%= config[:email] %>>
 
 ## General
 
-- Make sure you have ruby 1.9 or later installed.
+- Make sure you have ruby 2.0 or later installed.
 - Make sure you have firefox and/or chrome installed
+- Download chromedriver and put it into your ./ruby/bin folder
+- Download geckodriver and put it into your ./ruby/bin folder
 - Install the bundler gem:
 
     $ gem install bundler
