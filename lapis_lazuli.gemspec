@@ -23,8 +23,10 @@ Gem::Specification.new do |spec|
   spec.summary       = %q{Cucumber helper functions and scaffolding for easier test automation suite development.}
   spec.homepage      = "https://github.com/spriteCloud/lapis-lazuli"
   spec.license       = "MITNFA"
+  spec.required_ruby_version = '~> 2'
+  spec.platform    = Gem::Platform::RUBY
 
-  spec.files         = `git ls-files -z`.split("\x0")
+#  spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
@@ -42,4 +44,14 @@ Gem::Specification.new do |spec|
   spec.add_dependency "multi_xml", "~> 0.6"
   spec.add_dependency "teelogger", "~> 0.5"
   spec.add_dependency "minitest", "~> 5.10"
+  spec.add_dependency "ffi"
+  spec.add_dependency "rspec"
+
+  # webdriver specifics
+  spec.add_dependency "selenium-webdriver", ">= 2"
+  spec.add_dependency "watir", "~> 6"
+  spec.add_dependency "cucumber", "~> 2"
+
+  # Debugging tool
+  spec.add_dependency "byebug"
 end
