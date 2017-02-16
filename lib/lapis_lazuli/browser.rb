@@ -123,7 +123,7 @@ module LapisLazuli
         @browser = init(*args)
         # Add this browser to the list of all browsers
         LapisLazuli::Browser.add_browser(self)
-
+        # Making sure all browsers are gracefully closed when the exit event is triggered.
         at_exit { LapisLazuli::Browser::close_all 'exit event trigger' }
       end
     end
