@@ -22,8 +22,23 @@
       div.innerHTML = "bar";
       div.id = "bar";
       document.body.appendChild(div);
+
+      var div2 = document.createElement('div');
+      div2.id = 'inner-div';
+      div2.innerHTML = 'This is a fake inner div';
+      document.body.appendChild(div2);
+    }
+
+    var addSecondContent = function(){
+      // Add extra content later
+      var div = document.createElement('div');
+      div.id = 'inner-div';
+      div.innerHTML = 'This is the inner div';
+      var content = document.getElementsByClassName('asdf-foo-bar')[0];
+      content.innerHTML = content.innerHTML + div.outerHTML;
     }
     setTimeout(addContent, 2500);
+    setTimeout(addSecondContent, 5000);
     </script>
   </head>
   <body>

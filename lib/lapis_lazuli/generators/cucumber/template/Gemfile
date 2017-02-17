@@ -1,12 +1,14 @@
 source 'http://rubygems.org'
 
-# Add following two lines to your ~/.gemrc or /etc/gemrc:
-# install: --no-rdoc --no-ri
-# update:  --no-rdoc --no-ri
+# Run your project as following
+# > bundle install
+# > bundle exec cucumber
 
-# Install all the webdriver gems and cucumber
-gem 'watir'
-gem 'cucumber'
+# Windows specific
+platforms :mswin, :mingw do
+  gem 'win32console'
+  gem 'term-ansicolor'
+end
 
 # LapisLazul itself
 gem 'lapis_lazuli', <%= config[:lapis_lazuli][:dependency] %>

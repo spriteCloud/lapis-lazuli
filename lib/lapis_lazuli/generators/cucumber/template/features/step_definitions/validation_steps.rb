@@ -21,3 +21,49 @@ Then(/text "([^"]*)" should display/) do |string|
   #       There's a shortcut for that in find/wait:
   browser.wait(:html => /#{string}/i)
 end
+
+Then(/^the user should be on page (.*?)$/) do |page|
+  # Wait a moment for the page to load
+  browser.wait(
+    :like => [:h1, :text, 'spriteCloud'],
+    :timeout => 10,
+    :throw => false
+  )
+
+  # Get the expected url
+  expected_url = env('pages.root')
+  expected_url += env("pages.#{page}")
+  # Get the current url
+  current_url = browser.url
+
+  # Check if they are the same
+  unless current_url == expected_url
+    error("The current URL and expected URL were not the same: \n Current: #{current_url}\n Expected: #{expected_url}")
+  end
+end
+
+
+Then(/^the page should display as logged (in|out) state$/) do |logged|
+  pending # Write code here that turns the phrase above into concrete actions
+
+  # Adjust variable for checking logged in or logged out state.
+  if logged == 'in'
+    condition = :until
+    message = 'Unable to find profile picture, the user wasnt logged in successfully'
+  elsif logged == 'out'
+    condition = :while
+    message = 'The profile picture is present, indicating that the user did not log out successfully'
+  end
+
+
+  # Try to find a way to confirm that a user is logged out.
+  # Easiest way is to a reversed check on an element that is only present when you're logged in
+  # For example, the profile picture
+  browser.wait(
+    :img => {:id => 'profile_picture'},
+    :condition => condition,
+    :timeout => 5,
+    :message => message
+  )
+  # Lapis lazuli will automatically create a screenshot if this step fails.
+end

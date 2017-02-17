@@ -11,7 +11,7 @@ Given(/^I navigate to the (.*) test page$/) do |page|
   config = "server.url"
   if has_env?(config)
     url = env(config)
-    browser.goto "#{url}#{page.downcase.gsub(" ","_")}.html"
+    browser.goto "#{url}#{page.downcase.gsub(" ", "_")}.html"
   else
     error(:env => config)
   end
@@ -19,10 +19,10 @@ end
 
 Given(/I click (the|a) (first|last|random|[0-9]+[a-z]+) (.*)$/) do |arg1, index, type|
   # Convert the type text to a symbol
-  type = type.downcase.gsub(" ","_")
+  type = type.downcase.gsub(" ", "_")
 
   pick = 0
-  if ["first","last","random"].include?(index)
+  if ["first", "last", "random"].include?(index)
     pick = index.to_sym
   else
     pick = index.to_i - 1
@@ -64,6 +64,28 @@ end
 When(/^I find "(.*?)" and name it "(.*?)"$/) do |id, name|
   element = browser.find(id)
   scenario.storage.set(name, element)
+end
+
+When(/^I wait for (class )?"(.*?)" and name it "(.*?)"$/) do |type, id, name|
+  type = 'id' if type.nil? || type.empty?
+  type.strip!
+  element = browser.wait(:element => {type.to_sym => id})
+  scenario.storage.set(name, element)
+end
+
+When(/^no error should be thrown when waiting for "(.*?)"$/) do |id|
+  begin
+    elm = browser.wait(
+      :element => {:id => id},
+      :timeout => 3,
+      :throw => false
+    )
+  rescue
+    raise 'An error was thrown using a wait funtion with :throw => false'
+  end
+  if not elm.nil?
+    raise 'No element was suppose to be found, but it did have a value after the wait action.'
+  end
 end
 
 xpath_fragment = nil

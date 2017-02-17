@@ -1,8 +1,8 @@
 @timing @p
 Feature: Timing
-  When I want to test the Lapis Lazuli library
-  I want to run a webserver with some test files
-  And execute the each library function that handles timing.
+When I want to test the Lapis Lazuli library
+I want to run a webserver with some test files
+And execute the each library function that handles timing.
 
   @timing_01
   Scenario: timing_01 - Wait Until
@@ -20,7 +20,7 @@ Feature: Timing
     Then within 2 seconds I get an error waiting for "content"
     And a screenshot should have been created
 
-  @timing_04 @timing_errors @issue_24
+  @timing_04
   Scenario: timing_04 - Wait While Error
     Given I navigate to the timing test page
     Then within 2 seconds I get an error waiting for "waiting" to disappear
@@ -45,3 +45,39 @@ Feature: Timing
   Scenario: timing_08 - Expect wait to throw
     Given I navigate to the timing test page
     Then within 3 seconds I should not see nonexistent elements
+
+  @timing_09
+  Scenario Outline: Wait with context
+    Given I navigate to the find test page
+    When I wait for "<context>" and name it "test_element"
+    Then I should wait for "<element>" using "test_element" as context
+    And I should not wait for "<error_element>" using "test_element" as context
+
+    Examples:
+      | context | element | error_element |
+      | deep3   | deep6   | deep1         |
+      | deep2   | deep7   | deep1         |
+      | deep6   | deep7   | header        |
+
+  @timing_10
+  Scenario Outline: WaitAllPresent with context
+    Given I navigate to the find test page
+    When I wait for "<context>" and name it "test_element"
+    Then I should wait for "<element>" <number> times using "test_element" as context
+    Examples:
+      | context | element        | number |
+      | deep3   | deep6          | 1      |
+      | deep3   | count          | 4      |
+      | deep3   | does_not_exist | 0      |
+
+  @timing_11
+  Scenario: timing_11 - Waiting for an element in another element you waited for
+    Given I navigate to the timing test page
+    When I wait for class "asdf-foo-bar" and name it "test_element"
+    And I should wait for "inner-div" using "test_element" as context
+    Then that element should not container text "fake"
+
+  @timing_12
+  Scenario: timing_12 - Not throwing an error when failing
+    Given I navigate to the timing test page
+    Then no error should be thrown when waiting for "not_exist"
