@@ -47,9 +47,11 @@ users:
     firstname: Gijs
     lastname: Testerman
     email: ta-test@mailinator.com
-    username: gijstest
-    password: Test#123
-  random-user: # In ./features/support/functions.rb '_rand-alpha_' is replaces for rancome alphanumeric characters.
-    firstname: _rand-alpha_Tester
-    email: ta-test_rand-alpha_@mailinator.com
-    username: tester_rand-alpha_
+    username: test
+    password: test
+  random-user: # In ./features/support/functions.rb '_RAND-ALPHA_' is replaces for random alphanumeric characters.
+    firstname: _RAND-ALPHA_Tester
+    lastname: Testerman
+    email: ta-test_RAND-ALPHA_@mailinator.com
+    username: tester_RAND_
+    password: test123

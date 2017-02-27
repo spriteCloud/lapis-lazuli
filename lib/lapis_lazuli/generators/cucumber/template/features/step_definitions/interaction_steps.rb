@@ -5,7 +5,7 @@
 
 # interactions_steps.rb is used to interact with elements on the page.
 
-Given(/^the user navigates to (.*?)$/) do |page|
+Given(/^the user navigates to "(.*?)"$/) do |page|
   # Get the value of the configuration (see /config/config.yml)
 
   # First grab the root URL defined in the config
@@ -96,7 +96,7 @@ When(/^(.*?) registers for a new account$/) do |user_tag|
   # Fill in the form
 
   # Get the form container and use it as a context to find the fields
-  from = browser.wait(:like => [:form, :id, 'register_form'])
+  form = browser.wait(:like => [:form, :id, 'register_form'])
 
   # Fill in the details
   browser.find(:element => {:name => 'firstname'}, :context => form).set get_user_data('firstname')

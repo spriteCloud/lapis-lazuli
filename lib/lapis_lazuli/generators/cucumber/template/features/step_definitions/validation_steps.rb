@@ -22,7 +22,7 @@ Then(/text "([^"]*)" should display/) do |string|
   browser.wait(:html => /#{string}/i)
 end
 
-Then(/^the user should be on page (.*?)$/) do |page|
+Then(/^the user should be on page "(.*?)"$/) do |page|
   # Wait a moment for the page to load
   browser.wait(
     :like => [:h1, :text, 'spriteCloud'],
