@@ -12,7 +12,7 @@ I want to run and adjust the tests below
 
   @example02
   Scenario: example02 - Going to a search result
-    Given the user has searched for "lapis lazuli" on blog
+    Given the user has searched for "lapis lazuli" on "blog"
     When the user clicks on link "/announcing-lapislazuli/"
     Then text "Let's talk about testing" should display
 

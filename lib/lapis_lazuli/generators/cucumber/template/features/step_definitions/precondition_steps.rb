@@ -6,9 +6,9 @@
 # precondition_steps.rb is used to define steps that contain multiple steps to come to a certain start of a scenrario.
 # For example: "Given the user is logged in" will contain all steps done before logging in
 
-Given(/^the user has searched for "(.*?)" on (.*?)$/) do |query, page|
+Given(/^the user has searched for "(.*?)" on "(.*?)"$/) do |query, page|
   # Run step to go to page
-  step "the user navigates to #{page}"
+  step "the user navigates to \"#{page}\""
   # Run step to search
   step "the user searches for \"#{query}\""
 
@@ -19,21 +19,28 @@ Given(/^the user is logged out$/) do
   # If the user is not logged in, then this step does nothing, else it will trigger the logout step.
 
   # Make this step independent by going to the homepage
-  step 'the user navigates to page "home"'
+  step 'the user navigates to the "training-page" page'
 
-  # Then try clicking the logout button
-  begin
-    step 'the user clicks on the logout button'
-  rescue Exception => e
-    # Ignoring the error, since it probably means we're already logged out.
-    log.debug "Logout failed, so I should already be logged out: #{e}"
+  # Check if the user is already logged in
+  loggedin = browser.find(
+    :like => [:img, :id, 'user-gravatar'],
+    :throw => false # This will prevent that the lookup will thow an error if it fails
+  )
+  if !loggedin.nil?
+    # Then try clicking the logout button
+    begin
+      step 'the user clicks on the logout button'
+    rescue Exception => e
+      # Ignoring the error, since it probably means we're already logged out.
+      log.debug "Logout failed, so I should already be logged out: #{e}"
+    end
   end
 
   # And confirm we've successfully logged out
   step 'the page should display as logged out state'
 end
 
-Given(/^"(.*?)" is logged in$/) do |user_tag|
+Given(/^(".*?"|the user) is logged in$/) do |user_tag|
   # First, make sure we're not logged into another account
   step 'the user is logged out'
   # Note: This could be more efficient, often you're already logged in with the correct user.
@@ -46,7 +53,7 @@ Given(/^"(.*?)" is logged in$/) do |user_tag|
   # if logged_in? skip the rest
 
   # Then follow the login steps
-  step "When \"#{user_tag}\" fills in the login form"
+  step "#{user_tag} logs in"
 
   # And confirm the login was successful
   step 'the page should display as logged in state'

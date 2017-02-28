@@ -7,7 +7,7 @@ Feature: User accounts
   # By defining a register, log-in and log-out state, we can easily re-use all these preconditions
   # All the scenario's aren't completed, but it should be easy to implement it into your own project.
 
-  @account01 @log_in
+  @account01 @log_in #@pause # You can add @pause to have a break between every step.
   Scenario: account01 - Logging in
     Given the user is logged out
     When "default-user" logs in

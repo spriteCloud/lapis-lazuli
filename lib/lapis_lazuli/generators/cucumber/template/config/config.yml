@@ -40,18 +40,20 @@ production:
     testing: /testing/
     blog: /blog/
     functional-testing: /testing/functional/
+  training-page: http://training-page.testautomation.info
+
 
 # Different user variables
 users:
   default-user: # These are the default variable settings. If no setting was specified, these values will be used.
-    firstname: Gijs
-    lastname: Testerman
-    email: ta-test@mailinator.com
     username: test
     password: test
+    gender: 'Male'
+    experience: 'Ruby,Cucumber,HTML,XPath'
+    biography: 'Hello, I am Gijs, I am a Test Engineer for spriteCloud and I like to be lazy and let machines do my work'
   random-user: # In ./features/support/functions.rb '_RAND-ALPHA_' is replaces for random alphanumeric characters.
-    firstname: _RAND-ALPHA_Tester
-    lastname: Testerman
-    email: ta-test_RAND-ALPHA_@mailinator.com
-    username: tester_RAND_
-    password: test123
+    username: usr_RAND-ALPHA_
+    password: test_RAND_
+    gender: 'Female'
+    experience: 'Ruby,Gherkin'
+    biography: 'Hello, I am a randomized user, today is _TIMESTAMP_ seconds after the existance of computers'
