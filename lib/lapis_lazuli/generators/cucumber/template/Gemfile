@@ -4,11 +4,5 @@ source 'http://rubygems.org'
 # > bundle install
 # > bundle exec cucumber
 
-# Windows specific
-platforms :mswin, :mingw do
-  gem 'win32console'
-  gem 'term-ansicolor'
-end
-
 # LapisLazul itself
 gem 'lapis_lazuli', <%= config[:lapis_lazuli][:dependency] %>

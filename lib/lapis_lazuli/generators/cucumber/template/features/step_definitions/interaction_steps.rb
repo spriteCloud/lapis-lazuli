@@ -5,13 +5,21 @@
 
 # interactions_steps.rb is used to interact with elements on the page.
 
-Given(/^the user navigates to (.*?)$/) do |page|
+Given(/^the user navigates to "(.*?)"$/) do |page|
   # Get the value of the configuration (see /config/config.yml)
 
   # First grab the root URL defined in the config
   url = env('pages.root')
   # Then add the page specific part to the URL
   url += env("pages.#{page}")
+
+  # Go to the URL
+  browser.goto url
+end
+
+Given(/^the user navigates to the "(.*?)" page$/) do |page|
+  # Get the value of the configuration (see /config/config.yml)
+  url = env("#{page}")
 
   # Go to the URL
   browser.goto url
@@ -49,61 +57,109 @@ When(/^the user clicks on the spritecloud logo$/) do
   logo.click
 end
 
-
-When(/^"(.*?)" logs in$/) do |user_tag|
-  pending # Write code here that turns the phrase above into concrete actions
-
-  # Set the user data
-  set_user_data(user_tag)
-
+# A step definition is a regex, to learn more about this go to http://rubular.com/
+# The following step definition accepts both:
+# - the user logs in > will use the last stored user data
+# - "user-x" logs in > will load user data from config.yml
+When(/^"?(.*?|the user)"? logs in$/) do |user_tag|
+  if user_tag != 'the user'
+    # Set the user data
+    set_user_data(user_tag)
+  end
   # Fill in the user form
   browser.find(
-    :like => [:input, :name, 'username']
+    :like => [:input, :id, 'login-username']
   ).set(get_user_data('username'))
   browser.find(
-    :like => [:input, :name, 'password']
+    :like => [:input, :id, 'login-password']
   ).set(get_user_data('password'))
 
   # Press the submit button
   browser.find(
-    :like => [:input, :type, 'submit']
+    :like => [:button, :id, 'button-login']
   ).click
 end
 
 When(/^the user clicks on the logout button$/) do
-  pending # This step is an example and will fail
+  # pending # This is an example
 
   # First get the header to use as a context for the logout button
-  header = browser.wait(:like => [:div, :id, 'header'])
+  header = browser.wait(:like => [:nav, :class, 'navbar-fixed-top'])
 
-  # Then click the logout button
+  # Then click the logout button (in this case, first a drop down needs to be clicked, before the logout button shows)
   browser.find(
-    :like => [:a, :href, '/logout'],
+    :like => [:a, :id, 'user_dropdown'],
     :context => header,
-    :message => 'Failed to find the logout button.'
+    :message => 'Unable to click on the user icon'
+  ).click
+  dropdown = browser.wait(
+    :like => [:ul, :class, 'dropdown-menu'],
+    :timeout => 5,
+    :message => 'The user dropdown didn`t become present.'
   )
+  browser.find(
+    :like => [:a, :id, 'link-logout'],
+    :context => dropdown,
+    :error => 'Failed to click the logout button.'
+  ).click
 end
 
-When(/^(.*?) registers for a new account$/) do |user_tag|
-  pending # Write code here that turns the phrase above into concrete actions
+When(/^"(.*?)" registers for a new account$/) do |user_tag|
+  # pending # Write code here that turns the phrase above into concrete actions
 
   # Set the user data
   set_user_data(user_tag)
 
   # Go to the registration page
-  step 'the user navigates to page "registration"'
+  step 'the user navigates to the "training-page" page'
+  browser.find(:like => [:button, :id, 'button-register']).click
 
   # Fill in the form
 
   # Get the form container and use it as a context to find the fields
-  from = browser.wait(:like => [:form, :id, 'register_form'])
+  form = browser.wait(:like => [:form, :id, 'form-register'])
 
   # Fill in the details
-  browser.find(:element => {:name => 'firstname'}, :context => form).set get_user_data('firstname')
-  browser.find(:element => {:name => 'lastname'}, :context => form).set get_user_data('lastname')
   browser.find(:element => {:name => 'username'}, :context => form).set get_user_data('username')
   browser.find(:element => {:name => 'password'}, :context => form).set get_user_data('password')
 
+  # Select gender
+  browser.find(
+    :label => {:text => /#{get_user_data('gender')}/i},
+    :context => form,
+    :message => "Unable to find gender `#{get_user_data('gender')}`, are you sure it's an option to select??"
+  ).click
+
+  # Select experiences from the multi-select list
+  multi_selector = browser.find(:like => [:select, :id, "register-experience"], :context => form)
+  experiences = get_user_data('experience')
+  # Experiences is a list of words comma separated, EG `Ruby,Cucumber,Watir`
+  # The following function will cut text at every comma, and loop trough every separate word
+  experiences.split(',').each do |exp|
+    option = browser.find(
+      :option => {:value => /#{exp}/i},
+      :context => multi_selector
+    )
+    option.click
+  end
+
+  # Fill in the biagraphy
+  browser.find(
+    :like => [:textarea, :id, 'register-bio']
+  ).send_keys(get_user_data('biography'))
+
+  # Click the accept policy checkbox
+  browser.find(:like => [:input, :id, 'register-complete-all']).click
+
   # Press the submit button
-  browser.find(:input => {:type => 'submit'}).click
+  browser.find(:button => {:id => 'button-save'}).click
+
+  # Wait for the success message to display
+  browser.wait(
+    :like => [:div, :class, 'alert-success'],
+    :message => 'The successfully registered message did not display.'
+  )
+
+  # The website we're testing on, doesn't log in the user automatically. So let's trigger that step manually
+  step 'the user logs in'
 end

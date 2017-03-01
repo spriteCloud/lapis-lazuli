@@ -27,7 +27,7 @@ Before do
   # This can be very handy to make sure a browser has the same settings before a new scenario starts.
   # For example, to enforce a certain browser window size
   new_width = 1024
-  new_height = 800
+  new_height = 768
   current_size = browser.window.size
   # Only change the browser size, if it is not already the correct size
   unless current_size.width == new_width && current_size.height == new_height

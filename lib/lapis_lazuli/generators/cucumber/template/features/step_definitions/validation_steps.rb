@@ -22,29 +22,27 @@ Then(/text "([^"]*)" should display/) do |string|
   browser.wait(:html => /#{string}/i)
 end
 
-Then(/^the user should be on page (.*?)$/) do |page|
-  # Wait a moment for the page to load
-  browser.wait(
-    :like => [:h1, :text, 'spriteCloud'],
-    :timeout => 10,
-    :throw => false
-  )
-
+Then(/^the user should be on page "(.*?)"$/) do |page|
   # Get the expected url
   expected_url = env('pages.root')
   expected_url += env("pages.#{page}")
-  # Get the current url
-  current_url = browser.url
+
+  # A custom loop that waits 5 seconds until the expected_url is the same as the current url
+  start = Time.now
+  while browser.url != expected_url
+    break if (Time.now - start).to_i >= 5
+    sleep(0.1)
+  end
 
   # Check if they are the same
-  unless current_url == expected_url
+  if browser.url != expected_url
     error("The current URL and expected URL were not the same: \n Current: #{current_url}\n Expected: #{expected_url}")
   end
 end
 
 
 Then(/^the page should display as logged (in|out) state$/) do |logged|
-  pending # Write code here that turns the phrase above into concrete actions
+  # pending # Write code here that turns the phrase above into concrete actions
 
   # Adjust variable for checking logged in or logged out state.
   if logged == 'in'
@@ -60,7 +58,7 @@ Then(/^the page should display as logged (in|out) state$/) do |logged|
   # Easiest way is to a reversed check on an element that is only present when you're logged in
   # For example, the profile picture
   browser.wait(
-    :img => {:id => 'profile_picture'},
+    :img => {:class => 'user-gravatar'},
     :condition => condition,
     :timeout => 5,
     :message => message
