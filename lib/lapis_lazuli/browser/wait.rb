@@ -114,9 +114,9 @@ module BrowserModule
           # Catch the default error and add the selectors to it.
           unless throw === false
             # Only raise an error if :throw is not false
-            raise "#{e.message} with selectors: #{options[:selectors]}"
+            raise LapisLazuli::TimeoutError, "#{e.message} with selectors: #{options[:selectors]}"
           end
-        rescue RuntimeError => err
+        rescue LapisLazuli::TimeoutError => err
           options[:exception] = err
           options[:message] = optional_message('Error in wait', options)
           world.error(options)
@@ -125,10 +125,17 @@ module BrowserModule
 
       # Filter out any nil results
       filter_results = results.select {|i| not i.nil?}
+      # Error handling
+      if not err.nil? and filter_results.empty?
+        options[:exception] = err
+        world.error(options)
+      end
 
       # Set if the underlying find function returns single results
       if has_single
-        return results[0]
+        # In chrome, somehow results can be no array, but still has_single is true
+        return results[0] if results.kind_of?(Array)
+        return results
       end
       return results
     end
