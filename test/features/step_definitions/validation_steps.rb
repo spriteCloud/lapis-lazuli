@@ -159,7 +159,7 @@ Then(/^within (\d+) seconds I get an error waiting for "(.*?)"( to disappear)?$/
       :screenshot => true,
       :groups => ["wait"]
     )
-  rescue RuntimeError => err
+  rescue Watir::Wait::TimeoutError => err
     error_thrown = true
   end
   unless error_thrown

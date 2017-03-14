@@ -114,9 +114,9 @@ module BrowserModule
           # Catch the default error and add the selectors to it.
           unless throw === false
             # Only raise an error if :throw is not false
-            raise LapisLazuli::TimeoutError, "#{e.message} with selectors: #{options[:selectors]}"
+            raise Watir::Wait::TimeoutError, "#{e.message} with selectors: #{options[:selectors]}"
           end
-        rescue LapisLazuli::TimeoutError => err
+        rescue Watir::Wait::TimeoutError => err
           options[:exception] = err
           options[:message] = optional_message('Error in wait', options)
           world.error(options)
