@@ -56,9 +56,6 @@ module LapisLazuli
   include LapisLazuli::GenericModule::XPath
   include LapisLazuli::GenericModule::Assertions
 
-  # Custom error creation E.G. LapisLazuli::TimeoutError
-  class TimeoutError < StandardError ; end
-
   ##
   # Export equivalents to cucumber's Before/After functions
   def self.Before(&block)
