@@ -36,7 +36,7 @@ Then(/^the user should be on page "(.*?)"$/) do |page|
 
   # Check if they are the same
   if browser.url != expected_url
-    error("The current URL and expected URL were not the same: \n Current: #{current_url}\n Expected: #{expected_url}")
+    error("The current URL and expected URL were not the same: \n Current: #{browser.url}\n Expected: #{expected_url}")
   end
 end
 
