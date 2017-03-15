@@ -34,24 +34,16 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.6"
   spec.add_development_dependency "rake", "~> 12.0"
   spec.add_development_dependency "simplecov", "~> 0.12"
-
-  spec.add_dependency "thor", "~> 0.19"
-  spec.add_dependency "facets", "~> 3.1"
-  spec.add_dependency "json", "~> 2.0"
-  spec.add_dependency "faraday", "~> 0.9"
+  
   spec.add_dependency "faraday_middleware", "~> 0.10"
   spec.add_dependency "faraday_json", "~> 0.1"
   spec.add_dependency "multi_xml", "~> 0.6"
   spec.add_dependency "teelogger", "~> 0.5"
   spec.add_dependency "minitest", "~> 5.10"
-  spec.add_dependency "ffi", "~> 1.9"
-  spec.add_dependency "rspec", "~> 3.5"
 
   # webdriver specifics
   spec.add_dependency "selenium-webdriver", "~> 3.2.2"
   spec.add_dependency "watir", "~> 6.1.0"
   spec.add_dependency "cucumber", "~> 2"
 
-  # Debugging tool
-  spec.add_dependency "byebug", "~> 9"
 end
