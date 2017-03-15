@@ -17,3 +17,5 @@ tmp
 test/storage
 .*.sw*
 .idea
+Gemfile.lock
+test/Gemfile

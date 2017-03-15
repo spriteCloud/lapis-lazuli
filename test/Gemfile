@@ -6,12 +6,18 @@ platforms :mswin, :mingw do
   gem 'term-ansicolor'
 end
 
+
 # LapisLazul itself; test code should point to the current repo and branch
 # repo = `git config --get remote.origin.url`
 # branch = `git rev-parse --abbrev-ref HEAD`
-# gem 'lapis_lazuli', :git => repo, :branch => branch
-# gem "lapis_lazuli", '0.9.9-dev', path: 'E:\Ruby\lib\ruby\gems\2.3.0\gems\lapis-lazuli-dev'
-gem "lapis_lazuli"
+# Local gem
+# gem "lapis_lazuli", path: './../'
+
+# Development gem
+gem 'lapis_lazuli', :git => 'https://github.com/spriteCloud/lapis-lazuli.git', :branch => 'development'
+
+# Production gem
+# gem "lapis_lazuli"
 
 # Project specific gems
 gem 'watir-scroll'
