@@ -14,10 +14,10 @@ end
 # gem "lapis_lazuli", path: './../'
 
 # Development gem
-gem 'lapis_lazuli', :git => 'https://github.com/spriteCloud/lapis-lazuli.git', :branch => 'development'
+# gem 'lapis_lazuli', :git => 'https://github.com/spriteCloud/lapis-lazuli.git', :branch => 'development'
 
 # Production gem
-# gem "lapis_lazuli"
+gem "lapis_lazuli"
 
 # Project specific gems
 gem 'watir-scroll'
