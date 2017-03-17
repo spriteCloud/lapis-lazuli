@@ -42,8 +42,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency "minitest", "~> 5.10"
 
   # webdriver specifics
-  spec.add_dependency "selenium-webdriver", "~> 3.2.2"
-  spec.add_dependency "watir", "~> 6.1.0"
+  spec.add_dependency "selenium-webdriver", "~> 3"
+  spec.add_dependency "watir", "~> 6"
   spec.add_dependency "cucumber", "~> 2"
 
 end
