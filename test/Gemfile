@@ -6,6 +6,8 @@ platforms :mswin, :mingw do
   gem 'term-ansicolor'
 end
 
+# Locking Watir on 6.1.0 until this fix is deployed:
+# https://github.com/watir/watir/commit/472732a3b7899fd6595e966997b3a42922462fbb
 gem 'watir', '6.1.0'
 
 # LapisLazul itself; test code should point to the current repo and branch
