@@ -6,5 +6,5 @@
 # All rights reserved.
 #
 module LapisLazuli
-  VERSION = "1.0.3dev"
+  VERSION = "1.0.4dev"
 end

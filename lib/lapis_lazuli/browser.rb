@@ -130,10 +130,10 @@ module LapisLazuli
 
     ##
     # Close and create a new browser
-    def restart
+    def restart(*args)
       world.log.debug "Restarting browser"
-      @browser.close
-      self.start
+      self.close
+      self.start(*args)
     end
 
     ##
