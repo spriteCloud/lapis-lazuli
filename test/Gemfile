@@ -8,7 +8,7 @@ end
 
 # Locking Watir on 6.1.0 until this fix is deployed:
 # https://github.com/watir/watir/commit/472732a3b7899fd6595e966997b3a42922462fbb
-gem 'watir', '6.1.0'
+gem 'watir', :git => 'https://github.com/watir/watir.git', :ref => '472732a'
 
 # LapisLazul itself; test code should point to the current repo and branch
 # repo = `git config --get remote.origin.url`

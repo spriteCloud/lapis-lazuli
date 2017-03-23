@@ -4,34 +4,49 @@
 # Author: "<%= config[:user] %>" <<%= config[:email] %>>
 require 'lapis_lazuli'
 require 'lapis_lazuli/cucumber'
+require 'selenium-webdriver'
 
 LapisLazuli::WorldModule::Config.config_file = "config/config.yml"
 World(LapisLazuli)
 
 # Do something when LapisLazuli is started (This is before the browser is opened)
 LapisLazuli.Start do
-
-  # This code snippet prevents the security popup to appear in FF v>47.
-  # If BROWSER is NIL, Lapis Lazuli will default to Firefox
+  #If BROWSER is NIL, Lapis Lazuli will default to Firefox
   if !ENV['BROWSER'] || ENV['BROWSER'] == 'firefox'
+    ENV['BROWSER'] = 'firefox'
     # Get Selenium to create a profile object
-    require 'selenium-webdriver'
     profile = Selenium::WebDriver::Firefox::Profile.new
     profile['network.http.phishy-userpass-length'] = 255
-    browser :firefox, :profile => profile
+    profile['network.http.use-cache'] = false
   end
-end
 
-# This function is called before every scenario.
-Before do
-  # This can be very handy to make sure a browser has the same settings before a new scenario starts.
-  # For example, to enforce a certain browser window size
-  new_width = 1024
-  new_height = 768
-  current_size = browser.window.size
-  # Only change the browser size, if it is not already the correct size
-  unless current_size.width == new_width && current_size.height == new_height
-    log.info "Resizing browser to #{new_width}x#{new_height} (Was #{current_size.width}x#{current_size.height}"
-    browser.window.resize_to(new_width, new_height)
+  # Set device simulation settings if DEVICE=exmaple is not nil
+  if !ENV['DEVICE'].nil?
+    devices = YAML.load_file('./config/devices.yml')
+    if devices[ENV['DEVICE']]
+      device = devices[ENV['DEVICE']]
+      if ENV['BROWSER'] == 'firefox'
+        if profile.nil?
+          profile = Selenium::WebDriver::Firefox::Profile.new
+        end
+        profile['general.useragent.override'] = device['user-agent']
+      elsif ENV['BROWSER'] == 'chrome'
+        switches = %W[--user-agent=#{device['user-agent']}]
+      end
+    else
+      raise "Set device (DEVICE=#{ENV['DEVICE']} does not exist in ./config/devices.yml"
+    end
+  end
+
+  if !profile.nil? && !switches.nil?
+    browser ENV['BROWSER'], :profile => profile, :switches => switches
+  elsif !profile.nil?
+    browser ENV['BROWSER'], :profile => profile
+  elsif !switches.nil?
+    browser ENV['BROWSER'], :switches => switches
+  end
+
+  if !device.nil?
+    browser.window.resize_to(device['width'], device['height'])
   end
 end
