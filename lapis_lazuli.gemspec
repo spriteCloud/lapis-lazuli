@@ -40,6 +40,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "multi_xml", "~> 0.6"
   spec.add_dependency "teelogger", "~> 0.5"
   spec.add_dependency "minitest", "~> 5.10"
+  spec.add_dependency "thor", "~> 0.19"
 
   # webdriver specifics
   spec.add_dependency "selenium-webdriver", "~> 3"
