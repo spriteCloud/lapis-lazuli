@@ -10,6 +10,9 @@
 # Then add a width, height & user-agent field
 # The used browser will start the simulation in that browser.
 
+desktop1080:
+  width: 1080
+  height: 1920
 iphone5:
   width: 640
   height: 1136

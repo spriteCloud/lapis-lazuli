@@ -24,3 +24,16 @@ And test if I can parse bindings when starting the browsers
     And I navigate to URL "http://whatsmyua.com/"
     Then the browser window size should be "full screen"
     #And I close the browser
+
+  @bindings_04
+  Scenario: Using a pre-defined device
+    Given I restart the browser to device setting "iphone5"
+    When I navigate to URL "http://whatsmyua.com"
+    Then within 2 seconds I should see "Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3"
+    And the browser window size should be "640x1136"
+
+  @bindings_05
+  Scenario: Checkin the browser dimensions
+    Given I restart the browser to device setting "iphone5"
+    When I navigate to URL "http://whatsmyua.com"
+    Then within 2 seconds I should see "Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3"

@@ -136,31 +136,12 @@ module WorldModule
     # - Environment doesn't exist in config
     # - Default environment not set in config if no environment is set
     def load_config_from_file(filename)
-      # Try to load the file from disk
-      begin
-        # Determine the extension
-        ext = File.extname(filename)
-        # Use the correct loader
-        if ext == ".yml"
-          @config = YAML.load_file(filename)
-        elsif ext == ".json"
-          json = File.read(filename)
-          @config = JSON.parse(json)
-        end
-      rescue RuntimeError => err
-        # Can't help you
-        raise "Error loading file: #{filename} #{err}"
-      end
-
-      # Fix up empty files
-      if @config.nil? or @config == false
-        warn "Could not load configuration from '#{Config.config_file}'; it might be empty or malformed."
-        @config = {}
-      end
+      # Set the global @config variable
+      @config = get_config_from_file(filename)
 
       # If we have an environment this config should have it
       if not @env.nil? and not self.has_config?(@env)
-        raise "Environment doesn't exist in config file"
+        raise "Environment `#{@env}` doesn't exist in config file"
       end
 
       # If we don't have one then load the default
@@ -174,7 +155,38 @@ module WorldModule
       end
     end
 
+    # Adds the possibility to merge multiple config files.
+    def add_config_from_file(filename)
+      # Add the data to the global config
+      @config.merge! get_config_from_file(filename)
+    end
 
+    # returns the data that's loaded from a config file.
+    # Supports YAML and JSON
+    def get_config_from_file(filename)
+      # Try to load the file from disk
+      begin
+        # Determine the extension
+        ext = File.extname(filename)
+        # Use the correct loader
+        if ext == ".yml"
+          data = YAML.load_file(filename)
+        elsif ext == ".json"
+          json = File.read(filename)
+          data = JSON.parse(json)
+        end
+      rescue RuntimeError => err
+        # Can't help you
+        raise "Error loading file: #{filename} #{err}"
+      end
+
+      # Fix up empty files
+      if data.nil? or data == false
+        warn "Could not load configuration from '#{Config.config_file}'; it might be empty or malformed."
+        data = {}
+      end
+      return data
+    end
 
     ##
     # Does the config have a variable?

@@ -196,7 +196,7 @@ Given(/^I use browser bindings "(.*?)"$/) do |bindings|
       browser.restart :firefox, profile: profile
     when '2'
       switches = %w[--user-agent=CUSTOM-CHROME-USER-AGENT]
-      browser.restart :chrome, :switches => switches
+      browser.restart :chrome, :switches => switches, device: 'desktop720'
     when '3'
       caps = Selenium::WebDriver::Remote::Capabilities.chrome(
         "chromeOptions" => {
@@ -211,4 +211,8 @@ Given(/^I use browser bindings "(.*?)"$/) do |bindings|
     else
       error "Requested binding setup does not exist. Requested #{bindings}"
   end
+end
+
+Given(/^I restart the browser to device setting "(.*?)"$/) do |device|
+  browser.restart :chrome, device: device
 end
