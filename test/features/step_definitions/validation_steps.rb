@@ -406,14 +406,17 @@ Then(/^the browser window size should be "([^"]*)"$/) do |expected_size|
     when 'full screen'
       current_size = browser.window.size
       browser.window.maximize
-    when /\d+x+d+/
-      width, x, height = expected_size.split 'x'
+    when /^(\d+)x(\d+)$/
+      width = $1
+      height = $2.to_i + 400
       current_size = browser.window.size
       browser.window.resize_to(width, height)
     else
       error "Unkown variable #{expected_size} in 'the browser window size should be ...'"
   end
-  unless browser.window.size.width == current_size.width && browser.window.size.height == current_size.height
-    error "Window size changed after resizing it to `#{expected_size}`. before: #{current_size.width}x#{current_size.height}. After: #{browse.window.size.width}x#{browse.window.size.height}"
+  difference_width = browser.window.size.width - current_size.width
+  difference_height = browser.window.size.height - current_size.height
+  unless difference_width > -30 and difference_width < 30 and difference_height > -30 and difference_height < 30
+    error "Window size changed after resizing it to `#{expected_size}`. before: #{current_size.width}x#{current_size.height}. After: #{browser.window.size.width}x#{browser.window.size.height}"
   end
 end

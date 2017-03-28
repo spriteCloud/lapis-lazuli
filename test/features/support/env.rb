@@ -24,17 +24,6 @@ LapisLazuli.Start do
   print "Watir: #{Gem.loaded_specs['watir'].version}\n"
   print "---- VERSION INFO ----\n\n"
 
-  #If BROWSER is NIL, Lapis Lazuli will default to Firefox
-  if !ENV['BROWSER'] || ENV['BROWSER'] == 'firefox'
-    ENV['BROWSER'] = 'firefox'
-    # Get Selenium to create a profile object
-    require 'selenium-webdriver'
-    profile = Selenium::WebDriver::Firefox::Profile.new
-    profile['network.http.phishy-userpass-length'] = 255
-    profile['network.http.use-cache'] = false
-    browser :firefox, profile, device: 'desktop720'
-  end
-
 end
 
 # Transition function from old codebase to new

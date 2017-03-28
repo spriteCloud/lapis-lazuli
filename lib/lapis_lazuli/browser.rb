@@ -233,10 +233,7 @@ module LapisLazuli
     private
     ##
     # The main browser window for testing
-    def init(browser_wanted=nil, *optional_data)
-      p optional_data
-      # optional_data = {optional_data: optional_data}
-      p optional_data.is_a? Hash
+    def init(browser_wanted=nil, optional_data=nil)
       # Store the optional data so on restart of the browser it still has the
       # correct configuration
       if optional_data.nil? and @@cached_browser_options.has_key?(:optional_data) and (browser_wanted.nil? or browser_wanted == @@cached_browser_options[:browser])
@@ -251,16 +248,18 @@ module LapisLazuli
       end
 
       # Set the default device if the optional data does not contain a specific device
-      p optional_data
       if optional_data[:device].nil?
-        # Check if the ENV['DEVICE'] variable is set
-        if !world.env_or_config('DEVICE').nil?
+        # Check if there is a cached value of a previously used
+        if @@cached_browser_options.has_key?(:device)
+          optional_data[:device] = @@cached_browser_options[:device]
+          # Check if the ENV['DEVICE'] variable is set
+        elsif !world.env_or_config('DEVICE').nil?
           optional_data[:device] = world.env_or_config('DEVICE')
           # Else grab the default set device
         elsif !world.env_or_config('default_device').nil?
           optional_data[:device] = world.env_or_config('default_device')
         else
-          warn 'No default device, nor a delected device was set. Browser default settings will be loaded. More info: http://testautomation.info/Lapis_Lazuli:Device_Simulation'
+          warn 'No default device, nor a selected device was set. Browser default settings will be loaded. More info: http://testautomation.info/Lapis_Lazuli:Device_Simulation'
         end
       end
 
@@ -269,6 +268,10 @@ module LapisLazuli
         @@cached_browser_options[:browser] = browser_wanted
         # Duplicate the data as Webdriver modifies it
         @@cached_browser_options[:optional_data] = optional_data.dup
+        if !@@cached_browser_options[:optional_data][:profile].nil?
+          # A selenium profile needs to be duplicated separately, else it doesn't get a new ID.
+          @@cached_browser_options[:optional_data][:profile] = optional_data[:profile].dup
+        end
       end
 
       @browser_wanted = browser_wanted
@@ -281,13 +284,18 @@ module LapisLazuli
     # Create a new browser depending on settings
     # Always cached the supplied arguments
     def create_driver(browser_wanted=nil, optional_data=nil)
-      p optional_data
-      # Remove :device from optional_data, because it should not be included in the call to Watir
+      # Remove device information from optional_data and create a separate variable for it
       device = optional_data[:device]
       optional_data.delete :device
+
       # If device is set, load it from the devices.yml config
       if !device.nil?
-        world.add_config_from_file('./config/devices.yml')
+
+        begin
+          world.add_config_from_file('./config/devices.yml')
+        rescue
+          raise "`./config/devices.yml` was not found. See http://testautomation.info/Lapis_Lazuli:Device_Simulation for more information"
+        end
         if world.has_config? "devices.#{device}"
           device_configuration = world.config "devices.#{device}"
         else
@@ -335,15 +343,31 @@ module LapisLazuli
       end
 
       # Overwrite user-agent if a device simulation is set and it contains a user-agent
-      p b
-      if !device_configuration['user-agent'].nil?
+      if !device_configuration.nil? and !device_configuration['user-agent'].nil?
         case b
           when :firefox
-            puts 'Firefox device simulation.'
+            # Create a firefox profile if it does not exist yet
+            if optional_data[:profile].nil?
+              optional_data[:profile] = Selenium::WebDriver::Firefox::Profile.new
+            else
+              optional_data[:profile] = optional_data[:profile].dup
+            end
+            # Add the user agent to it if it has not been set yet
+            if optional_data[:profile].instance_variable_get(:@additional_prefs)['general.useragent.override'].nil?
+              optional_data[:profile]['general.useragent.override'] = device_configuration['user-agent']
+            else
+              warn "User-agent was already set when calling the browser and is not overwritten."
+            end
             p optional_data
           when :chrome
-            puts 'Chrome device simulation.'
-            p optional_data
+            ua_string = "--user-agent=#{device_configuration['user-agent']}"
+            if optional_data[:switches].nil?
+              optional_data[:switches] = [ua_string]
+            elsif !optional_data[:switches].join(',').include? '--user-agent='
+              optional_data[:switches].push ua_string
+            else
+              warn "User-agent was already set when calling the browser and is not overwritten."
+            end
           else
             raise "#{device} / #{b.to_s} combination not possible. Device simulation is only supported on Firefox and Chrome."
         end
@@ -388,9 +412,12 @@ module LapisLazuli
           args.push({:profile => profile})
         end
       end
-
       begin
         browser_instance = Watir::Browser.new(*args)
+        # Resize the browser if the device simulation requires it
+        if !device_configuration.nil? and !device_configuration['width'].nil? and !device_configuration['height'].nil?
+          browser_instance.window.resize_to(device_configuration['width'], device_configuration['height'])
+        end
       rescue Selenium::WebDriver::Error::UnknownError => err
         raise err
       end

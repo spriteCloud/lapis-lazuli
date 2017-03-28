@@ -196,13 +196,11 @@ Given(/^I use browser bindings "(.*?)"$/) do |bindings|
       browser.restart :firefox, profile: profile
     when '2'
       switches = %w[--user-agent=CUSTOM-CHROME-USER-AGENT]
-      browser.restart :chrome, :switches => switches, device: 'desktop720'
+      browser.restart :chrome, :switches => switches
     when '3'
       caps = Selenium::WebDriver::Remote::Capabilities.chrome(
         "chromeOptions" => {
           "args" => [
-            '--cast-initial-screen-height=200',
-            '--cast-initial-screen-width=400',
             '--start-maximized'
           ]
         }
