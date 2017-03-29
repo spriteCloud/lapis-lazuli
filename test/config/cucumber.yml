@@ -24,7 +24,6 @@ chrome: BROWSER=chrome
 ie: BROWSER=ie
 safari: BROWSER=safari
 
-
 ################################################################################
 # Listed environments (default is set in config.yml)
 t: TEST_ENV=test -t @t,@test

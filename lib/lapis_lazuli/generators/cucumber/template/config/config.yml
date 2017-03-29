@@ -9,9 +9,10 @@
 ################################################################################
 # Set the global variables
 default_env: production              # defines the environment
+default_device: desktop720           # See devices.yml for your options
 
 ################################################################################
-# List of error strings. Step will fail if one of these strings is detected.
+# List of error strings. `browser.html_error` will return an array of detected strings.
 error_strings:
   [
     "Server Error",

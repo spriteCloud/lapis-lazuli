@@ -19,3 +19,4 @@ test/storage
 .idea
 Gemfile.lock
 test/Gemfile
+test/debug.log
