@@ -234,8 +234,7 @@ module LapisLazuli
     ##
     # The main browser window for testing
     def init(browser_wanted=nil, optional_data=nil)
-      # Store the optional data so on restart of the browser it still has the
-      # correct configuration
+      # Store the optional data so on restart of the browser it still has the correct configuration
       if optional_data.nil? and @@cached_browser_options.has_key?(:optional_data) and (browser_wanted.nil? or browser_wanted == @@cached_browser_options[:browser])
         optional_data = @@cached_browser_options[:optional_data]
       elsif optional_data.nil?
@@ -290,11 +289,10 @@ module LapisLazuli
 
       # If device is set, load it from the devices.yml config
       if !device.nil?
-
         begin
           world.add_config_from_file('./config/devices.yml')
         rescue
-          raise "`./config/devices.yml` was not found. See http://testautomation.info/Lapis_Lazuli:Device_Simulation for more information"
+          raise '`./config/devices.yml` was not found. See http://testautomation.info/Lapis_Lazuli:Device_Simulation for more information'
         end
         if world.has_config? "devices.#{device}"
           device_configuration = world.config "devices.#{device}"
@@ -319,7 +317,6 @@ module LapisLazuli
       # Select the correct browser
       case browser_wanted.to_s.downcase
         when 'chrome'
-          # Check Platform running script
           b = :chrome
         when 'safari'
           b = :safari
@@ -350,15 +347,15 @@ module LapisLazuli
             if optional_data[:profile].nil?
               optional_data[:profile] = Selenium::WebDriver::Firefox::Profile.new
             else
+              # If the profile already exists, we need to create a duplicate, so we don't overwrite any settings.
               optional_data[:profile] = optional_data[:profile].dup
             end
             # Add the user agent to it if it has not been set yet
             if optional_data[:profile].instance_variable_get(:@additional_prefs)['general.useragent.override'].nil?
               optional_data[:profile]['general.useragent.override'] = device_configuration['user-agent']
             else
-              warn "User-agent was already set when calling the browser and is not overwritten."
+              log.debug "User-agent was already set in the :profile."
             end
-            p optional_data
           when :chrome
             ua_string = "--user-agent=#{device_configuration['user-agent']}"
             if optional_data[:switches].nil?
@@ -366,10 +363,10 @@ module LapisLazuli
             elsif !optional_data[:switches].join(',').include? '--user-agent='
               optional_data[:switches].push ua_string
             else
-              warn "User-agent was already set when calling the browser and is not overwritten."
+              log.debug "User-agent was already set in the :switches."
             end
           else
-            raise "#{device} / #{b.to_s} combination not possible. Device simulation is only supported on Firefox and Chrome."
+            warn "#{device} user agent cannot be set for #{b.to_s}. Only Chrome & Firefox are supported."
         end
       end
 

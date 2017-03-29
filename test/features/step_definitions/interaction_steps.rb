@@ -206,6 +206,7 @@ Given(/^I use browser bindings "(.*?)"$/) do |bindings|
         }
       )
       browser.restart :chrome, desired_capabilities: caps
+      browser.window.maximize
     else
       error "Requested binding setup does not exist. Requested #{bindings}"
   end
