@@ -23,7 +23,6 @@ LapisLazuli.Start do
   print "Selenium webdriver: #{Gem.loaded_specs['selenium-webdriver'].version}\n"
   print "Watir: #{Gem.loaded_specs['watir'].version}\n"
   print "---- VERSION INFO ----\n\n"
-
 end
 
 # Transition function from old codebase to new
