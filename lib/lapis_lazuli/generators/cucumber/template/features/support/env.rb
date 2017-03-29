@@ -4,7 +4,6 @@
 # Author: "<%= config[:user] %>" <<%= config[:email] %>>
 require 'lapis_lazuli'
 require 'lapis_lazuli/cucumber'
-require 'selenium-webdriver'
 
 LapisLazuli::WorldModule::Config.config_file = "config/config.yml"
 World(LapisLazuli)
@@ -13,40 +12,18 @@ World(LapisLazuli)
 LapisLazuli.Start do
   #If BROWSER is NIL, Lapis Lazuli will default to Firefox
   if !ENV['BROWSER'] || ENV['BROWSER'] == 'firefox'
-    ENV['BROWSER'] = 'firefox'
+
     # Get Selenium to create a profile object
+    require 'selenium-webdriver'
     profile = Selenium::WebDriver::Firefox::Profile.new
+
+    # These settings prevent a warning after authenticating via URL
+    # For example user:pass@https://website.com/
     profile['network.http.phishy-userpass-length'] = 255
     profile['network.http.use-cache'] = false
-  end
 
-  # Set device simulation settings if DEVICE=exmaple is not nil
-  if !ENV['DEVICE'].nil?
-    devices = YAML.load_file('./config/devices.yml')
-    if devices[ENV['DEVICE']]
-      device = devices[ENV['DEVICE']]
-      if ENV['BROWSER'] == 'firefox'
-        if profile.nil?
-          profile = Selenium::WebDriver::Firefox::Profile.new
-        end
-        profile['general.useragent.override'] = device['user-agent']
-      elsif ENV['BROWSER'] == 'chrome'
-        switches = %W[--user-agent=#{device['user-agent']}]
-      end
-    else
-      raise "Set device (DEVICE=#{ENV['DEVICE']} does not exist in ./config/devices.yml"
-    end
-  end
+    # Start the browser with these settings
+    browser :firefox, :profile => profile
 
-  if !profile.nil? && !switches.nil?
-    browser ENV['BROWSER'], :profile => profile, :switches => switches
-  elsif !profile.nil?
-    browser ENV['BROWSER'], :profile => profile
-  elsif !switches.nil?
-    browser ENV['BROWSER'], :switches => switches
-  end
-
-  if !device.nil?
-    browser.window.resize_to(device['width'], device['height'])
   end
 end
