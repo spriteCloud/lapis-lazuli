@@ -354,7 +354,7 @@ module LapisLazuli
             if optional_data[:profile].instance_variable_get(:@additional_prefs)['general.useragent.override'].nil?
               optional_data[:profile]['general.useragent.override'] = device_configuration['user-agent']
             else
-              log.debug "User-agent was already set in the :profile."
+              world.log.debug "User-agent was already set in the :profile."
             end
           when :chrome
             ua_string = "--user-agent=#{device_configuration['user-agent']}"
