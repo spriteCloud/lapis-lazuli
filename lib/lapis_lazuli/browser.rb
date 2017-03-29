@@ -218,7 +218,7 @@ module LapisLazuli
         # Close each browser
         @@browsers.each do |b|
           begin
-            b.close reason, false
+            b.self.close reason, false
           rescue Exception => err
             # Provide some details
             @@world.log.debug("Failed to close the browser, probably chrome: #{err.to_s}")
