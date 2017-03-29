@@ -363,7 +363,7 @@ module LapisLazuli
             elsif !optional_data[:switches].join(',').include? '--user-agent='
               optional_data[:switches].push ua_string
             else
-              log.debug "User-agent was already set in the :switches."
+              world.log.debug "User-agent was already set in the :switches."
             end
           else
             warn "#{device} user agent cannot be set for #{b.to_s}. Only Chrome & Firefox are supported."
