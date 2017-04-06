@@ -10,28 +10,20 @@ World(LapisLazuli)
 
 # Do something when LapisLazuli is started (This is before the browser is opened)
 LapisLazuli.Start do
-
-  # This code snippet prevents the security popup to appear in FF v>47.
-  # If BROWSER is NIL, Lapis Lazuli will default to Firefox
+  #If BROWSER is NIL, Lapis Lazuli will default to Firefox
   if !ENV['BROWSER'] || ENV['BROWSER'] == 'firefox'
+
     # Get Selenium to create a profile object
     require 'selenium-webdriver'
     profile = Selenium::WebDriver::Firefox::Profile.new
-    profile['network.http.phishy-userpass-length'] = 255
-    browser :firefox, :profile => profile
-  end
-end
 
-# This function is called before every scenario.
-Before do
-  # This can be very handy to make sure a browser has the same settings before a new scenario starts.
-  # For example, to enforce a certain browser window size
-  new_width = 1024
-  new_height = 768
-  current_size = browser.window.size
-  # Only change the browser size, if it is not already the correct size
-  unless current_size.width == new_width && current_size.height == new_height
-    log.info "Resizing browser to #{new_width}x#{new_height} (Was #{current_size.width}x#{current_size.height}"
-    browser.window.resize_to(new_width, new_height)
+    # These settings prevent a warning after authenticating via URL
+    # For example user:pass@https://website.com/
+    profile['network.http.phishy-userpass-length'] = 255
+    profile['network.http.use-cache'] = false
+
+    # Start the browser with these settings
+    browser :firefox, :profile => profile
+
   end
 end

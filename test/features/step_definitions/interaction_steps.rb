@@ -17,6 +17,10 @@ Given(/^I navigate to the (.*) test page$/) do |page|
   end
 end
 
+Given(/^I navigate to URL "(.*)"$/) do |url|
+  browser.goto url
+end
+
 Given(/I click (the|a) (first|last|random|[0-9]+[a-z]+) (.*)$/) do |arg1, index, type|
   # Convert the type text to a symbol
   type = type.downcase.gsub(" ", "_")
@@ -60,6 +64,10 @@ Given(/^I close the browser named "(.*?)"$/) do |name|
   else
     error("No item in the storage named #{name}")
   end
+end
+
+Given(/^I close the browser$/) do
+  browser.close
 end
 
 When(/^I find "(.*?)" and name it "(.*?)"$/) do |id, name|
@@ -177,4 +185,33 @@ Then(/^the report should include (.*?) and (.*?) in the correct place$/) do |dat
   annotations.each do |scope, values|
     assert ([[data1], [data2]] == values), "Stored values: #{values}, expected [[#{data1}], [#{data2}]]"
   end
+end
+
+Given(/^I use browser bindings "(.*?)"$/) do |bindings|
+  require 'selenium-webdriver'
+  case bindings
+    when '1'
+      profile = Selenium::WebDriver::Firefox::Profile.new
+      profile['general.useragent.override'] = "CUSTOM-USER-AGENT"
+      browser.restart :firefox, profile: profile
+    when '2'
+      switches = %w[--user-agent=CUSTOM-CHROME-USER-AGENT]
+      browser.restart :chrome, :switches => switches
+    when '3'
+      caps = Selenium::WebDriver::Remote::Capabilities.chrome(
+        "chromeOptions" => {
+          "args" => [
+            '--start-maximized'
+          ]
+        }
+      )
+      browser.restart :chrome, desired_capabilities: caps
+      browser.window.maximize
+    else
+      error "Requested binding setup does not exist. Requested #{bindings}"
+  end
+end
+
+Given(/^I restart the browser to device setting "(.*?)"$/) do |device|
+  browser.restart :chrome, device: device
 end

@@ -99,7 +99,7 @@ Then(/^within (\d+) seconds I should see "([^"]+?)"( disappear)?$/) do |timeout,
     :timeout => timeout,
     :text => text,
     :condition => condition,
-    :groups => ["wait"]
+    :groups => ["wait #{condition.to_s}"]
   )
 end
 
@@ -398,5 +398,25 @@ Then(/^that element should not container text "(.*?)"$/) do |text|
   element = scenario.storage.get 'last_element'
   if element.text.include? text
     raise 'Element did contain the text it should not contain.'
+  end
+end
+
+Then(/^the browser window size should be "([^"]*)"$/) do |expected_size|
+  case expected_size
+    when 'full screen'
+      current_size = browser.window.size
+      browser.window.maximize
+    when /^(\d+)x(\d+)$/
+      width = $1
+      height = $2
+      current_size = browser.window.size
+      browser.window.resize_to(width, height)
+    else
+      error "Unkown variable #{expected_size} in 'the browser window size should be ...'"
+  end
+  difference_width = browser.window.size.width - current_size.width
+  difference_height = browser.window.size.height - current_size.height
+  unless difference_width > -30 and difference_width < 30 and difference_height > -30 and difference_height < 30
+    error "Window size changed after resizing it to `#{expected_size}`. before: #{current_size.width}x#{current_size.height}. After: #{browser.window.size.width}x#{browser.window.size.height}"
   end
 end

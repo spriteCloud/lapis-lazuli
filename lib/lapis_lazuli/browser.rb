@@ -130,10 +130,10 @@ module LapisLazuli
 
     ##
     # Close and create a new browser
-    def restart
+    def restart(*args)
       world.log.debug "Restarting browser"
-      @browser.close
-      self.start
+      self.close
+      self.start(*args)
     end
 
     ##
@@ -214,15 +214,9 @@ module LapisLazuli
       if @@browsers.length != 0 and @@world.env_or_config("close_browser_after") != "never"
         # Notify user
         @@world.log.debug("Closing all browsers")
-
         # Close each browser
         @@browsers.each do |b|
-          begin
-            b.close reason, false
-          rescue Exception => err
-            # Provide some details
-            @@world.log.debug("Failed to close the browser, probably chrome: #{err.to_s}")
-          end
+          b.close reason, true
         end
 
         # Make sure the array is cleared
@@ -233,25 +227,48 @@ module LapisLazuli
     private
     ##
     # The main browser window for testing
-    def init(browser_wanted=(no_browser_wanted=true; nil), optional_data=(no_optional_data=true; nil))
-      # Store the optional data so on restart of the browser it still has the
-      # correct configuration
-      if no_optional_data and optional_data.nil? and @@cached_browser_options.has_key?(:optional_data) and (browser_wanted.nil? or browser_wanted == @@cached_browser_options[:browser])
-        optional_data = @@cached_browser_options[:optional_data]
+    def init(browser_wanted=nil, optional_data=nil)
+      # Store the optional data so on restart of the browser it still has the correct configuration
+      if optional_data.nil? and @@cached_browser_options.has_key?(:optional_data) and (browser_wanted.nil? or browser_wanted == @@cached_browser_options[:browser])
+        optional_data = @@cached_browser_options[:optional_data].dup
+        if !@@cached_browser_options[:optional_data][:profile].nil?
+          # A selenium profile needs to be duplicated separately, else it doesn't get a new ID.
+          optional_data[:profile] = @@cached_browser_options[:optional_data][:profile].dup
+        end
       elsif optional_data.nil?
         optional_data = {}
       end
 
       # Do the same caching stuff for the browser
-      if no_browser_wanted and browser_wanted.nil? and @@cached_browser_options.has_key?(:browser)
+      if browser_wanted.nil? and @@cached_browser_options.has_key?(:browser)
         browser_wanted = @@cached_browser_options[:browser]
       end
 
+      # Set the default device if the optional data does not contain a specific device
+      if optional_data[:device].nil?
+        # Check if there is a cached value of a previously used
+        if @@cached_browser_options.has_key?(:device)
+          optional_data[:device] = @@cached_browser_options[:device]
+          # Check if the ENV['DEVICE'] variable is set
+        elsif !world.env_or_config('DEVICE').nil?
+          optional_data[:device] = world.env_or_config('DEVICE')
+          # Else grab the default set device
+        elsif !world.env_or_config('default_device').nil?
+          optional_data[:device] = world.env_or_config('default_device')
+        else
+          warn 'No default device, nor a selected device was set. Browser default settings will be loaded. More info: http://testautomation.info/Lapis_Lazuli:Device_Simulation'
+        end
+      end
 
-      if !@@cached_browser_options.has_key? :browser
+      # cache all the settings if this is the first time opening the browser.
+      if !@@cached_browser_options.has_key? :browser and !@@cached_browser_options.has_key? :optional_data
         @@cached_browser_options[:browser] = browser_wanted
         # Duplicate the data as Webdriver modifies it
         @@cached_browser_options[:optional_data] = optional_data.dup
+        if !@@cached_browser_options[:optional_data][:profile].nil?
+          # A selenium profile needs to be duplicated separately, else it doesn't get a new ID.
+          @@cached_browser_options[:optional_data][:profile] = optional_data[:profile].dup
+        end
       end
 
       @browser_wanted = browser_wanted
@@ -264,6 +281,24 @@ module LapisLazuli
     # Create a new browser depending on settings
     # Always cached the supplied arguments
     def create_driver(browser_wanted=nil, optional_data=nil)
+      # Remove device information from optional_data and create a separate variable for it
+      device = optional_data[:device]
+      optional_data.delete :device
+
+      # If device is set, load it from the devices.yml config
+      if !device.nil?
+        begin
+          world.add_config_from_file('./config/devices.yml')
+        rescue
+          raise '`./config/devices.yml` was not found. See http://testautomation.info/Lapis_Lazuli:Device_Simulation for more information'
+        end
+        if world.has_config? "devices.#{device}"
+          device_configuration = world.config "devices.#{device}"
+        else
+          raise "Requested device `#{device}` was not found in the configuration. See http://testautomation.info/Lapis_Lazuli:Device_Simulation for more information"
+        end
+      end
+
       # Run-time dependency.
       begin
         require 'selenium-webdriver'
@@ -280,7 +315,6 @@ module LapisLazuli
       # Select the correct browser
       case browser_wanted.to_s.downcase
         when 'chrome'
-          # Check Platform running script
           b = :chrome
         when 'safari'
           b = :safari
@@ -301,6 +335,37 @@ module LapisLazuli
           b = :remote
         else
           b = :firefox
+      end
+
+      # Overwrite user-agent if a device simulation is set and it contains a user-agent
+      if !device_configuration.nil? and !device_configuration['user-agent'].nil?
+        case b
+          when :firefox
+            # Create a firefox profile if it does not exist yet
+            if optional_data[:profile].nil?
+              optional_data[:profile] = Selenium::WebDriver::Firefox::Profile.new
+            else
+              # If the profile already exists, we need to create a duplicate, so we don't overwrite any settings.
+              optional_data[:profile] = optional_data[:profile].dup
+            end
+            # Add the user agent to it if it has not been set yet
+            if optional_data[:profile].instance_variable_get(:@additional_prefs)['general.useragent.override'].nil?
+              optional_data[:profile]['general.useragent.override'] = device_configuration['user-agent']
+            else
+              world.log.debug "User-agent was already set in the :profile."
+            end
+          when :chrome
+            ua_string = "--user-agent=#{device_configuration['user-agent']}"
+            if optional_data[:switches].nil?
+              optional_data[:switches] = [ua_string]
+            elsif !optional_data[:switches].join(',').include? '--user-agent='
+              optional_data[:switches].push ua_string
+            else
+              world.log.debug "User-agent was already set in the :switches."
+            end
+          else
+            warn "#{device} user agent cannot be set for #{b.to_s}. Only Chrome & Firefox are supported."
+        end
       end
 
       args = [b]
@@ -342,9 +407,12 @@ module LapisLazuli
           args.push({:profile => profile})
         end
       end
-
       begin
         browser_instance = Watir::Browser.new(*args)
+        # Resize the browser if the device simulation requires it
+        if !device_configuration.nil? and !device_configuration['width'].nil? and !device_configuration['height'].nil?
+          browser_instance.window.resize_to(device_configuration['width'], device_configuration['height'])
+        end
       rescue Selenium::WebDriver::Error::UnknownError => err
         raise err
       end
