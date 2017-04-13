@@ -10,6 +10,7 @@
 # Set the global variables
 default_env: production              # defines the environment
 default_device: desktop720           # See devices.yml for your options
+close_browser_after: end             # Can be `scenario`, `feature` or `end`
 
 ################################################################################
 # List of error strings. `browser.html_error` will return an array of detected strings.

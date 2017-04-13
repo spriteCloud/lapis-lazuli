@@ -214,15 +214,9 @@ module LapisLazuli
       if @@browsers.length != 0 and @@world.env_or_config("close_browser_after") != "never"
         # Notify user
         @@world.log.debug("Closing all browsers")
-
         # Close each browser
         @@browsers.each do |b|
-          begin
-            b.close reason, false
-          rescue Exception => err
-            # Provide some details
-            @@world.log.debug("Failed to close the browser, probably chrome: #{err.to_s}")
-          end
+          b.close reason, true
         end
 
         # Make sure the array is cleared
@@ -236,7 +230,11 @@ module LapisLazuli
     def init(browser_wanted=nil, optional_data=nil)
       # Store the optional data so on restart of the browser it still has the correct configuration
       if optional_data.nil? and @@cached_browser_options.has_key?(:optional_data) and (browser_wanted.nil? or browser_wanted == @@cached_browser_options[:browser])
-        optional_data = @@cached_browser_options[:optional_data]
+        optional_data = @@cached_browser_options[:optional_data].dup
+        if !@@cached_browser_options[:optional_data][:profile].nil?
+          # A selenium profile needs to be duplicated separately, else it doesn't get a new ID.
+          optional_data[:profile] = @@cached_browser_options[:optional_data][:profile].dup
+        end
       elsif optional_data.nil?
         optional_data = {}
       end
@@ -263,7 +261,7 @@ module LapisLazuli
       end
 
       # cache all the settings if this is the first time opening the browser.
-      if !@@cached_browser_options.has_key? :browser
+      if !@@cached_browser_options.has_key? :browser and !@@cached_browser_options.has_key? :optional_data
         @@cached_browser_options[:browser] = browser_wanted
         # Duplicate the data as Webdriver modifies it
         @@cached_browser_options[:optional_data] = optional_data.dup
@@ -354,7 +352,7 @@ module LapisLazuli
             if optional_data[:profile].instance_variable_get(:@additional_prefs)['general.useragent.override'].nil?
               optional_data[:profile]['general.useragent.override'] = device_configuration['user-agent']
             else
-              log.debug "User-agent was already set in the :profile."
+              world.log.debug "User-agent was already set in the :profile."
             end
           when :chrome
             ua_string = "--user-agent=#{device_configuration['user-agent']}"
@@ -363,7 +361,7 @@ module LapisLazuli
             elsif !optional_data[:switches].join(',').include? '--user-agent='
               optional_data[:switches].push ua_string
             else
-              log.debug "User-agent was already set in the :switches."
+              world.log.debug "User-agent was already set in the :switches."
             end
           else
             warn "#{device} user agent cannot be set for #{b.to_s}. Only Chrome & Firefox are supported."

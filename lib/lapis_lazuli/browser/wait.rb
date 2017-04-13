@@ -74,6 +74,7 @@ module BrowserModule
       find_proc = lambda { |dummy|
         res = false
         err = nil
+        err_msg = []
         retries.times do
           begin
             opts = Marshal.load(Marshal.dump(options))
@@ -90,14 +91,20 @@ module BrowserModule
             end
             break # don't need to retry
           rescue Selenium::WebDriver::Error::StaleElementReferenceError => e
+            # Sometimes the element becomes stale right when we're trying to check its presence.
             err = e
+            err_msg << e.message
+          rescue Watir::Exception::UnknownObjectException => e
+            # Sometimes watir returns an unknown object exception, this should be caught when it's a wait until loop.
+            err = e
+            err_msg << e.message
           end
           # Retry
         end
 
         # Raise the error if the retries didn't suffice
-        if not err.nil? and not res
-          raise err, "Tried #{retries} times, but got: #{err.message}", err.backtrace
+        if not err.nil? and not res === false
+          raise err, "Tried #{retries} times, but got: \n#{err_msg.join("\n")}\n", err.backtrace
         end
 
         # Return the results!

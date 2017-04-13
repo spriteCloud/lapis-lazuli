@@ -408,7 +408,7 @@ Then(/^the browser window size should be "([^"]*)"$/) do |expected_size|
       browser.window.maximize
     when /^(\d+)x(\d+)$/
       width = $1
-      height = $2.to_i + 400
+      height = $2
       current_size = browser.window.size
       browser.window.resize_to(width, height)
     else
