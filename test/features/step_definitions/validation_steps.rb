@@ -97,7 +97,7 @@ Then(/^within (\d+) seconds I should see "([^"]+?)"( disappear)?$/) do |timeout,
 
   browser.wait(
     :timeout => timeout,
-    :text => text,
+    :html => {:text => /#{text}/},
     :condition => condition,
     :groups => ["wait #{condition.to_s}"]
   )
