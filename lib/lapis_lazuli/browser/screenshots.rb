@@ -79,8 +79,6 @@ module LapisLazuli
             browser.window.resize_to(width, original_height)
           end
 
-          # require 'optipng'
-          # p Optipng.optimize(File.expand_path(fileloc), { :level => 5 })
           world.log.debug "Screenshot saved: #{fileloc}"
 
           # Try to store the screenshot name
