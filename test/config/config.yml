@@ -9,8 +9,9 @@
 ################################################################################
 # Set the global variables
 default_env: production                   # defines the environment
-default_device: desktop720                        # set the default browser dimensions and/or user agent (See devices.yml)
+default_device: desktop720                # set the default browser dimensions and/or user agent (See devices.yml)
 screenshots_dir: screenshots              # where to save the screenshots
+screenshots_height: full                  # When 'full' the window will be resized to max height before taking a screenshot
 step_pause_time: 1                        # Waiting time in seconds defined after a step completes
 make_screenshot_on_failed_scenario: true  # make a screenshot after a scenario fails
 old_portal: true

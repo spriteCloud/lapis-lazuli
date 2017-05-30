@@ -67,6 +67,7 @@ Then(/(first|last|random|[0-9]+[a-z]+) (.*) should (not )?be present$/) do |inde
   options[type.to_sym] = {}
   # Pick the correct one
   options[:pick] = pick
+  options[:filter_by] = :exists?
   # Execute the find
   type_element = browser.find(options)
   # Find all
@@ -76,7 +77,7 @@ Then(/(first|last|random|[0-9]+[a-z]+) (.*) should (not )?be present$/) do |inde
   all_present = browser.find_all(options)
 
   if hidden and type_element.present?
-    error("Hidden element is visible")
+    error("Hidden element is visible using selectors: #{options}")
   elsif not hidden and not type_element.present?
     error("Element is hidden")
   elsif hidden and not type_element.present? and
@@ -94,10 +95,9 @@ Then(/^within (\d+) seconds I should see "([^"]+?)"( disappear)?$/) do |timeout,
   else
     condition = :until
   end
-
   browser.wait(
     :timeout => timeout,
-    :text => text,
+    :html => /#{text}/,
     :condition => condition,
     :groups => ["wait #{condition.to_s}"]
   )

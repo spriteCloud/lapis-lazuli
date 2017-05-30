@@ -11,6 +11,7 @@
 default_env: production              # defines the environment
 default_device: desktop720           # See devices.yml for your options
 close_browser_after: end             # Can be `scenario`, `feature` or `end`
+screenshots_height: full             # When 'full' the window will be resized to max height before taking a screenshot
 
 ################################################################################
 # List of error strings. `browser.html_error` will return an array of detected strings.
