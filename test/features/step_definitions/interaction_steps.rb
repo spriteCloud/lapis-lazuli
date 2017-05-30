@@ -215,3 +215,11 @@ end
 Given(/^I restart the browser to device setting "(.*?)"$/) do |device|
   browser.restart :chrome, device: device
 end
+
+When(/^I take a screenshot$/) do
+  browser.take_screenshot
+end
+
+When(/^I fail this step$/) do
+  error 'This step fails because it is suppose to'
+end
