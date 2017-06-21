@@ -60,15 +60,15 @@ module LapisLazuli
         begin
           # First make sure the window size is the full page size
           if world.env_or_config("screenshots_height") == 'full'
-            original_height = browser.window.size.height
-            width = browser.window.size.width
+            original_height = @browser.window.size.height
+            width = @browser.window.size.width
             target_height = @browser.execute_script('
               var body = document.body,
               html = document.documentElement;
               return Math.max( body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight );
             ')
             if target_height > original_height
-              browser.window.resize_to(width, target_height)
+              @browser.window.resize_to(width, target_height)
             end
           end
 
@@ -76,9 +76,10 @@ module LapisLazuli
           @browser.screenshot.save fileloc
 
           if world.env_or_config("screenshots_height") == 'full'
-            browser.window.resize_to(width, original_height)
+            if target_height > original_height
+              @browser.window.resize_to(width, original_height)
+            end
           end
-
           world.log.debug "Screenshot saved: #{fileloc}"
 
           # Try to store the screenshot name
