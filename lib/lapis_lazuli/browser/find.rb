@@ -109,7 +109,7 @@ module BrowserModule
     def multi_find_all(*args)
       # Parse args into options
       options = {
-        :mode => :match_one,
+        :mode => :match_any,
       }
       options = parse_find_options(options, *args)
       throw_opt, options = do_throw?(options)
@@ -170,7 +170,7 @@ module BrowserModule
       :pick => :first,
       :throw => true,
       :mode => :match_one,
-      :error => nil,
+      :error => nil
     }
 
     ##
@@ -185,7 +185,7 @@ module BrowserModule
       # Verify/sanitize common options
       if options.has_key? :mode
         options[:mode] = options[:mode].to_sym
-        assert [:match_all, :match_one].include?(options[:mode]), ":mode needs to be one of :match_one or :match_all"
+        assert [:match_all, :match_one, :match_any].include?(options[:mode]), ":mode needs to be one of :match_one, :match_all or :match_any"
       end
 
       if options.has_key? :pick
@@ -349,9 +349,8 @@ module BrowserModule
     def find_lambda_filtered(options)
       options = options.dup
 
-      filter_by = options.fetch(:filter_by, nil)
+      filter_by = options.fetch(:filter_by, :present?)
       options.delete(:filter_by)
-
       options, inner = find_lambda(options)
 
       # Wrap into filter function
@@ -420,15 +419,14 @@ module BrowserModule
         s, func = find_lambda_filtered(selector)
         lambdas << func
       end
-
       # Depending on mode, we need to execute something slightly different
       case options[:mode]
-      when :match_all
+      when :match_all, :match_any
         return options, lambda {
           all = []
           lambdas.each do |func|
             res = func.call
-            if 0 == res.length
+            if 0 == res.length and options[:mode] == :match_all
               all = []
               break
             end
@@ -485,7 +483,18 @@ module BrowserModule
         ret = func.call
 
         if throw_opt and (ret.nil? or ret.length <= 0)
-          raise "Cannot find elements with selectors: #{selectors}"
+          msg = "Cannot find elements with selectors: "
+          if selectors[:selectors].length < 2
+            msg += "#{selectors[:selectors]}\n"
+          else
+            msg += "\n"
+            selectors[:selectors].each do |s|
+              msg += "- #{s} \n"
+            end
+          end
+          selectors.delete(:selectors)
+          msg += "With the options: #{selectors}"
+          raise msg
         end
 
         return ret

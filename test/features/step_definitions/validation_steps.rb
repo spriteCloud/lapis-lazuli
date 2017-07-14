@@ -67,6 +67,7 @@ Then(/(first|last|random|[0-9]+[a-z]+) (.*) should (not )?be present$/) do |inde
   options[type.to_sym] = {}
   # Pick the correct one
   options[:pick] = pick
+  options[:filter_by] = :exists?
   # Execute the find
   type_element = browser.find(options)
   # Find all
@@ -76,7 +77,7 @@ Then(/(first|last|random|[0-9]+[a-z]+) (.*) should (not )?be present$/) do |inde
   all_present = browser.find_all(options)
 
   if hidden and type_element.present?
-    error("Hidden element is visible")
+    error("Hidden element is visible using selectors: #{options}")
   elsif not hidden and not type_element.present?
     error("Element is hidden")
   elsif hidden and not type_element.present? and
@@ -94,10 +95,9 @@ Then(/^within (\d+) seconds I should see "([^"]+?)"( disappear)?$/) do |timeout,
   else
     condition = :until
   end
-
   browser.wait(
     :timeout => timeout,
-    :text => text,
+    :html => /#{text}/,
     :condition => condition,
     :groups => ["wait #{condition.to_s}"]
   )
@@ -215,8 +215,7 @@ Then(/^I expect a (\d+) status code$/) do |expected|
     scenario.check_browser_errors = false
   elsif browser.get_http_status != expected
     error(
-      :message => "Incorrect status code: #{browser.get_http_status}",
-      :groups => ["error"]
+      :message => "Incorrect status code: #{browser.get_http_status}"
     )
   end
 end
@@ -234,13 +233,13 @@ end
 
 Then(/^the firefox browser named "(.*?)" has a profile$/) do |name|
   if scenario.storage.has? name
-    browser = scenario.storage.get name
-    if browser.browser_name == "remote"
-      if browser.driver.capabilities.firefox_profile.nil?
+    b = scenario.storage.get name
+    if b.browser_name == "remote"
+      if b.driver.capabilities.firefox_profile.nil?
         raise "Remote Firefox Profile is not set"
       end
     else
-      if browser.optional_data.has_key? "profile" or browser.optional_data.has_key? :profile
+      if !b.optional_data.has_key? "profile" and !b.optional_data.has_key? :profile
         raise "No profile found in the optional data"
       end
     end

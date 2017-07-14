@@ -5,7 +5,7 @@
 
 # validation_steps.rb is used to confirm that certain elements are displayed on the page.
 
-Then(/text "([^"]*)" should display/) do |string|
+Then(/^text "([^"]*)" should display$/) do |string|
   # Note: The following is *really* slow, as it'll apply the regex to all
   #       elements in the page, one after the other. Of course, if any element
   #       includes the regex, all its parent elements also will, so you have
