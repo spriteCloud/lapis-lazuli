@@ -120,7 +120,12 @@ module WorldModule
           # Try to load a config file
           return self.load_config_from_file(file)
         rescue
-          # Do nothing, load the next file
+          if File.file?(file)
+            # If loading fails but the file exists, throw error
+            raise "File exists but could not be read, there may be a parsing error."
+          else
+            #Do nothing, load the next fileee
+          end
         end
       end
     end
