@@ -124,7 +124,7 @@ module WorldModule
             # If loading fails but the file exists, throw error
             raise "File exists but could not be read, there may be a parsing error."
           else
-            #Do nothing, load the next fileee
+            #Do nothing, load the next file
           end
         end
       end
