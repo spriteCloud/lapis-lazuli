@@ -23,6 +23,7 @@ firefox: BROWSER=firefox
 chrome: BROWSER=chrome
 ie: BROWSER=ie
 safari: BROWSER=safari
+edge: BROWSER=edge
 
 
 ################################################################################
