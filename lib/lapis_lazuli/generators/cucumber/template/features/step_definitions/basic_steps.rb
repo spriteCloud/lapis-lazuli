@@ -4,27 +4,16 @@
 # Author: "<%= config[:user] %>" <<%= config[:email] %>>
 
 # interactions_steps.rb is used to interact with elements on the page.
-
-Given(/^the user navigates to "(.*?)"$/) do |page|
-  # Get the value of the configuration (see /config/config.yml)
-
-  # First grab the root URL defined in the config
-  url = env('pages.root')
-  # Then add the page specific part to the URL
-  url += env("pages.#{page}")
-
-  # Go to the URL
-  browser.goto url
+# Quite advances piece of regex. Goto http://rubular.com/ for practise
+# Whatever is put between parenthesis is captured as a variable unless you start with `?:`
+# /(?: text)?/ means: ` text` is optional and do not capture it as a variable
+# /(.*?)/ means: Any amount of any character, but don't be "greedy"
+# "greedy" means, do not take characters that match the rest of the regex.
+Given(/^the user navigates to (?:the )?"(.*?)"(?: page)?$/) do |page|
+  Nav.to(page)
 end
 
-Given(/^the user navigates to the "(.*?)" page$/) do |page|
-  # Get the value of the configuration (see /config/config.yml)
-  url = env("#{page}")
-
-  # Go to the URL
-  browser.goto url
-end
-
+# An example of interacting with some elements
 Given(/^the user searches for "(.*?)"$/) do |query|
   # Get the input element
   searchbox = browser.find(:text_field => {:name => "s"})
@@ -34,6 +23,11 @@ Given(/^the user searches for "(.*?)"$/) do |query|
   searchbox.send_keys(query)
   # Press enter to submit the search
   searchbox.send_keys(:enter)
+end
+
+
+Then(/^text "([^"]*)" should display somewhere on the page$/) do |string|
+  browser.wait(:html => /#{string}/i)
 end
 
 When(/^the user clicks on link "(.*?)"$/) do |url|
@@ -56,6 +50,13 @@ When(/^the user clicks on the spritecloud logo$/) do
   # And click the logo
   logo.click
 end
+
+Then(/^the user should be on page "(.*?)"$/) do |page|
+  url = Nav.set_url page
+  Nav.wait_for_url url
+end
+
+
 
 # A step definition is a regex, to learn more about this go to http://rubular.com/
 # The following step definition accepts both:

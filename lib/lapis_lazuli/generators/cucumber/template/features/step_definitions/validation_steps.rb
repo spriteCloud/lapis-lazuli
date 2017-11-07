@@ -5,42 +5,6 @@
 
 # validation_steps.rb is used to confirm that certain elements are displayed on the page.
 
-Then(/^text "([^"]*)" should display$/) do |string|
-  # Note: The following is *really* slow, as it'll apply the regex to all
-  #       elements in the page, one after the other. Of course, if any element
-  #       includes the regex, all its parent elements also will, so you have
-  #       tons of matches to process.
-  #
-  # browser.wait(:text => /#{string}/i)
-
-  #       Instead, you will want to search only the root element for some
-  #       text, e.g.
-  #
-  # browser.wait(:html => {:text => /#{string}/i})
-
-  #       There's a shortcut for that in find/wait:
-  browser.wait(:html => /#{string}/i)
-end
-
-Then(/^the user should be on page "(.*?)"$/) do |page|
-  # Get the expected url
-  expected_url = env('pages.root')
-  expected_url += env("pages.#{page}")
-
-  # A custom loop that waits 5 seconds until the expected_url is the same as the current url
-  start = Time.now
-  while browser.url != expected_url
-    break if (Time.now - start).to_i >= 5
-    sleep(0.1)
-  end
-
-  # Check if they are the same
-  if browser.url != expected_url
-    error("The current URL and expected URL were not the same: \n Current: #{browser.url}\n Expected: #{expected_url}")
-  end
-end
-
-
 Then(/^the page should display as logged (in|out) state$/) do |logged|
   # pending # Write code here that turns the phrase above into concrete actions
 

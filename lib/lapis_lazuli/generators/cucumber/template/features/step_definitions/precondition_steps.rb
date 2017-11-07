@@ -11,7 +11,6 @@ Given(/^the user has searched for "(.*?)" on "(.*?)"$/) do |query, page|
   step "the user navigates to \"#{page}\""
   # Run step to search
   step "the user searches for \"#{query}\""
-
 end
 
 Given(/^the user is logged out$/) do
