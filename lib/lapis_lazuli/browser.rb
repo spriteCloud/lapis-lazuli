@@ -316,6 +316,8 @@ module LapisLazuli
       case browser_wanted.to_s.downcase
         when 'chrome'
           b = :chrome
+        when 'edge'
+          b = :edge
         when 'safari'
           b = :safari
         when 'ie'

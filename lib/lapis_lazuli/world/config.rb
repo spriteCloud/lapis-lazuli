@@ -116,11 +116,14 @@ module WorldModule
 
       # Try all files in order
       files.each do |file|
-        begin
-          # Try to load a config file
-          return self.load_config_from_file(file)
-        rescue
-          # Do nothing, load the next file
+        # Check if files exist
+        if File.file?(file)
+          begin
+            # Try to load a config file
+            return self.load_config_from_file(file)
+          rescue Exception => e
+            raise e
+          end
         end
       end
     end
@@ -175,9 +178,8 @@ module WorldModule
           json = File.read(filename)
           data = JSON.parse(json)
         end
-      rescue RuntimeError => err
-        # Can't help you
-        raise "Error loading file: #{filename} #{err}"
+      rescue Exception => e
+        raise "Error loading file: #{filename} #{e}"
       end
 
       # Fix up empty files

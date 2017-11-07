@@ -215,8 +215,7 @@ Then(/^I expect a (\d+) status code$/) do |expected|
     scenario.check_browser_errors = false
   elsif browser.get_http_status != expected
     error(
-      :message => "Incorrect status code: #{browser.get_http_status}",
-      :groups => ["error"]
+      :message => "Incorrect status code: #{browser.get_http_status}"
     )
   end
 end
@@ -234,13 +233,13 @@ end
 
 Then(/^the firefox browser named "(.*?)" has a profile$/) do |name|
   if scenario.storage.has? name
-    browser = scenario.storage.get name
-    if browser.browser_name == "remote"
-      if browser.driver.capabilities.firefox_profile.nil?
+    b = scenario.storage.get name
+    if b.browser_name == "remote"
+      if b.driver.capabilities.firefox_profile.nil?
         raise "Remote Firefox Profile is not set"
       end
     else
-      if browser.optional_data.has_key? "profile" or browser.optional_data.has_key? :profile
+      if !b.optional_data.has_key? "profile" and !b.optional_data.has_key? :profile
         raise "No profile found in the optional data"
       end
     end

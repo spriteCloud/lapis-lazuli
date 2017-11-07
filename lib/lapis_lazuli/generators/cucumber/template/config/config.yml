@@ -37,7 +37,7 @@ uat:
 
 production:
   pages:
-    root: https://spritecloud.com
+    root: https://www.spritecloud.com
     home: /
     about-us: /about-us/
     testing: /testing/
