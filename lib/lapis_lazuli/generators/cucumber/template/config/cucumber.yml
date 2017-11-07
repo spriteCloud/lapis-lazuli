@@ -10,7 +10,7 @@
 
 ################################################################################
 # Type of testrun
-default: -f pretty -x -t
+default: -f pretty -x
 debug: -f pretty BREAKPOINT_ON_FAILURE=1
 html_report: -f pretty -f html --out=results/<%%=timestamp%>_report.html
 junit_report: -f pretty -f junit --out=results
