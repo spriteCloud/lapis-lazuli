@@ -43,6 +43,7 @@ production:
     testing: /testing/
     blog: /blog/
     functional-testing: /testing/functional/
+    jobs: /jobs
   training-page: http://training-page.testautomation.info
 
 

@@ -28,3 +28,11 @@ I want to run and adjust the tests below
       | about-us           |
       | testing            |
       | functional-testing |
+
+  # Learning to debug
+  #
+  @basic_04 @dev
+  Scenario: example_04 - going
+    Given the user navigates to "jobs"
+    When the user clicks on the last listed vacancy
+    Then the url should contain "/jobs/"
