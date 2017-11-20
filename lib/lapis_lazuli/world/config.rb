@@ -316,7 +316,7 @@ module WorldModule
     ##
     # Get a variable from the config
     # First checks the environment section, before it checks the global part
-    def env_or_config(variable, default=nil)
+    def env_or_config(variable, default=(no_default_set=true;nil))
       # Make sure the configured configuration is loaded, if possible
       init
 
@@ -332,6 +332,9 @@ module WorldModule
       elsif self.has_config?(variable)
         return self.config(variable, default)
       else
+        if no_default_set == true
+          raise "Unknown environment or configuration variable '(#{@env}.)#{variable}' and no default given"
+        end
         return default
       end
     end
