@@ -18,9 +18,9 @@ module Nav
 
     def get_url page
       begin
-        return "#{env('root')}#{config("pages.#{page}")}"
+        return config("pages.#{page}")
       rescue RuntimeError
-        return "#{env('root')}#{config("pages.#{page}.path")}"
+        return config("pages.#{page}.path")
       end
     end
 
@@ -37,7 +37,12 @@ module Nav
       if Nav.is_url? config_page_or_url
         return config_page_or_url
       else
-        return get_url config_page_or_url
+        path_or_url = get_url config_page_or_url
+        if Nav.is_url? path_or_url
+          return path_or_url
+        else
+          return env('root') + path_or_url
+        end
       end
     end
 
