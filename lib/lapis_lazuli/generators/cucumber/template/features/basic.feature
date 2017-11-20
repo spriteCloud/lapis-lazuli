@@ -29,10 +29,14 @@ I want to run and adjust the tests below
       | testing            |
       | functional-testing |
 
-  # Learning to debug
-  #
+  ### LEARNING TO DEBUG ###
+  # Scenario' or Feature's including the tag @dev will be ingored when running a regular profile. To run this do:
+  # bundle exec cucumber -t @basic_04 -p debug
+  # or, if you want to test it on a specific environment:
+  # bundle exec cucumber -p production -p debug -t @basic_04
+  # Good luck fixing the problems!
   @basic_04 @dev
   Scenario: example_04 - going
-    Given the user navigates to "jobs"
-    When the user clicks on the last listed vacancy
-    Then the url should contain "/jobs/"
+    Given the user navigates to "blog"
+    When the user searches for "no_results_expected"
+    Then the text "Nothing Found" should display on the blog page

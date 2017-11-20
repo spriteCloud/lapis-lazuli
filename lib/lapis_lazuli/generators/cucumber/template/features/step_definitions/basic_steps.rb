@@ -57,7 +57,6 @@ Then(/^the user should be on page "(.*?)"$/) do |page|
 end
 
 
-
 # A step definition is a regex, to learn more about this go to http://rubular.com/
 # The following step definition accepts both:
 # - the user logs in > will use the last stored user data
@@ -163,4 +162,12 @@ When(/^"(.*?)" registers for a new account$/) do |user_tag|
 
   # The website we're testing on, doesn't log in the user automatically. So let's trigger that step manually
   step 'the user logs in'
+end
+
+Then /^the text "(.*?)" should display on the blog page$/ do |expected_text|
+  # Many things wrong here, can you fix it?
+  header = browser.find(:like => [:h2, :id, 'entry_title'])
+  unless heeder.text.include? expected_text
+    error "Unable to find text `#{expected_text}`"
+  end
 end
