@@ -24,20 +24,20 @@ error_strings:
 ################################################################################
 # Environment specific variables
 test:
+  root: http://username:password@test.spritecloud.com #Not an existing page, note the username/password user inside the URL
   pages:
-    root: http://username:password@test.spritecloud.com #Not an existing page, note the username/password user inside the URL
     home: /
     about-us: /about-us/
 
 uat:
+  root: http://username:password@uat.spritecloud.com #Not an existing page, note the username/password user inside the URL
   pages:
-    root: http://username:password@uat.spritecloud.com #Not an existing page, note the username/password user inside the URL
     home: /
     about-us: /about-us/
 
 production:
+  root: https://www.spritecloud.com
   pages:
-    root: https://www.spritecloud.com
     home: /
     about-us: /about-us/
     testing: /testing/

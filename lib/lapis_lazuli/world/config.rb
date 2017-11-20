@@ -328,9 +328,9 @@ module WorldModule
       end
 
       if self.has_env?(variable)
-        return self.env(variable, default)
+        return self.env(variable)
       elsif self.has_config?(variable)
-        return self.config(variable, default)
+        return self.config(variable)
       else
         if no_default_set == true
           raise "Unknown environment or configuration variable '(#{@env}.)#{variable}' and no default given"
