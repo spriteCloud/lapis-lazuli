@@ -1,165 +1,105 @@
 module Auth
 
   extend LapisLazuli
-
   class << self
 
     @@user = ''
+    @login_page = 'training-page'
 
-    def log_in(user, renew_session=false)
-      Auth.set_role_if_not_exsist user unless user == 'super dev'
-      @@user = user
-      Auth.log_out if renew_session
+    # This is a list of elements relevant for this helper.
+    # The following is short notation, *only* use this if the element selector can be done in 1 line.
+    # @formatter:off
+    def form_container; browser.wait(:like => [:div, :class, 'container']); end
+    def username_field; form_container.input(:xpath => '//*[@id="login-username"]'); end
+    def password_field; form_container.browser.input(:id => 'login-password'); end
+    def login_button; browser.button(:id => 'button-login'); end
+    # @formatter:on
+
+    # Following elements that need more advanced options/search patterns
+    def logged_in_element(timeout=10, throw=true)
+      browser.wait(
+        :like => [:a, :id, 'user_dropdown'],
+        :timeout => timeout,
+        :throw => throw
+      )
+    end
+
+    def logged_out_element(timeout=10, throw=true)
+      browser.wait(
+        :like => [:form, :id, 'form-login'],
+        :timeout => timeout,
+        :throw => throw
+      )
+    end
+
+    # Next are the functions called from the step definitions
+    # `ensure_something` is best practise to be used for functions that should get the test to a certain state. For example:
+    # `ensure_log_out` only logs out if you're logged in
+    # `log_out` will blindly try to log out and fail if you're already logged out
+    def ensure_log_out
+      Nav.to('training-page')
+      if Auth.is_logged_in?
+        Auth.log_out
+        if Auth.is_logged_in?
+          error 'Page did not display in logged out state after logging out'
+        end
+      end
+    end
+
+    def ensure_log_in(user='default-user')
+      Nav.to('training-page')
       unless Auth.is_logged_in?(user)
         Auth.ensure_log_out
-        Nav.to('login')
-        browser.find(:like => [:input, :name, 'login[username]']).send_keys(Auth.get_user('username'))
-        browser.find(:like => [:input, :name, 'login[password]']).send_keys(Auth.get_user('password'))
-        browser.find(:like => [:input, :id, 'login-button']).click
-        if !Auth.is_logged_in? user
-          alert = browser.find(:like => [:div, :class, 'alert'], :throw => false)
-          if alert.nil?
-            error "Failed to log in user #{user}"
-          else
-            error "Found error while logging in #{user}: `#{alert.text}`"
-          end
+        Auth.log_in(user)
+        unless Auth.is_logged_in?(user)
+          error "Failed to log in `#{user}`."
+        end
+      end
+    end
+
+    def is_logged_in?(user=nil)
+      if Auth.logged_out_element(0, false)
+        return false
+      end
+      if user.nil?
+        return !Auth.logged_in_element(5, false).nil?
+      else
+        User.load_user_data(user)
+        elm = Auth.logged_in_element(5, false)
+        if elm.nil?
+          return false
+        else
+          return elm.span(:class => 'username ng-binding').text == User.get('username')
         end
       end
     end
 
     def log_out
-      browser.find(:like => [:div, :id, 'accountInfo']).click
-      browser.find(:like => [:a, :href, '/logout']).click
-      error "Failed logging out user #{@@user}" if Auth.is_logged_in?
+      Auth.logged_in_element.flash.click
+      dropdown = browser.wait(:like => [:ul, :class, 'dropdown-menu']).flash
+      browser.find(
+        :like => [:a, :id, 'link-logout'],
+        :context => dropdown
+      ).flash.click
     end
 
-    def ensure_log_out
-      Auth.log_out if Auth.is_logged_in?
-    end
+    def log_in(user, renew_session=false)
+      User.load_user_data(user)
+      Nav.to('training-page')
+      Auth.username_field.flash.send_keys(User.get('username'))
+      Auth.password_field.flash.send_keys(User.get('password'))
+      Auth.login_button.flash.click
 
-    def is_logged_in?(user=nil)
-      # Either look for just the avatar, or also include the user name
-      selector = {:div => {:id => 'accountInfo'}}
-      if !user.nil?
-        selector = {:div => {:id => 'accountInfo', :text => /#{(Auth.get_user('first_name'))}/}}
-      end
-
-      Nav.to('landing') unless Nav.is_url?(browser.url)
-      # Doing a quick check if either state can be confirmed
-      avatar = browser.find(:selectors => [selector], :throw => false)
-      if avatar.nil?
-        login_input = browser.find(:like => [:input, :name, 'login[username]'], :throw => false)
-        return false unless login_input.nil?
-      else
-        return true
-      end
-
-      Nav.to('landing')
-      # Wait a moment if logged in state can be confirmed
-      avatar = browser.multi_wait(
-        :selectors => [selector],
-        :throw => false
-      )
-      if avatar.nil?
-        return false
-      else
-        return true
-      end
-    end
-
-    def wait_while_logged_in
-      browser.wait_until(timeout: 10, message: 'User was still logged in after waiting for 10 seconds.') {!Auth.is_logged_in?}
-    end
-
-    def get_user(field)
-      data = Auth.get_data
-      begin
-        ret = data["users"][ENV['TEST_ENV']][ENV['BRANCH']][@@user][field]
-      rescue NoMethodError => e
-        if @@user == 'super dev'
-          ret = data["users"][@@user][field]
+      unless Auth.is_logged_in? user
+        alert = browser.find(:like => [:div, :class, 'alert'], :throw => false)
+        if alert.nil?
+          error "Failed to log in user #{user}"
         else
-          p data
-          error "Failed getting `users.#{ENV['TEST_ENV']}.#{ENV['BRANCH']}.#{@@user}.#{field}`: #{e.message}"
+          alert.flash
+          error "Found error while logging in #{user}: `#{alert.text}`"
         end
       end
-      return ret
     end
 
-    def get_role_id(role)
-      config("roles.#{role}")
-    end
-
-    def get_data()
-      YAML.load_file "./config/users.yml"
-    end
-
-    def set_data(new_data)
-      data = Auth.get_data
-
-      require 'deep_merge'
-      data.deep_merge!(new_data)
-
-      File.open("./config/users.yml", 'w') {|f| YAML.dump(data, f)}
-    end
-
-    def set_role_if_not_exsist(role)
-      begin
-        data = Auth.get_data['users'][ENV['TEST_ENV']][ENV['BRANCH']][role]
-        # Force error if data is nil
-        raise("users.#{ENV['TEST_ENV']}.#{ENV['BRANCH']}.#{role} was nil") if data.nil?
-      rescue Exception => e
-        warn e.message
-        start_url = browser.url
-        puts "Role `#{role}` does not exist yet. Looking up a user with this role..."
-        Auth.log_in('super dev')
-        Nav.to('accounts')
-        Auth.find_role role
-        @@user = role
-        puts "Role `#{role}` has been created in ./config/users.yml"
-      end
-    end
-
-    def find_role(role)
-      role_id = Auth.get_role_id role
-      elm = browser.find(:select => {:name => 'roles'})
-      begin
-        elm.select(role_id.to_s)
-      rescue Watir::Exception::NoValueFoundException
-        error "id `#{role_id.to_s}` for `#{role}` not found in the select list. Does this role exist for `#{ENV['BRANCH']}`"
-      end
-      browser.find(:like => [:input, :id, 'numberFilter']).set('')
-      #puts 'Looking for `edit` button in large table.. this could take a while...'
-      row = browser.find(:like => [:tr, :class, 'employed employee'])
-      browser.find(
-        :like => [:a, :href, '/editaccount/'],
-        :context => row,
-        :message => "No `#{role}` found after filtering all employees."
-      ).click
-      username = browser.wait(:like => [:input, :id, 'user_accounts_user_name']).value
-      firstname = browser.wait(:like => [:input, :id, '_first_name']).value
-      cache_role(role, username, firstname)
-    end
-
-    def cache_role(role, username, firstname)
-      add_data = {
-        'users' => {
-          ENV['TEST_ENV'] => {
-            ENV['BRANCH'] => {
-              role => {
-                'username' => username,
-                'first_name' => firstname,
-                'password' => Auth.get_data['users']['default-password']
-              }
-            }
-          }
-        }
-      }
-      Auth.set_data add_data
-    end
-
-    def current_user()
-      return @@user
-    end
   end
 end

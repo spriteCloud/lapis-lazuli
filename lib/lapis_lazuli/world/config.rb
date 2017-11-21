@@ -54,7 +54,7 @@ module LapisLazuli
       # still work to overwrite an existing configuration.
       def init
         # Guard against doing this more than once.
-        if not @config.nil?
+        unless @config.nil?
           return
         end
 
@@ -98,10 +98,15 @@ module LapisLazuli
       # - config/config-test.yml
       # - config/config-local.yml
       # - config/config.yml
+      #
+      # Throws errors if:
+      # - Config file isn't readable
+      # - Environment doesn't exist in config
+      # - Default environment not set in config if no environment is set
       def load_config(config_names)
         # Go trough each config_name
-        files = []
         config_names.each do |config_name|
+          files = []
           # Split the filename
           ext = File.extname(config_name)
           dir, filename = File.split(config_name)
@@ -125,17 +130,32 @@ module LapisLazuli
             files << "#{dir}#{File::SEPARATOR}#{basename}-#{suffix}#{ext}"
           end
           files << config_name
-        end
-        # Try all files in order
-        files.each do |file|
-          # Check if files exist
-          if File.file?(file)
-            begin
-              # Try to load a config file
-              return self.load_config_from_file(file)
-            rescue Exception => e
-              raise e
+          # Try all files in order
+          files.each do |file|
+            # Check if files exist
+            if File.file?(file)
+              begin
+                # Try to load a config file
+                self.add_config_from_file(file)
+                break
+              rescue Exception => e
+                raise e
+              end
             end
+          end
+        end
+        # If we have an environment, the config should contain it
+        if not @env.nil? and not self.has_config?(@env)
+          raise "Environment `#{@env}` doesn't exist in any of the config files"
+        end
+
+        # If we don't have one then load the default
+        if @env.nil? and self.has_config?("default_env")
+          tmp = self.config("default_env")
+          if self.has_config?(tmp)
+            @env = tmp
+          else
+            raise "Default environment not present in any of the config files"
           end
         end
       end
@@ -146,32 +166,9 @@ module LapisLazuli
       #
       # Supports: YML, JSON
       #
-      # Throws errors if:
-      # - Config file isn't readable
-      # - Environment doesn't exist in config
-      # - Default environment not set in config if no environment is set
-      def load_config_from_file(filename)
-        # Set the global @config variable
-        @config = get_config_from_file(filename)
-
-        # If we have an environment this config should have it
-        if not @env.nil? and not self.has_config?(@env)
-          raise "Environment `#{@env}` doesn't exist in config file"
-        end
-
-        # If we don't have one then load the default
-        if @env.nil? and self.has_config?("default_env")
-          tmp = self.config("default_env")
-          if self.has_config?(tmp)
-            @env = tmp
-          else
-            raise "Default environment not present in config file"
-          end
-        end
-      end
-
       # Adds the possibility to merge multiple config files.
       def add_config_from_file(filename)
+        @config = {} if @config.nil?
         # Add the data to the global config
         @config.merge! get_config_from_file(filename)
       end
