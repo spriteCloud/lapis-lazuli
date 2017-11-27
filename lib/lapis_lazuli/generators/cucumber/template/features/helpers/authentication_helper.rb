@@ -69,7 +69,7 @@ module Auth
         if elm.nil?
           return false
         else
-          return elm.span(:class => 'username ng-binding').text == User.get('username')
+          return elm.span(:class => ['username', 'ng-binding']).text == User.get('username')
         end
       end
     end
@@ -83,11 +83,12 @@ module Auth
       ).flash.click
     end
 
-    def log_in(user, renew_session=false)
-      User.load_user_data(user)
+    def log_in(user=nil, renew_session=false)
+      User.load_user_data(user) unless user.nil?
+
       Nav.to('training-page')
-      Auth.username_field.flash.send_keys(User.get('username'))
-      Auth.password_field.flash.send_keys(User.get('password'))
+      Auth.username_field.flash.to_subtype.set(User.get('username'))
+      Auth.password_field.flash.to_subtype.set(User.get('password'))
       Auth.login_button.flash.click
 
       unless Auth.is_logged_in? user
@@ -100,6 +101,5 @@ module Auth
         end
       end
     end
-
   end
 end

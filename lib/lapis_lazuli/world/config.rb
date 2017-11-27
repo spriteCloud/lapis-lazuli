@@ -154,6 +154,7 @@ module LapisLazuli
           tmp = self.config("default_env")
           if self.has_config?(tmp)
             @env = tmp
+            ENV['TEST_ENV'] = tmp
           else
             raise "Default environment not present in any of the config files"
           end

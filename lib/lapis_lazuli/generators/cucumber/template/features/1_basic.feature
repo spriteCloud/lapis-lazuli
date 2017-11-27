@@ -36,7 +36,7 @@ I want to run and adjust the tests below
   # bundle exec cucumber -p production -p debug -t @basic_04
   # Good luck fixing the problems!
   @basic_04 @dev
-  Scenario: example_04 - going
+  Scenario: example_04 - confirming there is a no results page
     Given the user navigates to "blog"
     When the user searches for "no_results_expected"
     Then the text "Nothing Found" should display on the blog page

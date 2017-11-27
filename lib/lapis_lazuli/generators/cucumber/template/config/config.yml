@@ -44,4 +44,4 @@ production:
     blog: /blog/
     functional-testing: /testing/functional/
     jobs: /jobs
-    training-page: http://training-page.testautomation.info
+    training-page: http://training-page.testautomation.info/#

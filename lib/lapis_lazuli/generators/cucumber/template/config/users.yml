@@ -1,10 +1,10 @@
 ---
 users:
-  default-user:
-    username: TA_user__RAND-ALPHA_
+  default-user: # See ./features/helpers/user_helper.rb
+    username: ta_RAND-ALPHA_
     password: Ab!2_RAND_
     gender: male
-    experience: Ruby, Gherkin
+    experience: Ruby,Gherkin
     biography: This is the default test user
     complete_all: 1
   production:
