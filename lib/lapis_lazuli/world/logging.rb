@@ -37,7 +37,7 @@ module WorldModule
         end
 
         # Start the logger with the config filename
-        log_file = "#{dir}#{File::SEPARATOR}#{File.basename(Config.config_file, ".*")}.log"
+        log_file = "#{dir}#{File::SEPARATOR}#{File.basename(Config.config_files[0], ".*")}.log"
         # Or a filename from the environment
         if has_env_or_config?("log_file")
           log_file = env_or_config("log_file")

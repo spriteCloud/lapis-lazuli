@@ -250,10 +250,10 @@ module LapisLazuli
         if @@cached_browser_options.has_key?(:device)
           optional_data[:device] = @@cached_browser_options[:device]
           # Check if the ENV['DEVICE'] variable is set
-        elsif !world.env_or_config('DEVICE').nil?
+        elsif world.env_or_config('DEVICE', false)
           optional_data[:device] = world.env_or_config('DEVICE')
           # Else grab the default set device
-        elsif !world.env_or_config('default_device').nil?
+        elsif world.env_or_config('default_device', false)
           optional_data[:device] = world.env_or_config('default_device')
         else
           warn 'No default device, nor a selected device was set. Browser default settings will be loaded. More info: http://testautomation.info/Lapis_Lazuli:Device_Simulation'
@@ -316,6 +316,8 @@ module LapisLazuli
       case browser_wanted.to_s.downcase
         when 'chrome'
           b = :chrome
+        when 'edge'
+          b = :edge
         when 'safari'
           b = :safari
         when 'ie'

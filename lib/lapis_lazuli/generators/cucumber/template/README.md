@@ -4,6 +4,8 @@ Author: "<%= config[:user] %>" <<%= config[:email] %>>
 
 # Setup
 
+See: www.testautomation.info/index.php?title=Installing_ruby_with_cucumber
+
 ## General
 
 - Make sure you have ruby 2.0 or later installed.

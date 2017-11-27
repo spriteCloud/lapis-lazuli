@@ -5,7 +5,8 @@
 require 'lapis_lazuli'
 require 'lapis_lazuli/cucumber'
 
-LapisLazuli::WorldModule::Config.config_file = "config/config.yml"
+LapisLazuli::WorldModule::Config.add_config("config/config.yml")
+LapisLazuli::WorldModule::Config.add_config("config/users.yml")
 World(LapisLazuli)
 
 # Do something when LapisLazuli is started (This is before the browser is opened)
