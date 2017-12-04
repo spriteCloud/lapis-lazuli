@@ -18,6 +18,8 @@ gem 'lapis_lazuli', :git => 'https://github.com/spriteCloud/lapis-lazuli.git', :
 # Production gem
 # gem "lapis_lazuli"
 
+gem 'cucumber', '~>2'
+
 # Project specific gems
 gem 'watir-scroll'
 gem 'xml-simple'
