@@ -43,9 +43,9 @@ Given(/I click (the|a) (first|last|random|[0-9]+[a-z]+) (.*)$/) do |arg1, index,
 end
 
 
-Given(/^I create a firefox browser named "(.*?)"( with proxy to "(.*?)")$/) do |name, proxy, proxy_url|
+Given(/^I create a firefox browser named "(.*?)"(?: with proxy to "(.*?)")?$/) do |name, proxy_url|
   b = nil
-  if proxy
+  if proxy_url
     log.debug("Starting with profile")
     require 'selenium-webdriver'
     profile = Selenium::WebDriver::Firefox::Profile.new

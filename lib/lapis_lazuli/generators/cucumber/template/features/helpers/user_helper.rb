@@ -8,8 +8,12 @@ module User
       data = config('users.default-user')
       begin
         specific_data = config("users.#{user}")
-      rescue
-        specific_data = config("users.#{ENV['TEST_ENV']}.#{user}")
+      rescue Exception => err1
+        begin
+          specific_data = config("users.#{ENV['TEST_ENV']}.#{user}")
+        rescue Exception => err2
+          error "The given user `#{user}` was not found in any of the config files:\n- #{err1.message}\n- #{err2.message}"
+        end
       end
       new_data = data.merge specific_data
       @@data = replace_hash_constants(new_data)

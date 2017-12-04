@@ -30,7 +30,7 @@ module Register
           :option => {:value => /#{exp}/i},
           :context => Register.experience_field
         )
-        option.send_keys([:control, :space])
+        option.click(:control)
       end
     end
 
@@ -57,7 +57,6 @@ module Register
     end
 
     def submit_form
-      Register.submit_button.focus
       Register.submit_button.click
     end
 
