@@ -75,21 +75,21 @@ module Auth
     end
 
     def log_out
-      Auth.logged_in_element.flash.click
-      dropdown = browser.wait(:like => [:ul, :class, 'dropdown-menu']).flash
+      Auth.logged_in_element.click
+      dropdown = browser.wait(:like => [:ul, :class, 'dropdown-menu'])
       browser.find(
         :like => [:a, :id, 'link-logout'],
         :context => dropdown
-      ).flash.click
+      ).click
     end
 
     def log_in(user=nil, renew_session=false)
       User.load_user_data(user) unless user.nil?
 
       Nav.to('training-page')
-      Auth.username_field.flash.to_subtype.set(User.get('username'))
-      Auth.password_field.flash.to_subtype.set(User.get('password'))
-      Auth.login_button.flash.click
+      Auth.username_field.to_subtype.set(User.get('username'))
+      Auth.password_field.to_subtype.set(User.get('password'))
+      Auth.login_button.click
 
       unless Auth.is_logged_in? user
         alert = browser.find(:like => [:div, :class, 'alert'], :throw => false)
