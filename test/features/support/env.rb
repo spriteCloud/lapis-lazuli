@@ -11,7 +11,7 @@ module TestModule
   end
 end
 
-LapisLazuli::WorldModule::Config.config_file = "config/config.yml"
+LapisLazuli::WorldModule::Config.add_config "config/config.yml"
 World(LapisLazuli, TestModule)
 
 LapisLazuli::WorldModule::Browser.browser_module(TestModule)
@@ -22,6 +22,7 @@ LapisLazuli.Start do
   print "Lapis Lazuli: #{Gem.loaded_specs['lapis_lazuli'].version}\n"
   print "Selenium webdriver: #{Gem.loaded_specs['selenium-webdriver'].version}\n"
   print "Watir: #{Gem.loaded_specs['watir'].version}\n"
+  print "Cucumber: #{Gem.loaded_specs['cucumber'].version}\n"
   print "---- VERSION INFO ----\n\n"
 end
 

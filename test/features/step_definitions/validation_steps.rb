@@ -126,11 +126,11 @@ Then(/^within (\d+) seconds I should see added elements with matching$/) do |tim
   elems = browser.multi_wait_all(
     :timeout => timeout,
     :condition => :until,
-    :mode => :match_all,
+    :mode => :match_any,
     :groups => ["wait"],
     :selectors => [
       {:tag_name => 'span', :class => /foo/, :text => /foo/},
-      {:tag_name => 'div', :id => 'bar', :html => "bar"}
+      {:tag_name => 'div', :id => 'bar', :text => "bar"}
     ]
   )
   assert (2 == elems.length), "Expected two elements, found #{elems.length}"
