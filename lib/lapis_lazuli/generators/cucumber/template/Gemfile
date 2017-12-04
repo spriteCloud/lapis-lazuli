@@ -5,5 +5,4 @@ source 'http://rubygems.org'
 # > bundle exec cucumber
 
 # LapisLazul itself
-# gem 'lapis_lazuli', <%= config[:lapis_lazuli][:dependency] %>
-gem 'lapis_lazuli', :path => '../../../../../'
+gem 'lapis_lazuli', <%= config[:lapis_lazuli][:dependency] %>
