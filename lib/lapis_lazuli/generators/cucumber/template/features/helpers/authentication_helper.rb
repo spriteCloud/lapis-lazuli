@@ -11,7 +11,7 @@ module Auth
     # @formatter:off
     def form_container; browser.wait(:like => [:div, :class, 'container']); end
     def username_field; form_container.input(:xpath => '//*[@id="login-username"]'); end
-    def password_field; form_container.browser.input(:id => 'login-password'); end
+    def password_field; form_container.input(:id => 'login-password'); end
     def login_button; browser.button(:id => 'button-login'); end
     # @formatter:on
 
