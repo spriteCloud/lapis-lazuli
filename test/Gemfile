@@ -19,6 +19,7 @@ gem 'lapis_lazuli', :git => 'https://github.com/spriteCloud/lapis-lazuli.git', :
 # gem "lapis_lazuli"
 
 gem 'cucumber', '~>2'
+gem 'selenium-webdriver', '3.4.4'
 
 # Project specific gems
 gem 'watir-scroll'
