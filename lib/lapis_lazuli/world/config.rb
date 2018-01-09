@@ -42,7 +42,7 @@ module LapisLazuli
         end
 
         def config_files
-          return @config_files
+          return @config_files || ["config/config.yml"]
         end
       end
       extend ClassMethods
