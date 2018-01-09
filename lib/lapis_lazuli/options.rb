@@ -17,6 +17,7 @@ module LapisLazuli
     "email_domain" => ["google.com", "The domain name used when generating email addresses. See the `placeholders` command for more information."],
     "screenshot_on_failure" => [true, "Toggle whether failed scenarios should result in a screenshot being taken automatically."],
     "screenshot_dir" => [".#{File::SEPARATOR}screenshots", "Location prefix for the screenshot path."],
+    "screenshots_height" => [nil, "When 'full' the window will be resized to max height before taking a screenshot"],
     "screenshot_scheme" => ["old", "Naming scheme for screenshots. Possible values are 'old' and 'new'. This option will be deprecated in the near future, and only the new scheme will be supported."],
     "breakpoint_on_error" => [false, "If the error() function is used to create errors, should the debugger be started?"],
     "step_pause_time" => [0, "(Deprecated) Number of seconds to wait after each cucumber step is executed."],
