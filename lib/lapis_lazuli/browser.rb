@@ -307,42 +307,18 @@ module LapisLazuli
         raise LoadError, "#{err}: you need to add 'watir' to your Gemfile before using the browser."
       end
 
-      # No browser? Does the config have a browser? Default to firefox
+      # No browser? Does the config have a browser?
       if browser_wanted.nil?
-        browser_wanted = world.env_or_config('browser', 'firefox')
+        browser_wanted = world.env_or_config('browser', nil)
       end
 
-      # Select the correct browser
-      case browser_wanted.to_s.downcase
-        when 'chrome'
-          b = :chrome
-        when 'edge'
-          b = :edge
-        when 'safari'
-          b = :safari
-        when 'ie'
-          require 'rbconfig'
-          if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
-            b = :ie
-          else
-            world.error("You can't run IE tests on non-Windows machine")
-          end
-        when 'ios'
-          if RUBY_PLATFORM.downcase.include?("darwin")
-            b = :iphone
-          else
-            world.error("You can't run IOS tests on non-mac machine")
-          end
-        when 'remote'
-          b = :remote
-        else
-          b = :firefox
-      end
+      b = browser_wanted
+      b = b.to_sym unless b.nil?
 
       # Overwrite user-agent if a device simulation is set and it contains a user-agent
       if !device_configuration.nil? and !device_configuration['user-agent'].nil?
-        case b
-          when :firefox
+        #case b
+          #when :firefox
             # Create a firefox profile if it does not exist yet
             if optional_data[:profile].nil?
               optional_data[:profile] = Selenium::WebDriver::Firefox::Profile.new
@@ -356,7 +332,7 @@ module LapisLazuli
             else
               world.log.debug "User-agent was already set in the :profile."
             end
-          when :chrome
+          #when :chrome
             ua_string = "--user-agent=#{device_configuration['user-agent']}"
             if optional_data[:switches].nil?
               optional_data[:switches] = [ua_string]
@@ -365,12 +341,13 @@ module LapisLazuli
             else
               world.log.debug "User-agent was already set in the :switches."
             end
-          else
-            warn "#{device} user agent cannot be set for #{b.to_s}. Only Chrome & Firefox are supported."
-        end
+         # else
+         #   warn "#{device} user agent cannot be set for #{b.to_s}. Only Chrome & Firefox are supported."
+        #end
       end
 
-      args = [b]
+      args = []
+      args = [b] unless b.nil?
       @browser_name = b.to_s
       if b == :remote
         # Get the config

@@ -16,10 +16,10 @@ html_report: -f pretty -f html --out=results/<%%=timestamp%>_report.html
 junit_report: -f pretty -f junit --out=results
 
 ################################################################################
-# Supported browsers (default = firefox)
+# Supported browsers (default = chrome)
+chrome: BROWSER=chrome
 ff: BROWSER=firefox
 firefox: BROWSER=firefox
-chrome: BROWSER=chrome
 
 ################################################################################
 # Listed environments (default is set in config.yml)
