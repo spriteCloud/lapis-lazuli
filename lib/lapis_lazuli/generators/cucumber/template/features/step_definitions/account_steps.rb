@@ -1,9 +1,12 @@
 # A step definition is a regex, to learn more about this go to http://rubular.com/
+# More info: https://github.com/cucumber/cucumber/wiki/Step-Definitions
+
 # The following step definition accepts both:
 # - the user logs in > will use the last stored user data
 # - "user-x" logs in > will load user data from config.yml
 When(/^"?(.*?)"? logs in$/) do |user|
   user = nil if user == 'the user'
+  # Check out ./features/helpers/ for the function being called
   Auth.log_in(user)
 end
 
@@ -19,6 +22,7 @@ Given(/^"(.*?)" is logged in$/) do |user|
   Auth.ensure_log_in(user)
 end
 
+# One step definition that handles both the logged in as the logged out state
 Then(/^the page should display as logged (in|out) state$/) do |logged|
   # Adjust variable for checking logged in or logged out state.
   if logged == 'in' and !Auth.is_logged_in?
@@ -28,6 +32,7 @@ Then(/^the page should display as logged (in|out) state$/) do |logged|
   end
 end
 
+# A static way to write your step definition
 When 'the user clicks on the registration button' do
   Register.open_registration
 end

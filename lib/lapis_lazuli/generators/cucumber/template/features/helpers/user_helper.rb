@@ -1,3 +1,5 @@
+# This helper loads user data from the config files.
+# After loading the data, it will overwrite certain strings, like __TIMESTAMP__ to randomize information
 module User
   extend LapisLazuli
 

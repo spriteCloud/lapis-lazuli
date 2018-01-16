@@ -34,14 +34,18 @@ module Register
       end
     end
 
+    # The following 3 functions are a typical example of something to use.
+    # First a function in which you perform an action (open_something, click_something, press_something)
     def open_registration
       Register.open_register_button.click
     end
 
+    # Second, a function that confirms that the action was successful
     def is_registration_open?
       return Register.form rescue false
     end
 
+    # And finally as function that ensures an action was successfully completed.
     def ensure_open_registrarion
       Auth.ensure_log_out
       Register.open_registration unless Register.is_registration_open?
