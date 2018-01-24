@@ -9,6 +9,7 @@
 require "lapis_lazuli/options"
 require "lapis_lazuli/storage"
 require "lapis_lazuli/runtime"
+require 'deep_merge'
 
 module LapisLazuli
   module WorldModule
@@ -171,7 +172,7 @@ module LapisLazuli
       def add_config_from_file(filename)
         @config = {} if @config.nil?
         # Add the data to the global config
-        @config.merge! get_config_from_file(filename)
+        @config.deep_merge! get_config_from_file(filename)
       end
 
       # returns the data that's loaded from a config file.
