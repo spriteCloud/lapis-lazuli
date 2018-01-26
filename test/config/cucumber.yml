@@ -24,10 +24,9 @@ chrome: BROWSER=chrome
 ie: BROWSER=ie
 safari: BROWSER=safari
 
-p: TEST_ENV=production -t @p,@prod
-production: TEST_ENV=production -t @p,@prod
+local: TEST_ENV=local -t @p,@prod
 
-remote: SELENIUM_ENV=remote -t ~@ignore_on_remote
+remote: SELENIUM_ENV=remote -t ~@ignore_on_remote TEST_ENV=remote
 
 ################################################################################
 # Calliope.pro settings

@@ -44,7 +44,7 @@ LapisLazuli.Start do
 
   ENV['TA_OS'] = RUBY_PLATFORM
   ENV['TA_PLATFORM'] = "#{browser.driver.browser} #{browser.driver.capabilities.version}"
-  ENV['TA_BUILD'] = "#{LapisLazuli.software_versions['aem']}"
+  ENV['TA_BUILD'] = "#{Gem.loaded_specs['lapis_lazuli'].version}"
 end
 
 # Transition function from old codebase to new

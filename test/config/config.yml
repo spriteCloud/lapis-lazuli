@@ -8,7 +8,7 @@
 
 ################################################################################
 # Set the global variables
-default_env: production                   # defines the environment
+default_env: local                   # defines the environment
 default_device: desktop720                # set the default browser dimensions and/or user agent (See devices.yml)
 screenshots_dir: screenshots              # where to save the screenshots
 screenshots_height: full                  # When 'full' the window will be resized to max height before taking a screenshot
@@ -29,11 +29,12 @@ error_strings:
 
 ################################################################################
 # Environment specific variables
-test:
-
-uat:
-
-production:
+remote:
   close_browser_after: feature
   server:
-      url: http://localhost:9090/
+    url: http://spritecloud__ruby-selenium-runner:9090
+
+local:
+  close_browser_after: feature
+  server:
+    url: http://localhost:9090/
