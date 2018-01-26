@@ -4,6 +4,7 @@ services:
 - selenium/standalone-chrome:latest
 
 before_script:
+- cd test/
 - bundle install
 - export SELENIUM_ENV=remote
 
