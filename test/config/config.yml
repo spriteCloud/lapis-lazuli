@@ -37,4 +37,5 @@ remote:
 local:
   close_browser_after: feature
   server:
-    url: http://localhost:9090/
+    url: local_path
+    url2: http://localhost:9090/

@@ -12,7 +12,7 @@ Given(/^I navigate to the (.*) test page$/) do |page|
   if has_env?(config)
     url = env(config)
     if url == 'local_path'
-      url = 'file://' + File.expand_path(File.dirname(File.dirname(__FILE__))) + '/server/www/'
+      url = 'file://' + File.expand_path(File.dirname(File.dirname(__FILE__))) + '/../server/www/'
     end
     browser.goto "#{url}#{page.downcase.gsub(" ", "_")}.html"
   else
