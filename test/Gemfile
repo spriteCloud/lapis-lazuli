@@ -3,6 +3,9 @@ source 'http://rubygems.org'
 # Build and include the LL gem from the parent directory
 gem "lapis_lazuli", path: './../'
 
+# Gem used to import results to calliope.pro
+gem 'cucumber-calliope_importer'
+
 # Project specific gems
 gem 'watir-scroll'
 gem 'xml-simple'
