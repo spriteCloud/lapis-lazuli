@@ -10,15 +10,15 @@ before_script:
 
 ll-selftest-chrome:
   script:
-  - bundle exec cucumber -p chrome -p calliope_import PROFILE_ID=11
+  - bundle exec cucumber -p chrome -p calliope_import PROFILE_ID=11 -x
   when: manual
 
 ll-selftest-firefox:
   script:
-  - bundle exec cucumber -p ff -p calliope_import PROFILE_ID=6
+  - bundle exec cucumber -p ff -p calliope_import PROFILE_ID=6 -x
   when: manual
 
 ll-selftest-chrome-mobile:
   script:
-  - bundle exec cucumber -p chrome DEVICE=iphone5 -p calliope_import PROFILE_ID=12
+  - bundle exec cucumber -p chrome DEVICE=iphone5 -p calliope_import PROFILE_ID=12 -x
   when: manual
