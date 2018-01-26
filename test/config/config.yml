@@ -32,7 +32,7 @@ error_strings:
 remote:
   close_browser_after: feature
   server:
-    url: http://spritecloud__ruby-selenium-runner:9090
+    url: http://spritecloud__ruby-selenium-runner:9090/
 
 local:
   close_browser_after: feature

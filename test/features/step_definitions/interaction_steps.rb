@@ -11,6 +11,7 @@ Given(/^I navigate to the (.*) test page$/) do |page|
   config = "server.url"
   if has_env?(config)
     url = env(config)
+    p url
     browser.goto "#{url}#{page.downcase.gsub(" ", "_")}.html"
   else
     error(:env => config)
