@@ -24,13 +24,6 @@ chrome: BROWSER=chrome
 ie: BROWSER=ie
 safari: BROWSER=safari
 
-################################################################################
-# Listed environments (default is set in config.yml)
-gem-live: LL_GEM=live
-gem-master: LL_GEM=master
-gem-development: LL_GEM=development
-gem-local: LL_GEM=local
-
 p: TEST_ENV=production -t @p,@prod
 production: TEST_ENV=production -t @p,@prod
 

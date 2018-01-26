@@ -24,6 +24,26 @@ LapisLazuli.Start do
   print "Watir: #{Gem.loaded_specs['watir'].version}\n"
   print "Cucumber: #{Gem.loaded_specs['cucumber'].version}\n"
   print "---- VERSION INFO ----\n\n"
+
+  if ENV['SELENIUM_ENV'] == 'remote'
+    if ENV['BROWSER'] == 'firefox'
+      remote_url = 'http://selenium__standalone-firefox:4444/wd/hub/'
+      remote_browser = 'Firefox'
+    else
+      remote_url = 'http://selenium__standalone-chrome:4444/wd/hub/'
+      remote_browser = 'Chrome'
+    end
+    browser :remote, {
+        :url => remote_url,
+        :caps => {
+            "browser" => remote_browser
+        }
+    }
+  end
+
+  ENV['TA_OS'] = RUBY_PLATFORM
+  ENV['TA_PLATFORM'] = "#{browser.driver.browser} #{browser.driver.capabilities.version}"
+  ENV['TA_BUILD'] = "#{LapisLazuli.software_versions['aem']}"
 end
 
 # Transition function from old codebase to new

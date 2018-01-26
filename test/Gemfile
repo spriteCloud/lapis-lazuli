@@ -1,24 +1,7 @@
 source 'http://rubygems.org'
 
-# Windows specific
-platforms :mswin, :mingw do
-  gem 'win32console'
-  gem 'term-ansicolor'
-end
-
-# LapisLazul itself; test code should point to the current repo and branch
-# repo = `git config --get remote.origin.url`
-# branch = `git rev-parse --abbrev-ref HEAD`
-# Local gem
-# gem "lapis_lazuli", path: './../'
-
-# Development gem
-gem 'lapis_lazuli', :git => 'https://github.com/spriteCloud/lapis-lazuli.git', :branch => 'development'
-
-# Production gem
-# gem "lapis_lazuli"
-
-gem 'cucumber', '~>2'
+# Build and include the LL gem from the parent directory
+gem "lapis_lazuli", path: './../'
 
 # Project specific gems
 gem 'watir-scroll'

@@ -10,17 +10,17 @@ before_script:
 ll-selftest-chrome:
   script:
   - cd test/
-  - bundle exec cucumber -p chrome
+  - bundle exec cucumber -p chrome -p calliope_import PROFILE_ID=11
   when: manual
 
 ll-selftest-firefox:
   script:
   - cd test/
-  - bundle exec cucumber -p ff
+  - bundle exec cucumber -p ff -p calliope_import PROFILE_ID=6
   when: manual
 
 ll-selftest-chrome-mobile:
   script:
   - cd test/
-  - bundle exec cucumber -p chrome DEVICE=iphone5
+  - bundle exec cucumber -p chrome DEVICE=iphone5 -p calliope_import PROFILE_ID=12
   when: manual
