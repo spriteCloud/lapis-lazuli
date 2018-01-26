@@ -4,6 +4,7 @@
 # Author: "spriteCloud" <info@spritecloud.com>
 require 'lapis_lazuli'
 require 'lapis_lazuli/cucumber'
+require 'cucumber/calliope_importer'
 
 module TestModule
   def test_func
