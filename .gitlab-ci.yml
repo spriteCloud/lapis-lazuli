@@ -2,6 +2,7 @@ image: spritecloud/ruby-selenium-runner:2.4
 
 services:
 - selenium/standalone-chrome:latest
+- selenium/standalone-firefox:latest
 
 before_script:
 - cd test/
