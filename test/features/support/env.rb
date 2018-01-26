@@ -29,22 +29,20 @@ LapisLazuli.Start do
   if ENV['SELENIUM_ENV'] == 'remote'
     if ENV['BROWSER'] == 'firefox'
       remote_url = 'http://selenium__standalone-firefox:4444/wd/hub/'
-      remote_browser = 'Firefox'
+      caps = Selenium::WebDriver::Remote::Capabilities.firefox
     else
       remote_url = 'http://selenium__standalone-chrome:4444/wd/hub/'
-      remote_browser = 'Chrome'
+      caps = Selenium::WebDriver::Remote::Capabilities.chrome
     end
-    browser :remote, {
-        :url => remote_url,
-        :caps => {
-            "browser" => remote_browser
-        }
-    }
+    client = Selenium::WebDriver::Remote::Http::Default.new
+    client.timeout = 120
+
+    browser :remote, {desired_capabilities: caps, http_client: client, url: remote_url}
   end
 
   ENV['TA_OS'] = RUBY_PLATFORM
   ENV['TA_PLATFORM'] = "#{browser.driver.browser} #{browser.driver.capabilities.version}"
-  ENV['TA_BUILD'] = "#{Gem.loaded_specs['lapis_lazuli'].version}"
+  ENV['TA_BUILD'] = "Lapis Lazuli #{Gem.loaded_specs['lapis_lazuli'].version}"
 end
 
 # Transition function from old codebase to new
