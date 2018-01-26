@@ -29,5 +29,5 @@ production: TEST_ENV=production -t @p,@prod
 
 ################################################################################
 # Calliope.pro settings
-calliope_key: API_KEY=NGYzYmE2ZTg4OGYwODZkOGI2NDQwNzNkYTgyZTVhYWQyMDAyNDUxMmY2Y2E2N2M1NzY1OWFiNzc4NTRmZTcwNDVl
+calliope_key: API_KEY=NDM4NmY5Njk5N2U2ZGJmNmRhYmI1ZDU1YjRkNDM1NzMxYjhlMDk2MjNlOGE5MWUyOTg2ZWUyMDJiZTVlMjk2YmJh
 calliope_import: -p calliope_key -c -f pretty -f calliope_import --out ./results/latest_results.json
