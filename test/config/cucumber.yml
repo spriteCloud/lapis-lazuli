@@ -27,6 +27,8 @@ safari: BROWSER=safari
 p: TEST_ENV=production -t @p,@prod
 production: TEST_ENV=production -t @p,@prod
 
+remote: SELENIUM_ENV=remote -t ~@ignore_on_remote
+
 ################################################################################
 # Calliope.pro settings
 calliope_key: API_KEY=NDM4NmY5Njk5N2U2ZGJmNmRhYmI1ZDU1YjRkNDM1NzMxYjhlMDk2MjNlOGE5MWUyOTg2ZWUyMDJiZTVlMjk2YmJh

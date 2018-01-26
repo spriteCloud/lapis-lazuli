@@ -1,4 +1,4 @@
-@bindings @p
+@bindings @p @ignore_on_remote
 Feature: binding
 When I want to test the Lapis Lazuli library
 I want to run a webserver with some test files
