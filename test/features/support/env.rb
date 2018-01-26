@@ -27,6 +27,7 @@ LapisLazuli.Start do
   print "---- VERSION INFO ----\n\n"
 
   if ENV['SELENIUM_ENV'] == 'remote'
+    require 'selenium-webdriver'
     if ENV['BROWSER'] == 'firefox'
       remote_url = 'http://selenium__standalone-firefox:4444/wd/hub/'
       caps = Selenium::WebDriver::Remote::Capabilities.firefox
