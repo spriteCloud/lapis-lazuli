@@ -26,11 +26,15 @@ safari: BROWSER=safari
 
 ################################################################################
 # Listed environments (default is set in config.yml)
-t: TEST_ENV=test -t @t,@test
-test: TEST_ENV=test -t @t,@test
-
-u: TEST_ENV=acceptatie -t @u,@uat
-uat: TEST_ENV=acceptatie -t @u,@uat
+gem-live: LL_GEM=live
+gem-master: LL_GEM=master
+gem-development: LL_GEM=development
+gem-local: LL_GEM=local
 
 p: TEST_ENV=production -t @p,@prod
 production: TEST_ENV=production -t @p,@prod
+
+################################################################################
+# Calliope.pro settings
+calliope_key: API_KEY=NGYzYmE2ZTg4OGYwODZkOGI2NDQwNzNkYTgyZTVhYWQyMDAyNDUxMmY2Y2E2N2M1NzY1OWFiNzc4NTRmZTcwNDVl
+calliope_import: -p calliope_key -c -f pretty -f calliope_import --out ./results/latest_results.json
