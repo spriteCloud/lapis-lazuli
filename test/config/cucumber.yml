@@ -30,5 +30,5 @@ remote: SELENIUM_ENV=remote -t ~@ignore_on_remote TEST_ENV=remote
 
 ################################################################################
 # Calliope.pro settings
-calliope_key: API_KEY=NDM4NmY5Njk5N2U2ZGJmNmRhYmI1ZDU1YjRkNDM1NzMxYjhlMDk2MjNlOGE5MWUyOTg2ZWUyMDJiZTVlMjk2YmJh
+calliope_key: API_KEY=
 calliope_import: -p calliope_key -c -f pretty -f calliope_import --out ./results/latest_results.json
