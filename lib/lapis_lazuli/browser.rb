@@ -124,7 +124,7 @@ module LapisLazuli
         # Add this browser to the list of all browsers
         LapisLazuli::Browser.add_browser(self)
         # Making sure all browsers are gracefully closed when the exit event is triggered.
-        at_exit { LapisLazuli::Browser::close_all 'exit event trigger' }
+        at_exit {LapisLazuli::Browser::close_all 'exit event trigger'}
       end
     end
 
@@ -317,33 +317,32 @@ module LapisLazuli
 
       # Overwrite user-agent if a device simulation is set and it contains a user-agent
       if !device_configuration.nil? and !device_configuration['user-agent'].nil?
-        #case b
-          #when :firefox
-            # Create a firefox profile if it does not exist yet
-            if optional_data[:profile].nil?
-              optional_data[:profile] = Selenium::WebDriver::Firefox::Profile.new
-            else
-              # If the profile already exists, we need to create a duplicate, so we don't overwrite any settings.
-              optional_data[:profile] = optional_data[:profile].dup
-            end
-            # Add the user agent to it if it has not been set yet
-            if optional_data[:profile].instance_variable_get(:@additional_prefs)['general.useragent.override'].nil?
-              optional_data[:profile]['general.useragent.override'] = device_configuration['user-agent']
-            else
-              world.log.debug "User-agent was already set in the :profile."
-            end
-          #when :chrome
-            ua_string = "--user-agent=#{device_configuration['user-agent']}"
-            if optional_data[:switches].nil?
-              optional_data[:switches] = [ua_string]
-            elsif !optional_data[:switches].join(',').include? '--user-agent='
-              optional_data[:switches].push ua_string
-            else
-              world.log.debug "User-agent was already set in the :switches."
-            end
-         # else
-         #   warn "#{device} user agent cannot be set for #{b.to_s}. Only Chrome & Firefox are supported."
-        #end
+        # Firefox user-agent settings
+        # Create a firefox profile if it does not exist yet
+        if optional_data[:profile].nil?
+          optional_data[:profile] = Selenium::WebDriver::Firefox::Profile.new
+        else
+          # If the profile already exists, we need to create a duplicate, so we don't overwrite any settings.
+          optional_data[:profile] = optional_data[:profile].dup
+        end
+        # Add the user agent to it if it has not been set yet
+        if optional_data[:profile].instance_variable_get(:@additional_prefs)['general.useragent.override'].nil?
+          optional_data[:profile]['general.useragent.override'] = device_configuration['user-agent']
+        else
+          world.log.debug "User-agent was already set in the :profile."
+        end
+        # Chrome user-agent settings
+        ua_string = "--user-agent=#{device_configuration['user-agent']}"
+        if optional_data[:switches].nil?
+          optional_data[:switches] = [ua_string]
+        elsif !optional_data[:switches].join(',').include? '--user-agent='
+          optional_data[:switches].push ua_string
+        else
+          world.log.debug "User-agent was already set in the :switches."
+        end
+        if b != :firfox and b != :chrome
+          warn "#{device} user agent cannot be set for #{b.to_s}. Only Chrome & Firefox are supported."
+        end
       end
 
       args = []
@@ -357,12 +356,12 @@ module LapisLazuli
         remote_settings = {}
 
         # Add the config to the settings using downcase string keys
-        remote_config.each { |k, v| remote_settings[k.to_s.downcase] = v }
+        remote_config.each {|k, v| remote_settings[k.to_s.downcase] = v}
 
         if optional_data.is_a? Hash
           # Convert the optional data to downcase string keys
           string_hash = Hash.new
-          optional_data.each { |k, v| string_hash[k.to_s.downcase] = v }
+          optional_data.each {|k, v| string_hash[k.to_s.downcase] = v}
 
           # Merge them with the settings
           remote_settings.merge! string_hash
