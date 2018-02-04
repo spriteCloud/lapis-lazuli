@@ -340,7 +340,7 @@ module LapisLazuli
         else
           world.log.debug "User-agent was already set in the :switches."
         end
-        if b != :firfox and b != :chrome
+        if b != :firefox and b != :chrome
           warn "#{device} user agent cannot be set for #{b.to_s}. Only Chrome & Firefox are supported."
         end
       end
