@@ -1,0 +1,21 @@
+---
+users:
+  default-user: # See ./features/helpers/user_helper.rb
+    username: ta_RAND-ALPHA_
+    password: Ab!2_RAND_
+    gender: male
+    experience: Ruby,Gherkin
+    biography: This is the default test user
+    complete_all: 1
+  production:
+    test-user:
+      username: test
+      password: test
+  test:
+    test-user:
+      username: ta-test-user
+      password: ^%8jah7hH
+  uat:
+    test-user:
+      username: ta-uat-user
+      password: (87hsjaJH#

@@ -1,4 +1,4 @@
-@browser @p
+@browser @p @ignore_on_remote
 Feature: Browsers
 When I want to test the Lapis Lazuli library
 And test if I can start a browser with options

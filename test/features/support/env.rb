@@ -4,6 +4,7 @@
 # Author: "spriteCloud" <info@spritecloud.com>
 require 'lapis_lazuli'
 require 'lapis_lazuli/cucumber'
+require 'cucumber/calliope_importer'
 
 module TestModule
   def test_func
@@ -11,7 +12,7 @@ module TestModule
   end
 end
 
-LapisLazuli::WorldModule::Config.config_file = "config/config.yml"
+LapisLazuli::WorldModule::Config.add_config "config/config.yml"
 World(LapisLazuli, TestModule)
 
 LapisLazuli::WorldModule::Browser.browser_module(TestModule)
@@ -22,7 +23,27 @@ LapisLazuli.Start do
   print "Lapis Lazuli: #{Gem.loaded_specs['lapis_lazuli'].version}\n"
   print "Selenium webdriver: #{Gem.loaded_specs['selenium-webdriver'].version}\n"
   print "Watir: #{Gem.loaded_specs['watir'].version}\n"
+  print "Cucumber: #{Gem.loaded_specs['cucumber'].version}\n"
   print "---- VERSION INFO ----\n\n"
+
+  if ENV['SELENIUM_ENV'] == 'remote'
+    require 'selenium-webdriver'
+    if ENV['BROWSER'] == 'firefox'
+      remote_url = 'http://selenium__standalone-firefox:4444/wd/hub/'
+      caps = Selenium::WebDriver::Remote::Capabilities.firefox
+    else
+      remote_url = 'http://selenium__standalone-chrome:4444/wd/hub/'
+      caps = Selenium::WebDriver::Remote::Capabilities.chrome
+    end
+    client = Selenium::WebDriver::Remote::Http::Default.new
+    client.timeout = 120
+
+    browser :remote, {desired_capabilities: caps, http_client: client, url: remote_url}
+  end
+
+  ENV['TA_OS'] = RUBY_PLATFORM
+  ENV['TA_PLATFORM'] = "#{browser.driver.browser} #{browser.driver.capabilities.version}"
+  ENV['TA_BUILD'] = "Lapis Lazuli #{Gem.loaded_specs['lapis_lazuli'].version}"
 end
 
 # Transition function from old codebase to new

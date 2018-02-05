@@ -42,10 +42,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency "minitest", "~> 5.10"
   spec.add_dependency "thor", "~> 0.19" # Used in the cucumber project generator
   spec.add_dependency "facets", "~> 3.1" # Used in the cucumber project generator
+  spec.add_dependency "deep_merge", "~> 1.2"
 
   # webdriver specifics
-  spec.add_dependency "selenium-webdriver", "~> 3"
+  spec.add_dependency "selenium-webdriver", ">= 2.0", '< 4'
   spec.add_dependency "watir", "~> 6"
-  spec.add_dependency "cucumber", "~> 2"
+  spec.add_dependency "cucumber", ">= 2.0", '< 4.0'
 
 end

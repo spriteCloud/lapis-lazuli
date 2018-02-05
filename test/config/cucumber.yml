@@ -24,13 +24,11 @@ chrome: BROWSER=chrome
 ie: BROWSER=ie
 safari: BROWSER=safari
 
+local: TEST_ENV=local -t @p,@prod
+
+remote: SELENIUM_ENV=remote -t ~@ignore_on_remote TEST_ENV=remote
+
 ################################################################################
-# Listed environments (default is set in config.yml)
-t: TEST_ENV=test -t @t,@test
-test: TEST_ENV=test -t @t,@test
-
-u: TEST_ENV=acceptatie -t @u,@uat
-uat: TEST_ENV=acceptatie -t @u,@uat
-
-p: TEST_ENV=production -t @p,@prod
-production: TEST_ENV=production -t @p,@prod
+# Calliope.pro settings
+calliope_key: API_KEY=
+calliope_import: -p calliope_key -c -f pretty -f calliope_import --out ./results/latest_results.json
