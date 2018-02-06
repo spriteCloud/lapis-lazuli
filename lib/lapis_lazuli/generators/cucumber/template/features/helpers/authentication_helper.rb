@@ -10,7 +10,7 @@ module Auth
     # This is a list of elements relevant for this helper.
     # The following is short notation, *only* use this if the element selector can be done in 1 line.
     # @formatter:off
-    def form_container; browser.wait(:like => [:div, :class, 'container']); end
+    def form_container; browser.wait(:like => [:form, :id, 'form-login']); end
     def username_field; form_container.input(:xpath => '//*[@id="login-username"]'); end
     def password_field; form_container.input(:id => 'login-password'); end
     def login_button; browser.button(:id => 'button-login'); end
