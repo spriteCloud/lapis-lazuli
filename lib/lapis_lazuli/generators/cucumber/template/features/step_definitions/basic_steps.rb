@@ -27,7 +27,14 @@ end
 
 
 Then(/^text "([^"]*)" should display somewhere on the page$/) do |string|
-  browser.wait(:html => /#{string}/i)
+  # Search for the text on the page
+  browser.wait(
+    :like => {
+      :element => :body,
+      :attribute => :text,
+      :include => string
+    }
+  )
 end
 
 When(/^the user clicks on link "(.*?)"$/) do |url|
