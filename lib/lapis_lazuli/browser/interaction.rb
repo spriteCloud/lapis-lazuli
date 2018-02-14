@@ -8,6 +8,7 @@
 
 require 'lapis_lazuli/assertions'
 require 'lapis_lazuli/argparse'
+require "lapis_lazuli/world/logging"
 
 module LapisLazuli
 module BrowserModule
@@ -63,6 +64,8 @@ module BrowserModule
       types.each do |type|
         begin
           click_type(elem, type)
+        rescue Selenium::WebDriver::Error::StaleElementReferenceError => err
+          log.debug "An stale element error occurred when trying to `#{type}` on `#{elem}`. We're assuming it's because a previous click type was successful"
         rescue RuntimeError => err
           errors << err
         end

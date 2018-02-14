@@ -28,13 +28,7 @@ end
 
 Then(/^text "([^"]*)" should display somewhere on the page$/) do |string|
   # Search for the text on the page
-  browser.wait(
-    :like => {
-      :element => :body,
-      :attribute => :text,
-      :include => string
-    }
-  )
+  browser.wait(:xpath => "//*[contains(text(),\"#{string}\")]")
 end
 
 When(/^the user clicks on link "(.*?)"$/) do |url|
