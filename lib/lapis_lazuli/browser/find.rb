@@ -401,8 +401,7 @@ module BrowserModule
       # Create the XPath query
       return options, lambda {
         context.elements(
-          :xpath,
-          xpath
+          xpath: xpath
         )
       }
     end
