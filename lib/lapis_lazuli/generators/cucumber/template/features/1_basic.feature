@@ -12,9 +12,9 @@ I want to run and adjust the tests below
 
   @basic_02
   Scenario: example02 - Going to a search result
-    Given the user navigates to "https://spritecloud.com/?s=lapis+lazuli"
+    Given the user navigates to "https://www.spritecloud.com/?s=lapis+lazuli"
     When the user clicks on link "/announcing-lapislazuli/"
-    Then text "Let's talk about testing" should display somewhere on the page
+    Then text "A few days later you are working" should display somewhere on the page
 
   @basic_03
   Scenario Outline: example03 - checking multiple pages for the logo
