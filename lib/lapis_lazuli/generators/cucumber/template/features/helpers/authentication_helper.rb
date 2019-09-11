@@ -104,8 +104,8 @@ module Auth
       # If user=nil, we expect that there already is user data loaded in a previous step.
       User.load_user_data(user) unless user.nil?
 
-      Auth.username_field.to_subtype.set(User.get('username'))
-      Auth.password_field.to_subtype.set(User.get('password'))
+      Auth.username_field.to_subtype.to_subtype.set(User.get('username'))
+      Auth.password_field.to_subtype.to_subtype.set(User.get('password'))
       Auth.login_button.click
 
       unless Auth.is_logged_in? user
@@ -114,7 +114,7 @@ module Auth
           error "Failed to log in user #{user}"
         else
           alert.flash
-          error "Found error while logging in #{user}: `#{alert.text}`"
+          error "Found error while logging in #{user}: `#{alert.html}`"
         end
       end
     end

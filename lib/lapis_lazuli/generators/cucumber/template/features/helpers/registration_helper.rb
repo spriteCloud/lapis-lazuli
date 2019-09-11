@@ -52,12 +52,14 @@ module Register
     end
 
     def fill_form
-      Register.username_field.set(User.get('username'))
-      Register.password_field.set(User.get('password'))
+      #wait 1 second to load page, if not the username will not be completed    
+      sleep 1
+      Register.username_field.to_subtype.set(User.get('username'))
+      Register.password_field.to_subtype.set(User.get('password'))
       Register.gender_radio(User.get('gender')).click
       Register.select_experiences(User.get('experience').split(','))
-      Register.biography_field.set(User.get('biography'))
-      Register.policy_checkbox.set((User.get('complete_all').to_i == 1))
+      Register.biography_field.to_subtype.set(User.get('biography'))
+      Register.policy_checkbox.to_subtype.set((User.get('complete_all').to_i == 1))
     end
 
     def submit_form
@@ -73,8 +75,8 @@ module Register
       alert = browser.wait(like: [:div, :class, 'alert'], timeout: 2, throw: false)
       if alert.nil?
         return false, 'No message was displayed after registering'
-      elsif !alert.text.include? User.get('username')
-        return false, "An error message did display, but didn't contain the expected text: `#{alert.text}`"
+      elsif !alert.html.include? User.get('username')
+        return false, "An error message did display, but didn't contain the expected text: `#{alert.html}`"
       end
       return true, 'Successfully found the success message'
     end

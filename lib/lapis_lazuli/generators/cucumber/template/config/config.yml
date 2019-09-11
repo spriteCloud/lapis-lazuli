@@ -42,6 +42,6 @@ production:
     about-us: /about-us/
     testing: /testing/
     blog: /blog/
-    functional-testing: /testing/functional/
+    functional-testing: /testing/functional-testing/
     jobs: /jobs
     training-page: http://training-page.testautomation.info/#
