@@ -40,8 +40,7 @@ When(/^the user clicks on link "(.*?)"$/) do |url|
       :include => url
     }
   )  
-  link.hover
-  
+  link.hover  
   # Privacy policy label is in front of link, so we scroll down a bit first.
   browser.driver.execute_script("window.scrollBy(0,200)")
   link.click
