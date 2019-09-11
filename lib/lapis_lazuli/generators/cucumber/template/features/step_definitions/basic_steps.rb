@@ -32,19 +32,25 @@ end
 
 When(/^the user clicks on link "(.*?)"$/) do |url|
   # Search for the element that includes the expected text
-  browser.wait(
+ 
+  link = browser.wait(
     :like => {
       :element => :a,
       :attribute => :href,
       :include => url
     }
-  ).click
+  )  
+  link.hover
+  
+  # Privacy policy label is in front of link, so we scroll down a bit first.
+  browser.driver.execute_script("window.scrollBy(0,200)")
+  link.click
 end
 
 When(/^the user clicks on the spritecloud logo$/) do
   # Search for the logo
   logo = browser.find(
-    :like => [:img, :id, 'logo'],
+    :a =>  {:class=> 'logo'},
     :message => 'Unable to find the logo on this page.'
   )
   # And click the logo
