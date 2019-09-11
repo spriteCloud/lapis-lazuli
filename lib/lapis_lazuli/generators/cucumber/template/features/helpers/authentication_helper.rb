@@ -114,7 +114,7 @@ module Auth
           error "Failed to log in user #{user}"
         else
           alert.flash
-          error "Found error while logging in #{user}: `#{alert.text}`"
+          error "Found error while logging in #{user}: `#{alert.html}`"
         end
       end
     end
