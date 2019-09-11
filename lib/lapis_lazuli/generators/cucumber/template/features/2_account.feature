@@ -31,7 +31,6 @@ Feature: User accounts
     When the user completes registration
     Then the successful registration message should display
 
-  ###Could give an error, the username sometimes gets filled in too fast
   @account_05
   Scenario: account_05 - Logging in a new registration
     Given "default-user" has registered a new account

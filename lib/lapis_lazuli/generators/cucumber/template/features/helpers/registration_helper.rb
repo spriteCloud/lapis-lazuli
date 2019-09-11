@@ -52,6 +52,8 @@ module Register
     end
 
     def fill_form
+      #wait 1 second to load page, if not the username will not be completed    
+      sleep 1
       Register.username_field.to_subtype.set(User.get('username'))
       Register.password_field.to_subtype.set(User.get('password'))
       Register.gender_radio(User.get('gender')).click
