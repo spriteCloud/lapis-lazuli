@@ -14,7 +14,6 @@ module Nav
 
     # Waits until the browser URL is the same as the given URL
     def wait_for_url(url)
-      p url
       browser.wait_until(timeout: 5, message: "URL did not become `#{url}`") {
         browser.url.include? url
       }
