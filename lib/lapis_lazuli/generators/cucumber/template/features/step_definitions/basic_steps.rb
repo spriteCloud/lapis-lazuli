@@ -25,6 +25,10 @@ Given(/^the user searches for "(.*?)"$/) do |query|
   searchbox.send_keys(:enter)
 end
 
+When(/^the user scrolls down$/) do
+  browser.driver.execute_script("window.scrollBy(0,300)")
+end
+
 Then(/^text "([^"]*)" should display somewhere on the page$/) do |string|
   # Search for the text on the page
   browser.wait(:xpath => "//*[contains(text(),\"#{string}\")]")
@@ -33,17 +37,13 @@ end
 When(/^the user clicks on link "(.*?)"$/) do |url|
   # Search for the element that includes the expected text
  
-  link = browser.wait(
+  browser.wait(
     :like => {
       :element => :a,
       :attribute => :href,
       :include => url
     }
-  )  
-  link.hover  
-  # Privacy policy label is in front of link, so we scroll down a bit first.
-  browser.driver.execute_script("window.scrollBy(0,200)")
-  link.click
+  ).click
 end
 
 When(/^the user clicks on the spritecloud logo$/) do
