@@ -25,6 +25,10 @@ Given(/^the user searches for "(.*?)"$/) do |query|
   searchbox.send_keys(:enter)
 end
 
+When(/^the user scrolls down$/) do
+  browser.driver.execute_script("window.scrollBy(0,400)")
+end
+
 Then(/^text "([^"]*)" should display somewhere on the page$/) do |string|
   # Search for the text on the page
   browser.wait(:xpath => "//*[contains(text(),\"#{string}\")]")
@@ -32,6 +36,7 @@ end
 
 When(/^the user clicks on link "(.*?)"$/) do |url|
   # Search for the element that includes the expected text
+ 
   browser.wait(
     :like => {
       :element => :a,
@@ -44,8 +49,8 @@ end
 When(/^the user clicks on the spritecloud logo$/) do
   # Search for the logo
   logo = browser.find(
-    :like => [:img, :id, 'logo'],
-    :message => 'Unable to find the logo on this page.'
+    a:  {class: ['logo']},
+    message: 'Unable to find the logo on this page.'
   )
   # And click the logo
   logo.click
