@@ -8,7 +8,7 @@ module Register
     # @formatter:off
     def form; browser.wait(:like => [:form, :id, 'form-register']); end
     def open_register_button; browser.find(:like => [:button, :id, 'button-register']); end
-    def username_field; browser.find(:element => {:name => 'username'}, :context => Register.form); end
+    def username_field; browser.wait(:element => {:name => 'username'}, :context => Register.form); end
     def password_field; browser.find(:element => {:name => 'password'}, :context => Register.form); end
     def experience_field; browser.find(:like => [:select, :id, "register-experience"], :context => form); end
     def biography_field; browser.find(:like => [:textarea, :id, 'register-bio']); end
@@ -52,8 +52,11 @@ module Register
     end
 
     def fill_form
-      #wait 1 second to load page, if not the username will not be completed    
-      sleep 1
+      #the setter goes too fast sometimes not finishing the username, this will re-set the username when it does
+      browser.wait_until(timeout: 10, message: 'False did not become true withing 10 seconds') {
+        Register.username_field.to_subtype.set(User.get('username'))
+        Register.username_field.value == User.get('username')
+       }
       Register.username_field.to_subtype.set(User.get('username'))
       Register.password_field.to_subtype.set(User.get('password'))
       Register.gender_radio(User.get('gender')).click
@@ -64,6 +67,10 @@ module Register
 
     def submit_form
       Register.submit_button.click
+      browser.wait(
+        :like => [:div, :class, 'modal-backdrop fade in'],
+        :condition => :while
+      )
     end
 
     def register_user
