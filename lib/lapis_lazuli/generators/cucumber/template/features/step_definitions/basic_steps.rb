@@ -26,7 +26,7 @@ Given(/^the user searches for "(.*?)"$/) do |query|
 end
 
 When(/^the user scrolls down$/) do
-  browser.driver.execute_script("window.scrollBy(0,300)")
+  browser.driver.execute_script("window.scrollBy(0,400)")
 end
 
 Then(/^text "([^"]*)" should display somewhere on the page$/) do |string|
