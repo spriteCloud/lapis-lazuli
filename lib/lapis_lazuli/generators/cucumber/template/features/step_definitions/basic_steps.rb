@@ -49,8 +49,8 @@ end
 When(/^the user clicks on the spritecloud logo$/) do
   # Search for the logo
   logo = browser.find(
-    :a =>  {:class: ['logo']},
-    :message => 'Unable to find the logo on this page.'
+    a:  {class: ['logo']},
+    message: 'Unable to find the logo on this page.'
   )
   # And click the logo
   logo.click
