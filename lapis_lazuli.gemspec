@@ -46,7 +46,7 @@ Gem::Specification.new do |spec|
 
   # webdriver specifics
   spec.add_dependency "selenium-webdriver", ">= 2.0", '< 4'
-  spec.add_dependency "watir", "~> 6.16"
+  spec.add_dependency "watir", "~> 6"
   spec.add_dependency "ffi", "~> 1.11"
   spec.add_dependency "cucumber", ">= 2.0", '< 4.0'
 
