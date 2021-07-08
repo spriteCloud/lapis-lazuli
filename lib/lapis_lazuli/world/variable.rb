@@ -9,6 +9,7 @@
 require "securerandom"
 require 'json'
 
+require "lapis_lazuli/scenario"
 require "lapis_lazuli/versions"
 require "lapis_lazuli/runtime"
 require "lapis_lazuli/placeholders"
@@ -21,12 +22,21 @@ module WorldModule
   # Module for variable replacement
   #
   # Manages the following:
+  #   scenario   - for per-scenario variables
   #   uuid       - for the entire test run
   #   time       - for the entire test run
   #   storage    - for the entire test run
   #   versions   - versions as gathered by e.g. fetch_versions
   module Variable
     include LapisLazuli::WorldModule::Config
+
+    ##
+    # Scenario "singleton"
+    def scenario
+      return data(:scenario) do
+        Scenario.new
+      end
+    end
 
     ##
     # Time "singleton"

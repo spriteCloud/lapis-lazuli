@@ -5,7 +5,7 @@
 # Copyright (c) 2013-2019 spriteCloud B.V. and other LapisLazuli contributors.
 # All rights reserved.
 #
-
+require "lapis_lazuli/ast"
 # Modules
 require "lapis_lazuli/browser/error"
 require 'lapis_lazuli/browser/find'
@@ -32,9 +32,10 @@ module LapisLazuli
     include LapisLazuli::BrowserModule::Interaction
     include LapisLazuli::GenericModule::XPath
 
-    @@world=nil
-    @@cached_browser_options={}
-    @@browsers=[]
+    @@world = nil
+    @@cached_browser_options = {}
+    @@browsers = []
+
     class << self
       include LapisLazuli::GenericModule::Assertions
 
@@ -116,7 +117,7 @@ module LapisLazuli
         # Add this browser to the list of all browsers
         LapisLazuli::Browser.add_browser(self)
         # Making sure all browsers are gracefully closed when the exit event is triggered.
-        at_exit {LapisLazuli::Browser::close_all 'exit event trigger'}
+        at_exit { LapisLazuli::Browser::close_all 'exit event trigger' }
       end
     end
 
@@ -130,7 +131,7 @@ module LapisLazuli
 
     ##
     # Closes the browser and updates LL so that it will open a new one if needed
-    def close(reason = nil, remove_from_list=true)
+    def close(reason = nil, remove_from_list = true)
       if not @browser.nil?
         if not reason.nil?
           reason = " after #{reason}"
@@ -163,18 +164,16 @@ module LapisLazuli
       # Determine the config
       close_browser_after = world.env_or_config("close_browser_after")
       case close_browser_after
-        when "scenario"
-          # We always close it
-          LapisLazuli::Browser.close_all close_browser_after
-        when "never"
-          # Do nothing: party time, excellent!
-        when "feature"
-          if is_last_scenario?(scenario)
-            # Close it
-            LapisLazuli::Browser.close_all close_browser_after
-          end
-        else # close after 'end' is now default
-          # Also ignored here - this is handled  in World.browser_destroy
+      when "scenario"
+        # We always close it
+        LapisLazuli::Browser.close_all close_browser_after
+      when "never"
+        # Do nothing: party time, excellent!
+      when "feature"
+        warn 'Close after feature is not supported anymore.'
+      else
+        # close after 'end' is now default
+        # Also ignored here - this is handled  in World.browser_destroy
       end
     end
 
@@ -201,7 +200,7 @@ module LapisLazuli
       LapisLazuli::Browser.close_all("end")
     end
 
-    def self.close_all(reason=nil)
+    def self.close_all(reason = nil)
       # A running browser should exist and we are allowed to close it
       if @@browsers.length != 0 and @@world.env_or_config("close_browser_after") != "never"
         # Notify user
@@ -217,6 +216,7 @@ module LapisLazuli
     end
 
     private
+
     ##
     # The main browser window for testing
     def init(*args)
@@ -229,7 +229,7 @@ module LapisLazuli
     # Always cached the supplied arguments
     def create_driver(*args)
       # Remove device information from optional_data and create a separate variable for it
-      device = args.delete :device
+      device = args[1] ? args[1].delete(:device) : nil
       # If device is set, load it from the devices.yml config
       unless device.nil?
         begin

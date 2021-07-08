@@ -6,6 +6,9 @@
 # All rights reserved.
 #
 
+require 'cucumber/core/test/case'
+require 'cucumber/core/test/step'
+
 module LapisLazuli
   module BrowserModule
 
