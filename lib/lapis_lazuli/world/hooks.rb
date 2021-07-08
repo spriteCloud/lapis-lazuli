@@ -44,7 +44,7 @@ module LapisLazuli
 
         # Show the name
         if respond_to? :log
-          log.info("Starting Scenario: #{scenario.id}")
+          log.info("Starting Scenario: #{cuke_scenario.id}")
         end
 
         # Run 'start' queue once.
@@ -64,22 +64,14 @@ module LapisLazuli
         # Run 'after' queue
         run_queue(:after, cuke_scenario)
 
-        # Run 'end' queue
-        # FIXME hard to implement; see issue #13
-
-        # The current scenario has finished
-        if respond_to? :scenario
-          scenario.running = false
-        end
-
         # Sleep if needed
         if respond_to? :config and has_env_or_config?("step_pause_time")
           sleep env_or_config("step_pause_time")
         end
 
         # Did we fail?
-        if respond_to? :scenario and respond_to? :has_browser? and respond_to? :browser and respond_to? :config
-          if has_browser? and (cuke_scenario.failed? or (scenario.check_browser_errors and browser.has_error?))
+        if respond_to? :has_browser? and respond_to? :browser and respond_to? :config
+          if has_browser? and cuke_scenario.failed?
             # Take a screenshot if needed
             if has_env_or_config?('screenshot_on_failure')
               if env_or_config("screenshot_scheme") == "new"

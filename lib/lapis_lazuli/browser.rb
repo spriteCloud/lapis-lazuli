@@ -6,15 +6,12 @@
 # All rights reserved.
 #
 
-require "lapis_lazuli/ast"
-
 # Modules
 require "lapis_lazuli/browser/error"
 require 'lapis_lazuli/browser/find'
 require "lapis_lazuli/browser/wait"
 require "lapis_lazuli/browser/screenshots"
 require "lapis_lazuli/browser/interaction"
-require "lapis_lazuli/browser/remote"
 require 'lapis_lazuli/generic/xpath'
 require 'lapis_lazuli/generic/assertions'
 
@@ -27,14 +24,12 @@ module LapisLazuli
   # object, and for some WorldModules to exist in it (see assertions in
   # constructor).
   class Browser
-    include LapisLazuli::Ast
 
     include LapisLazuli::BrowserModule::Error
     include LapisLazuli::BrowserModule::Find
     include LapisLazuli::BrowserModule::Wait
     include LapisLazuli::BrowserModule::Screenshots
     include LapisLazuli::BrowserModule::Interaction
-    include LapisLazuli::BrowserModule::Remote
     include LapisLazuli::GenericModule::XPath
 
     @@world=nil
@@ -70,11 +65,9 @@ module LapisLazuli
     end
 
     @browser
-    @browser_name
-    @browser_wanted
-    @optional_data
+    @browser_args
 
-    attr_reader :browser_name, :browser_wanted, :optional_data
+    attr_reader :browser_args
 
     def initialize(*args)
       # The class only works with some modules loaded; they're loaded by the
@@ -94,8 +87,7 @@ module LapisLazuli
     # Support browser.dup to create a duplicate
     def initialize_copy(source)
       super
-      @optional_data = @optional_data.dup
-      @browser = create_driver(@browser_wanted, @optional_data)
+      @browser = create_driver(*@browser_args)
       # Add this browser to the list of all browsers
       LapisLazuli::Browser.add_browser(self)
     end
@@ -227,66 +219,19 @@ module LapisLazuli
     private
     ##
     # The main browser window for testing
-    def init(browser_wanted=nil, optional_data=nil)
+    def init(*args)
       # Store the optional data so on restart of the browser it still has the correct configuration
-      if optional_data.nil? and @@cached_browser_options.has_key?(:optional_data) and (browser_wanted.nil? or browser_wanted == @@cached_browser_options[:browser])
-        optional_data = @@cached_browser_options[:optional_data].dup
-        if !@@cached_browser_options[:optional_data][:profile].nil?
-          # A selenium profile needs to be duplicated separately, else it doesn't get a new ID.
-          optional_data[:profile] = @@cached_browser_options[:optional_data][:profile].dup
-        end
-      elsif optional_data.nil?
-        optional_data = {}
-      end
-
-      # Do the same caching stuff for the browser
-      if browser_wanted.nil? and @@cached_browser_options.has_key?(:browser)
-        browser_wanted = @@cached_browser_options[:browser]
-      end
-
-      # Set the default device if the optional data does not contain a specific device
-      if optional_data[:device].nil?
-        # Check if there is a cached value of a previously used
-        if @@cached_browser_options.has_key?(:device)
-          optional_data[:device] = @@cached_browser_options[:device]
-          # Check if the ENV['DEVICE'] variable is set
-        elsif world.env_or_config('DEVICE', false)
-          optional_data[:device] = world.env_or_config('DEVICE')
-          # Else grab the default set device
-        elsif world.env_or_config('default_device', false)
-          optional_data[:device] = world.env_or_config('default_device')
-        else
-          warn 'No default device, nor a selected device was set. Browser default settings will be loaded. More info: http://testautomation.info/Lapis_Lazuli:Device_Simulation'
-        end
-      end
-
-      # cache all the settings if this is the first time opening the browser.
-      if !@@cached_browser_options.has_key? :browser and !@@cached_browser_options.has_key? :optional_data
-        @@cached_browser_options[:browser] = browser_wanted
-        # Duplicate the data as Webdriver modifies it
-        @@cached_browser_options[:optional_data] = optional_data.dup
-        if !@@cached_browser_options[:optional_data][:profile].nil?
-          # A selenium profile needs to be duplicated separately, else it doesn't get a new ID.
-          @@cached_browser_options[:optional_data][:profile] = optional_data[:profile].dup
-        end
-      end
-
-      @browser_wanted = browser_wanted
-      @optional_data = optional_data
-      # Create the browser
-      create_driver(@browser_wanted, @optional_data)
+      create_driver(*args)
     end
 
     ##
     # Create a new browser depending on settings
     # Always cached the supplied arguments
-    def create_driver(browser_wanted=nil, optional_data=nil)
+    def create_driver(*args)
       # Remove device information from optional_data and create a separate variable for it
-      device = optional_data[:device]
-      optional_data.delete :device
-
+      device = args.delete :device
       # If device is set, load it from the devices.yml config
-      if !device.nil?
+      unless device.nil?
         begin
           world.add_config_from_file('./config/devices.yml')
         rescue
@@ -307,84 +252,6 @@ module LapisLazuli
         raise LoadError, "#{err}: you need to add 'watir' to your Gemfile before using the browser."
       end
 
-      # No browser? Does the config have a browser?
-      if browser_wanted.nil?
-        browser_wanted = world.env_or_config('browser', nil)
-      end
-
-      b = browser_wanted
-      b = b.to_sym unless b.nil?
-
-      # Overwrite user-agent if a device simulation is set and it contains a user-agent
-      if !device_configuration.nil? and !device_configuration['user-agent'].nil?
-        # Firefox user-agent settings
-        # Create a firefox profile if it does not exist yet
-        if optional_data[:profile].nil?
-          optional_data[:profile] = Selenium::WebDriver::Firefox::Profile.new
-        else
-          # If the profile already exists, we need to create a duplicate, so we don't overwrite any settings.
-          optional_data[:profile] = optional_data[:profile].dup
-        end
-        # Add the user agent to it if it has not been set yet
-        if optional_data[:profile].instance_variable_get(:@additional_prefs)['general.useragent.override'].nil?
-          optional_data[:profile]['general.useragent.override'] = device_configuration['user-agent']
-        else
-          world.log.debug "User-agent was already set in the :profile."
-        end
-        # Chrome user-agent settings
-        ua_string = "--user-agent=#{device_configuration['user-agent']}"
-        if optional_data[:switches].nil?
-          optional_data[:switches] = [ua_string]
-        elsif !optional_data[:switches].join(',').include? '--user-agent='
-          optional_data[:switches].push ua_string
-        else
-          world.log.debug "User-agent was already set in the :switches."
-        end
-        if b != :firefox and b != :chrome
-          warn "#{device} user agent cannot be set for #{b.to_s}. Only Chrome & Firefox are supported."
-        end
-      end
-
-      args = []
-      args = [b] unless b.nil?
-      @browser_name = b.to_s
-      if b == :remote
-        # Get the config
-        remote_config = world.env_or_config("remote", {})
-
-        # The settings we are going to use to create the browser
-        remote_settings = {}
-
-        # Add the config to the settings using downcase string keys
-        remote_config.each {|k, v| remote_settings[k.to_s.downcase] = v}
-
-        if optional_data.is_a? Hash
-          # Convert the optional data to downcase string keys
-          string_hash = Hash.new
-          optional_data.each {|k, v| string_hash[k.to_s.downcase] = v}
-
-          # Merge them with the settings
-          remote_settings.merge! string_hash
-        end
-
-        args.push(remote_browser_config(remote_settings))
-      elsif not optional_data.nil? and not optional_data.empty?
-        world.log.debug("Got optional data: #{optional_data}")
-        args.push(optional_data)
-      elsif world.has_proxy?
-        # Create a session if needed
-        if !world.proxy.has_session?
-          world.proxy.create()
-        end
-
-        proxy_url = "#{world.proxy.ip}:#{world.proxy.port}"
-        if b == :firefox
-          world.log.debug("Configuring Firefox proxy: #{proxy_url}")
-          profile = Selenium::WebDriver::Firefox::Profile.new
-          profile.proxy = Selenium::WebDriver::Proxy.new :http => proxy_url, :ssl => proxy_url
-          args.push({:profile => profile})
-        end
-      end
       begin
         browser_instance = Watir::Browser.new(*args)
         # Resize the browser if the device simulation requires it
@@ -394,7 +261,7 @@ module LapisLazuli
       rescue Selenium::WebDriver::Error::UnknownError => err
         raise err
       end
-      return browser_instance
+      browser_instance
     end
   end
 

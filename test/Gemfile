@@ -5,7 +5,7 @@ gem "lapis_lazuli", path: './../'
 
 
 # Project specific gems
-gem 'watir-scroll'
+gem 'cucumber', '~> 4'
 gem 'xml-simple'
 gem 'mechanize'
 gem 'simplecov'
