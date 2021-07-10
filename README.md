@@ -7,6 +7,9 @@ test automation suite development.
 [![Code Climate](https://codeclimate.com/github/spriteCloud/lapis-lazuli/badges/gpa.svg)](https://codeclimate.com/github/spriteCloud/lapis-lazuli)
 [![Test Coverage](https://codeclimate.com/github/spriteCloud/lapis-lazuli/badges/coverage.svg)](https://codeclimate.com/github/spriteCloud/lapis-lazuli)
 
+Tested with Cucumber 4, 5 & 6
+For cucumber 2 and 3, have a look at the version 2 release of Lapis Lazuli.
+
 A lot of functionality is aimed at dealing better with [Watir](http://watir.com/),
 such as:
 

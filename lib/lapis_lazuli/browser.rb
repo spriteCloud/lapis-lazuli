@@ -174,7 +174,6 @@ module LapisLazuli
           # Close it
           LapisLazuli::Browser.close_all close_browser_after
         end
-        warn 'Close after feature is not supported anymore.'
       else
         # close after 'end' is now default
         # Also ignored here - this is handled  in World.browser_destroy
