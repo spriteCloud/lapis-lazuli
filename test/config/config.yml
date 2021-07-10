@@ -15,7 +15,7 @@ screenshots_height: full                  # When 'full' the window will be resiz
 step_pause_time: 1                        # Waiting time in seconds defined after a step completes
 make_screenshot_on_failed_scenario: true  # make a screenshot after a scenario fails
 old_portal: true
-close_browser_after: end
+close_browser_after: feature
 
 
 ################################################################################

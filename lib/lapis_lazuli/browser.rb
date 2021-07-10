@@ -170,10 +170,34 @@ module LapisLazuli
       when "never"
         # Do nothing: party time, excellent!
       when "feature"
+        if is_last_scenario?(scenario)
+          # Close it
+          LapisLazuli::Browser.close_all close_browser_after
+        end
         warn 'Close after feature is not supported anymore.'
       else
         # close after 'end' is now default
         # Also ignored here - this is handled  in World.browser_destroy
+      end
+    end
+
+    def is_last_scenario?(scenario)
+      begin
+        feature_file = File.read(scenario.location.file)
+        gherkin_object = Gherkin::Parser.new.parse(feature_file)
+        last_line = gherkin_object[:feature][:children].last[:scenario][:examples].last[:table_body].last[:location][:line] rescue nil
+        unless last_line
+          last_line = gherkin_object[:feature][:children].last[:scenario][:location][:line] rescue nil
+        end
+        if last_line
+          return last_line == scenario.location.line
+        else
+          warn 'Failed to find the last line of the feature trying to determine if this is the last scenario running.'
+          return false
+        end
+      rescue Exception => e
+        warn 'Something went wrong trying to determine if this is the last sceanrio of the feature.'
+        warn e
       end
     end
 

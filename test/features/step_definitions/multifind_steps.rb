@@ -21,7 +21,7 @@ Given(/^the user expects an error in a multi_find lookup$/) do
     )
     err = "Expected an error looking for elements with no results."
   rescue RuntimeError => e
-    puts "Caught expected error: #{e.message}"
+    log "Caught expected error: #{e.message}"
   end
   error err unless err.empty?
 end
@@ -86,7 +86,7 @@ Given(/^the user expects an error in a multi_find_all lookup$/) do
     )
     err = "Expected an error looking for elements with no results."
   rescue RuntimeError => e
-    puts "Caught expected error: #{e.message}"
+    log "Caught expected error: #{e.message}"
   end
   error err unless err.empty?
 end
@@ -116,7 +116,7 @@ Given(/^the user expects an error in a multi_find_all lookup matching all elemen
     )
     err = "Expected an error matching all elements with results."
   rescue RuntimeError => e
-    puts "Caught expected error: #{e.message}"
+    log "Caught expected error: #{e.message}"
   end
   error err unless err.empty?
 end
