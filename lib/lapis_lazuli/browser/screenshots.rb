@@ -6,6 +6,9 @@
 # All rights reserved.
 #
 
+require 'cucumber/core/test/case'
+require 'cucumber/core/test/step'
+
 module LapisLazuli
   module BrowserModule
 
@@ -82,10 +85,6 @@ module LapisLazuli
           end
           world.log.debug "Screenshot saved: #{fileloc}"
 
-          # Try to store the screenshot name
-          if world.respond_to? :annotate
-            world.annotate :screenshot => fileloc
-          end
         rescue RuntimeError => e
           world.log.debug "Failed to save screenshot to '#{fileloc}'. Error message #{e.message}"
         end

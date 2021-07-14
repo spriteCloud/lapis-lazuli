@@ -12,6 +12,6 @@ thread = Thread.new { server.start }
 
 # If this file was executed manually, let's wait for input
 if __FILE__ == $0
-  puts "Press enter to shut down the server."
+  log "Press enter to shut down the server."
   gets
 end

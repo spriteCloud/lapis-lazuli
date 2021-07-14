@@ -1,8 +1,8 @@
 @button @p
 Feature: Buttons
-  When I want to test the Lapis Lazuli library
-  I want to run a webserver with some test files
-  And execute the each library function that handles buttons.
+When I want to test the Lapis Lazuli library
+I want to run a webserver with some test files
+And execute the each library function that handles buttons.
 
   @button_01
   Scenario: button_01 - Find First
@@ -36,3 +36,4 @@ Feature: Buttons
     Given I navigate to the button test page
     And I click the last button
     Then within 1 seconds I should see "last clicked"
+

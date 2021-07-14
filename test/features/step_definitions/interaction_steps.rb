@@ -45,7 +45,6 @@ Given(/I click (the|a) (first|last|random|[0-9]+[a-z]+) (.*)$/) do |arg1, index,
   type_element.click
 end
 
-
 Given(/^I create a firefox browser named "(.*?)"(?: with proxy to "(.*?)")?$/) do |name, proxy_url|
   b = nil
   if proxy_url
@@ -81,14 +80,14 @@ end
 When(/^I wait for (class )?"(.*?)" and name it "(.*?)"$/) do |type, id, name|
   type = 'id' if type.nil? || type.empty?
   type.strip!
-  element = browser.wait(:element => {type.to_sym => id})
+  element = browser.wait(:element => { type.to_sym => id })
   scenario.storage.set(name, element)
 end
 
 When(/^no error should be thrown when waiting for "(.*?)"$/) do |id|
   begin
     elm = browser.wait(
-      :element => {:id => id},
+      :element => { :id => id },
       :timeout => 3,
       :throw => false
     )
@@ -162,7 +161,6 @@ Then(/^I should be able to click the first button by click type (.*?)$/) do |typ
   )
 end
 
-
 Then(/^I should be able to click the first button by force click$/) do
   elem = browser.button(:id => 'first')
   browser.force_click(elem)
@@ -174,7 +172,7 @@ Then(/^I should be able to click the first button by force click$/) do
 end
 
 Given(/^I set environment variable "(.*?)" to "(.*?)"$/) do |var, val|
-  ENV[var]=val
+  ENV[var] = val
 end
 
 Given(/^I annotate a step with (.*?)$/) do |data|
@@ -193,25 +191,16 @@ end
 Given(/^I use browser bindings "(.*?)"$/) do |bindings|
   require 'selenium-webdriver'
   case bindings
-    when '1'
-      profile = Selenium::WebDriver::Firefox::Profile.new
-      profile['general.useragent.override'] = "CUSTOM-USER-AGENT"
-      browser.restart :firefox, profile: profile
-    when '2'
-      switches = %w[--user-agent=CUSTOM-CHROME-USER-AGENT]
-      browser.restart :chrome, :switches => switches
-    when '3'
-      caps = Selenium::WebDriver::Remote::Capabilities.chrome(
-        "chromeOptions" => {
-          "args" => [
-            '--start-maximized'
-          ]
-        }
-      )
-      browser.restart :chrome, desired_capabilities: caps
-      browser.window.maximize
-    else
-      error "Requested binding setup does not exist. Requested #{bindings}"
+  when '1'
+    profile = Selenium::WebDriver::Firefox::Profile.new
+    profile['general.useragent.override'] = "CUSTOM-USER-AGENT"
+    browser.restart :firefox, options: { profile: profile }
+  when '2'
+    browser.restart :chrome, options: { args: ['--user-agent=CUSTOM-CHROME-USER-AGENT'] }
+  when '3'
+    browser.restart :chrome, options: { args: ['--start-maximized'] }
+  else
+    error "Requested binding setup does not exist. Requested #{bindings}"
   end
 end
 

@@ -34,7 +34,6 @@ require "lapis_lazuli/world/config"
 require "lapis_lazuli/world/hooks"
 require "lapis_lazuli/world/variable"
 require "lapis_lazuli/world/error"
-require "lapis_lazuli/world/annotate"
 require "lapis_lazuli/world/logging"
 require "lapis_lazuli/world/browser"
 require "lapis_lazuli/world/api"
@@ -49,7 +48,6 @@ module LapisLazuli
   include LapisLazuli::WorldModule::Hooks
   include LapisLazuli::WorldModule::Variable
   include LapisLazuli::WorldModule::Error
-  include LapisLazuli::WorldModule::Annotate
   include LapisLazuli::WorldModule::Logging
   include LapisLazuli::WorldModule::Browser
   include LapisLazuli::WorldModule::API
